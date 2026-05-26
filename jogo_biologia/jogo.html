@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Corpo em Ação - Versão Completa com Imagens no Quiz</title>
+  <style>
+    :root {
+      --bg: #fef9f0;
+      --card: #ffffff;
+      --line: #f0dfc8;
+      --text: #2d1a0e;
+      --muted: #7a6555;
+      --primary: #e85d04;
+      --primary-soft: #fff0e0;
+      --ok: #2d8a4e;
+      --ok-soft: #d4f5df;
+      --err: #c62828;
+      --err-soft: #ffe0e0;
+      --warn: #e6a817;
+      --shadow: 0 12px 28px rgba(80, 40, 0, 0.10);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
+      background: linear-gradient(135deg, #fff8e1 0%, #e1f5fe 33%, #f3e5f5 66%, #e8f5e9 100%);
+      background-attachment: fixed;
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .app {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    .header,
+    .panel {
+      background: var(--card);
+      border: 2px solid #e0c9a6;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .header {
+      padding: 18px;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #fff3e0 0%, #e3f2fd 50%, #f3e5f5 100%);
+      border: 2px solid #ffcc80;
+    }
+
+    .header h1 {
+      margin: 0 0 8px;
+      font-size: 1.8rem;
+      background: linear-gradient(90deg, #e85d04, #7e57c2, #2196f3, #43a047);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .topbar {
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .stats,
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-weight: bold;
+      font-size: 0.95rem;
+      border: 2px solid;
+    }
+
+    .pill:nth-child(1) { background: #e3f2fd; color: #1565c0; border-color: #90caf9; }
+    .pill:nth-child(2) { background: #fff3e0; color: #e65100; border-color: #ffcc80; }
+    .pill:nth-child(3) { background: #f3e5f5; color: #6a1b9a; border-color: #ce93d8; }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.98rem;
+      transition: 0.15s ease;
+      font-family: inherit;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:disabled { opacity: 0.42; cursor: default; transform: none; }
+    button.primary { background: linear-gradient(135deg, #e85d04, #ff8a50); color: #fff; border: 2px solid #e85d04; }
+    button.secondary { background: linear-gradient(135deg, #42a5f5, #64b5f6); color: #fff; border: 2px solid #42a5f5; }
+    button.ghost { background: #fff; color: #6a1b9a; border: 2px solid #ce93d8; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel { padding: 18px; }
+
+    .question {
+      border: 2px solid #90caf9;
+      background: linear-gradient(135deg, #e3f2fd 0%, #e8f5e9 100%);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .question h2 { margin: 0 0 6px; font-size: 1.25rem; }
+    .question p { margin: 0; line-height: 1.45; }
+
+    /* Área de Jogo Padrão (Imagens) */
+    .game-area {
+      display: grid;
+      grid-template-columns: minmax(310px, 1fr) minmax(280px, 0.75fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .scene-card {
+      border: 2px solid #ffcc80;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #fffde7 0%, #fff8e1 100%);
+      padding: 10px;
+    }
+
+    .scene {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      max-height: 650px;
+      min-height: 430px;
+      margin: 0 auto;
+      overflow: hidden;
+      border-radius: 16px;
+      background: radial-gradient(circle at top, #fffef5 0%, #fef9f0 45%, #fdf3e3 100%);
+      border: 2px solid #ffcc80;
+    }
+
+    .scene.head { aspect-ratio: 1 / 1; max-height: 560px; }
+    .scene.digestive { aspect-ratio: 4 / 5.1; }
+    .scene.hygiene { aspect-ratio: 4 / 4.8; }
+
+    .scene img.bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .fallback-scene {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      text-align: center;
+      color: #334155;
+      background: radial-gradient(circle at center, #ffffff 0%, #eff6ff 78%);
+    }
+
+    .fallback-art { width: min(80%, 360px); height: auto; opacity: 0.92; }
+
+    .hotspot {
+      position: absolute;
+      z-index: 3;
+      border: 2px solid rgba(37, 99, 235, 0.15);
+      background: rgba(255, 255, 255, 0.02);
+      color: transparent;
+      cursor: pointer;
+      border-radius: 999px;
+      padding: 0;
+    }
+
+    .show-hotspots .hotspot {
+      border: 3px solid rgba(37, 99, 235, 0.55);
+      background: rgba(219, 234, 254, 0.38);
+      color: #1e3a8a;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
+    .hotspot.active {
+      border: 3px solid rgba(232, 93, 4, 0.8);
+      background: rgba(255, 240, 224, 0.45);
+      box-shadow: 0 0 0 6px rgba(232, 93, 4, 0.14);
+      color: transparent;
+    }
+
+    .show-hotspots .hotspot.active { color: #bf360c; }
+
+    .hotspot.ok {
+      border: 3px solid rgba(67, 160, 71, 0.95);
+      background: rgba(212, 245, 223, 0.74);
+      color: var(--ok);
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    .show-hotspots .hotspot.ok { color: var(--ok); }
+
+    .placed-token {
+      position: absolute;
+      z-index: 4;
+      width: 58px;
+      height: 58px;
+      transform: translate(-50%, -50%);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 3px solid #66bb6a;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 10px 18px rgba(80, 40, 0, 0.15);
+      animation: pop 0.18s ease-out;
+      overflow: hidden;
+    }
+
+    .placed-token img { width: 48px; height: 48px; object-fit: contain; }
+    .placed-token .emoji { font-size: 2rem; }
+
+    @keyframes pop {
+      from { transform: translate(-50%, -50%) scale(0.82); opacity: 0.2; }
+      to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    }
+
+    .items { display: grid; gap: 10px; }
+
+    .item {
+      display: grid;
+      grid-template-columns: 60px 1fr;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      background: #fff;
+      border: 2px solid #e0c9a6;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: 0.15s ease;
+      text-align: left;
+      color: var(--text);
+    }
+
+    .item:hover { transform: translateY(-1px); }
+
+    .item.selected {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+      box-shadow: 0 0 0 5px rgba(232, 93, 4, 0.12);
+    }
+
+    .item.done { opacity: 0.45; cursor: default; transform: none; }
+
+    .icon-box {
+      width: 60px;
+      height: 60px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #fffde7, #fff3e0);
+      border: 2px solid #ffcc80;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    .icon-box img { width: 50px; height: 50px; object-fit: contain; }
+    .icon-box .emoji { font-size: 2.15rem; line-height: 1; }
+
+    .item strong { display: block; margin-bottom: 4px; font-size: 1.04rem; }
+    .item small { color: var(--muted); line-height: 1.35; display: block; }
+
+    /* Estilos da nova Área de Quiz (Fases 6+) */
+    .quiz-area {
+      background: #fff;
+      border: 2px solid #ce93d8;
+      border-radius: 18px;
+      padding: 24px;
+      display: none; /* Oculto por padrão */
+      flex-direction: column;
+      gap: 20px;
+      box-shadow: 0 8px 24px rgba(106, 27, 154, 0.08);
+    }
+
+    /* Contêiner da Imagem do Quiz */
+    .quiz-image-container {
+      width: 100%;
+      text-align: center;
+      display: none; /* Oculto até que haja imagem */
+    }
+
+    .quiz-image-container img {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 14px;
+      border: 2px solid #90caf9;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      object-fit: contain;
+      background: #f8fafc;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .quiz-option {
+      padding: 16px 20px;
+      border: 2px solid #e0c9a6;
+      border-radius: 14px;
+      background: #fff;
+      font-size: 1.1rem;
+      cursor: pointer;
+      text-align: left;
+      transition: 0.2s;
+      color: var(--text);
+    }
+
+    .quiz-option:hover:not(:disabled) {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+      transform: translateY(-2px);
+    }
+
+    .quiz-option.correct {
+      border-color: #43a047;
+      background: #e8f5e9;
+      color: #1b5e20;
+      font-weight: bold;
+    }
+
+    .quiz-option.wrong {
+      border-color: #e53935;
+      background: #ffebee;
+      color: #b71c1c;
+      opacity: 0.7;
+    }
+
+    .feedback {
+      margin-top: 14px;
+      min-height: 56px;
+      padding: 12px;
+      border-radius: 14px;
+      border: 2px solid #ce93d8;
+      background: #f3e5f5;
+      line-height: 1.4;
+      font-weight: bold;
+      color: #6a1b9a;
+    }
+
+    .feedback.ok { background: var(--ok-soft); border-color: #66bb6a; color: var(--ok); }
+    .feedback.err { background: var(--err-soft); border-color: #fecaca; color: var(--err); }
+
+    .info-box h2 { margin: 18px 0 8px; font-size: 1.15rem; }
+    .info-box h2:first-child { margin-top: 0; }
+    .info-box ul { margin: 8px 0 16px; padding-left: 20px; line-height: 1.5; }
+
+    .history {
+      border: 2px solid #90caf9;
+      border-radius: 14px;
+      background: #e3f2fd;
+      padding: 12px;
+      max-height: 250px;
+      overflow: auto;
+      font-size: 0.92rem;
+    }
+
+    .history p { margin: 0 0 8px; color: var(--muted); }
+    .history-item { margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #e5edf5; }
+
+    .asset-note {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.4;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      padding: 10px;
+      border-radius: 12px;
+      margin-top: 12px;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.58);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 20;
+    }
+
+    .modal.open { display: flex; }
+
+    .modal-card {
+      width: min(620px, 100%);
+      background: #fff;
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+      border: 3px solid #ffcc80;
+    }
+
+    .modal-card h2 {
+      margin-top: 0;
+      background: linear-gradient(90deg, #e85d04, #43a047);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .result-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 14px 0 18px; }
+    .result-card { padding: 12px; border-radius: 14px; border: 2px solid; }
+    .result-card:nth-child(1) { background: #fff3e0; border-color: #ffcc80; }
+    .result-card:nth-child(2) { background: #e3f2fd; border-color: #90caf9; }
+    .result-card:nth-child(3) { background: #e8f5e9; border-color: #81c784; }
+    .result-card:nth-child(4) { background: #f3e5f5; border-color: #ce93d8; }
+    .result-card strong { display: block; margin-top: 4px; font-size: 1.35rem; }
+
+    .modal-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    @media (max-width: 980px) {
+      .layout, .game-area { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      .app { padding: 12px; }
+      .header h1 { font-size: 1.5rem; }
+      .scene { min-height: 360px; }
+      .item { grid-template-columns: 52px 1fr; }
+      .icon-box { width: 52px; height: 52px; }
+      .result-grid { grid-template-columns: 1fr; }
+      .placed-token { width: 50px; height: 50px; }
+      .start-screen h1 { font-size: 2rem !important; }
+      .start-screen p { font-size: 1rem !important; }
+    }
+
+    .start-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: linear-gradient(135deg, #fff8e1 0%, #e1f5fe 25%, #f3e5f5 50%, #e8f5e9 75%, #fff3e0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .start-screen.hidden { display: none; }
+
+    .start-content {
+      max-width: 520px;
+      animation: fadeUp 0.5s ease-out;
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 28px;
+      padding: 40px 32px;
+      box-shadow: 0 16px 48px rgba(80, 40, 0, 0.12);
+      border: 3px solid #ffcc80;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .start-icon { font-size: 5rem; margin-bottom: 12px; line-height: 1; }
+    .start-screen h1 {
+      font-size: 2.6rem; margin: 0 0 10px;
+      background: linear-gradient(90deg, #e85d04, #ec407a, #7e57c2, #2196f3, #43a047);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .start-screen p { font-size: 1.12rem; color: #475569; line-height: 1.55; margin: 0 0 28px; }
+
+    .start-buttons { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .start-buttons button { padding: 14px 32px; font-size: 1.15rem; border-radius: 14px; min-width: 180px; }
+    .start-buttons .primary { background: linear-gradient(135deg, #e85d04, #ff8a50); box-shadow: 0 6px 20px rgba(232, 93, 4, 0.3); }
+    .start-buttons .ghost { background: #fff; color: #7e57c2; border: 3px solid #ce93d8; box-shadow: 0 6px 20px rgba(126, 87, 194, 0.15); }
+
+    .instr-modal {
+      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.58);
+      display: none; align-items: center; justify-content: center; padding: 18px; z-index: 110;
+    }
+    .instr-modal.open { display: flex; }
+    .instr-card {
+      width: min(560px, 100%); background: #fff; border-radius: 24px; padding: 28px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25); text-align: left; animation: fadeUp 0.3s ease-out; border: 3px solid #ce93d8;
+    }
+    .instr-card h2 { margin: 0 0 14px; font-size: 1.45rem; background: linear-gradient(90deg, #e85d04, #7e57c2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .instr-card ol { margin: 0 0 18px; padding-left: 22px; line-height: 1.7; font-size: 1.02rem; color: #334155; }
+    .instr-card .tip { background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 12px; font-size: 0.95rem; color: #92400e; margin-bottom: 18px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <!-- Start Screen -->
+  <div class="start-screen" id="startScreen">
+    <div class="start-content">
+      <div class="start-icon">🧬</div>
+      <h1>Corpo em Ação</h1>
+      <p>Jogo educacional de Biologia. Monte o corpo humano e responda desafios de biologia avançada!</p>
+      <div class="start-buttons">
+        <button class="primary" id="startPlayBtn">▶ Jogar</button>
+        <button class="ghost" id="startInstrBtn">📖 Instruções</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Instructions Modal -->
+  <div class="instr-modal" id="instrModal">
+    <div class="instr-card">
+      <h2>📖 Como jogar</h2>
+      <ol>
+        <li><strong>Fases 1 a 5:</strong> Clique em uma peça da lista e depois no local correto da imagem.</li>
+        <li><strong>Fases 6 a 10 (Quiz):</strong> Leia as perguntas avançadas de biologia e selecione a alternativa correta (ou Verdadeiro/Falso). Algumas questões podem ter imagens de apoio!</li>
+        <li>Cada acerto vale <strong>10 pontos</strong>. Erros tiram 2 pontos.</li>
+        <li>Complete todas as <strong>10 fases</strong> o mais rápido possível!</li>
+      </ol>
+      <div class="tip">💡 Dica: Nas fases de localizar, use o botão "Mostrar locais" se precisar de ajuda. Nas de quiz, analise bem as imagens e as alternativas!</div>
+      <button class="primary" id="closeInstrBtn" style="width:100%">Entendi!</button>
+    </div>
+  </div>
+
+  <div class="app">
+    <section class="header">
+      <h1>Biologia em Ação</h1>
+      <p class="subtitle">
+        Do básico de anatomia aos mistérios da genética e evolução. Mostre seus conhecimentos em todos os níveis!
+      </p>
+
+      <div class="topbar">
+        <div class="stats">
+          <div class="pill">Fase: <span id="levelLabel">1</span>/<span id="totalLevelsLabel">10</span></div>
+          <div class="pill">Pontos: <span id="scoreLabel">0</span></div>
+          <div class="pill">Tempo: <span id="timeLabel">00:00</span></div>
+        </div>
+        <div class="actions">
+          <button class="secondary" id="speakBtn">Ouvir pergunta</button>
+          <button class="ghost" id="toggleZonesBtn">Mostrar locais</button>
+          <button class="secondary" id="restartBtn">Reiniciar</button>
+          <button class="primary" id="csvBtn">Baixar CSV</button>
+        </div>
+      </div>
+    </section>
+
+    <main class="layout">
+      <section class="panel">
+        <div class="question">
+          <h2 id="levelTitle">Fase 1</h2>
+          <p id="questionText">Selecione uma peça e clique no lugar correto.</p>
+        </div>
+
+        <!-- Área Drag/Click (Fases 1 a 5) -->
+        <div class="game-area" id="dragArea">
+          <div class="scene-card">
+            <div class="scene" id="scene">
+              <div class="fallback-scene" id="fallbackScene"></div>
+              <img class="bg" id="sceneImage" alt="Cena da fase" />
+              <div id="hotspots"></div>
+              <div id="placedTokens"></div>
+            </div>
+          </div>
+          <div>
+            <div class="items" id="items"></div>
+            <div class="feedback" id="feedbackDrag">Escolha uma peça para começar.</div>
+          </div>
+        </div>
+
+        <!-- Nova Área Quiz (Fases 6 a 10) -->
+        <div class="quiz-area" id="quizArea">
+          <!-- Novo contêiner de imagem do Quiz -->
+          <div class="quiz-image-container" id="quizImageContainer">
+            <img id="quizImage" src="" alt="Imagem de apoio da questão" onerror="this.style.display='none'" />
+          </div>
+
+          <div class="quiz-options" id="quizOptions">
+            <!-- Os botões do quiz entrarão aqui dinamicamente -->
+          </div>
+          <div class="feedback" id="quizFeedback">Escolha a alternativa correta.</div>
+        </div>
+
+      </section>
+
+      <aside class="panel info-box">
+        <h2>Como jogar</h2>
+        <ul>
+          <li>Fases de Anatomia: Associe o nome ao lugar na imagem.</li>
+          <li>Fases de Quiz: Responda perguntas de biologia, evolução e genética.</li>
+          <li>Acerto: +10 pontos.</li>
+          <li>Erro: −2 pontos.</li>
+        </ul>
+
+        
+
+        <h2>Histórico recente</h2>
+        <div class="history" id="history"><p>Nenhuma ação registrada ainda.</p></div>
+      </aside>
+    </main>
+  </div>
+
+  <div class="modal" id="endModal">
+    <div class="modal-card">
+      <h2>Resultado final</h2>
+      <p>Parabéns, você concluiu todas as fases do jogo.</p>
+      <div class="result-grid">
+        <div class="result-card">Pontuação final<strong id="finalScore">0</strong></div>
+        <div class="result-card">Tentativas<strong id="finalAttempts">0</strong></div>
+        <div class="result-card">Acertos<strong id="finalCorrect">0</strong></div>
+        <div class="result-card">Tempo total<strong id="finalTime">00:00</strong></div>
+      </div>
+      <div class="modal-actions">
+        <button class="primary" id="playAgainBtn">Jogar novamente</button>
+        <button class="secondary" id="closeModalBtn">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ASSET_BASE = "assets";
+
+    const levels = [
+      // Fases 1 a 5 originais (tipo "drag")
+      {
+        type: "drag",
+        title: "Fase 1: Partes externas",
+        question: "Coloque as partes externas no local correto do corpo.",
+        image: `${ASSET_BASE}/fases/corpo-inteiro.png`,
+        fallback: "body",
+        sceneClass: "body",
+        pieces: [
+          { id: "cabeca", name: "Cabeça", hint: "Parte superior do corpo", icon: `${ASSET_BASE}/icones/cabeca.png`, emoji: "🙂" },
+          { id: "braco", name: "Braço", hint: "Ajuda a pegar e carregar objetos", icon: `${ASSET_BASE}/icones/braco.png`, emoji: "💪" },
+          { id: "mao", name: "Mão", hint: "Usamos para tocar e segurar", icon: `${ASSET_BASE}/icones/mao.png`, emoji: "✋" },
+          { id: "perna", name: "Perna", hint: "Ajuda na locomoção", icon: `${ASSET_BASE}/icones/perna.png`, emoji: "🦵" },
+          { id: "pe", name: "Pé", hint: "Ajuda a apoiar o corpo", icon: `${ASSET_BASE}/icones/pe.png`, emoji: "🦶" }
+        ],
+        hotspots: [
+          { id: "cabeca", label: "Cabeça", x: 43, y: 2, w: 14, h: 18 },
+          { id: "braco", label: "Braço", x: 27, y: 26, w: 14, h: 24 },
+          { id: "mao", label: "Mão", x: 26, y: 47, w: 12, h: 12 },
+          { id: "perna", label: "Perna", x: 39, y: 62, w: 12, h: 27 },
+          { id: "pe", label: "Pé", x: 34, y: 88, w: 17, h: 9 }
+        ]
+      },
+      {
+        type: "drag",
+        title: "Fase 2: Órgãos internos",
+        question: "Coloque cada órgão no local aproximado do corpo.",
+        image: `${ASSET_BASE}/fases/torso-orgaos.png`,
+        fallback: "torso",
+        sceneClass: "body",
+        pieces: [
+          { id: "pescoço", name: "Pescoço", hint: "Conecta a cabeça ao tronco", icon: `${ASSET_BASE}/icones/pescoço.png`, emoji: "🧠" },
+          { id: "pulmao", name: "Pulmões", hint: "Ajudam na respiração", icon: `${ASSET_BASE}/icones/pulmoes.png`, emoji: "🫁" },
+          { id: "coracao", name: "Coração", hint: "Bombeia o sangue", icon: `${ASSET_BASE}/icones/coracao.png`, emoji: "❤️" },
+          { id: "estomago", name: "Estômago", hint: "Ajuda na digestão", icon: `${ASSET_BASE}/icones/estomago.png`, emoji: "🥣" }
+        ],
+        hotspots: [
+          { id: "pescoço", label: "Pescoço", x: 42, y: 7, w: 16, h: 15 },
+          { id: "pulmao", label: "Pulmões", x: 33, y: 27, w: 24, h: 17 },
+          { id: "coracao", label: "Coração", x: 44, y: 36, w: 13, h: 11 },
+          { id: "estomago", label: "Estômago", x: 45, y: 52, w: 17, h: 13 }
+        ]
+      },
+      {
+        type: "drag",
+        title: "Fase 3: Sistema digestório",
+        question: "Monte partes do sistema digestório em uma visão ampliada.",
+        image: `${ASSET_BASE}/fases/sistema-digestorio.png`,
+        fallback: "digestive",
+        sceneClass: "digestive",
+        pieces: [
+          { id: "boca", name: "Boca", hint: "Por onde o alimento entra", icon: `${ASSET_BASE}/icones/boca.png`, emoji: "👄" },
+          { id: "esofago", name: "Esôfago", hint: "Leva o alimento até o estômago", icon: `${ASSET_BASE}/icones/esofago.png`, emoji: "〰️" },
+          { id: "figado", name: "Fígado", hint: "Ajuda no processamento dos alimentos", icon: `${ASSET_BASE}/icones/figado.png`, emoji: "🟤" },
+          { id: "intestino", name: "Intestino", hint: "Absorve nutrientes e forma resíduos", icon: `${ASSET_BASE}/icones/intestino.png`, emoji: "🌀" }
+        ],
+        hotspots: [
+          { id: "boca", label: "Boca", x: 28, y: 17, w: 16, h: 10 },
+          { id: "esofago", label: "Esôfago", x: 46, y: 22, w: 8, h: 25 },
+          { id: "figado", label: "Fígado", x: 31, y: 43, w: 20, h: 14 },
+          { id: "intestino", label: "Intestino", x: 36, y: 60, w: 28, h: 22 }
+        ]
+      },
+      {
+        type: "drag",
+        title: "Fase 4: Sentidos",
+        question: "Associe cada sentido à parte correta da cabeça.",
+        image: `${ASSET_BASE}/fases/cabeca-sentidos.png`,
+        fallback: "head",
+        sceneClass: "head",
+        pieces: [
+          { id: "visao", name: "Visão", hint: "Usamos os olhos para enxergar", icon: `${ASSET_BASE}/icones/olhos.png`, emoji: "👀" },
+          { id: "audicao", name: "Audição", hint: "Usamos os ouvidos para escutar", icon: `${ASSET_BASE}/icones/ouvido.png`, emoji: "👂" },
+          { id: "olfato", name: "Olfato", hint: "Usamos o nariz para sentir cheiros", icon: `${ASSET_BASE}/icones/nariz.png`, emoji: "👃" },
+          { id: "paladar", name: "Paladar", hint: "Usamos a língua para sentir sabores", icon: `${ASSET_BASE}/icones/lingua.png`, emoji: "👅" },
+          { id: "tato", name: "Tato", hint: "A pele ajuda a sentir toque e temperatura", icon: `${ASSET_BASE}/icones/pele.png`, emoji: "✋" }
+        ],
+        hotspots: [
+          { id: "visao", label: "Olhos", x: 35, y: 49, w: 30, h: 12 },
+          { id: "audicao", label: "Ouvidos", x: 7, y: 47, w: 17, h: 22 },
+          { id: "olfato", label: "Nariz", x: 43, y: 58, w: 10, h: 10 },
+          { id: "paladar", label: "Língua", x: 40, y: 68, w: 20, h: 12 },
+          { id: "tato", label: "Pele", x: 66, y: 57, w: 17, h: 24 }
+        ]
+      },
+      {
+        type: "drag",
+        title: "Fase 5: Hábitos de higiene",
+        question: "Associe cada hábito de higiene à parte correta.",
+        image: `${ASSET_BASE}/fases/higiene.png`,
+        fallback: "hygiene",
+        sceneClass: "hygiene",
+        pieces: [
+          { id: "pentear", name: "Pentear o cabelo", hint: "Cuidado com o cabelo", icon: `${ASSET_BASE}/icones/pentear.png`, emoji: "🪮" },
+          { id: "escovar", name: "Escovar os dentes", hint: "Higiene da boca e dos dentes", icon: `${ASSET_BASE}/icones/escovar-dentes.png`, emoji: "🪥" },
+          { id: "lavar_maos", name: "Lavar as mãos", hint: "Higiene das mãos", icon: `${ASSET_BASE}/icones/lavar-maos.png`, emoji: "🧼" },
+          { id: "tomar_banho", name: "Tomar banho", hint: "Higiene do corpo", icon: `${ASSET_BASE}/icones/banho.png`, emoji: "🚿" }
+        ],
+        hotspots: [
+          { id: "pentear", label: "Cabelo", x: 54, y: 62, w: 20, h: 18 },
+          { id: "escovar", label: "Boca", x: 25, y: 20, w: 20, h: 18 },
+          { id: "lavar_maos", label: "Mãos", x: 54, y: 22, w: 20, h: 18 },
+          { id: "tomar_banho", label: "Corpo", x: 18, y: 62, w: 20, h: 18 }
+        ]
+      },
+      // Novas Fases 6 a 10 (tipo "quiz") AGORA COM IMAGENS!
+      {
+        type: "quiz",
+        title: "Fase 6: Biologia Celular",
+        question: "Qual é a principal função dos lisossomos nas células eucarióticas?",
+        image: `${ASSET_BASE}/fases/celula-lisossomos.png`, 
+        options: [
+          "Síntese de proteínas.",
+          "Digestão intracelular e degradação de resíduos.",
+          "Produção de energia na forma de ATP.",
+          "Armazenamento de material genético."
+        ],
+        correctAnswer: 1
+      },
+      {
+        type: "quiz",
+        title: "Fase 7: Evolução (Verdadeiro ou Falso)",
+        question: "As asas de um morcego e as de um inseto são consideradas estruturas homólogas porque possuem a mesma função e a mesma origem embrionária.",
+        image: `${ASSET_BASE}/fases/asas-homologas.png`, 
+        options: [
+          "Verdadeiro",
+          "Falso (São análogas, evoluíram para a mesma função mas de origens diferentes)."
+        ],
+        correctAnswer: 1
+      },
+      {
+        type: "quiz",
+        title: "Fase 8: Genética de Tipos Sanguíneos",
+        question: "Um homem com tipo sanguíneo AB tem filhos com uma mulher de tipo O. Quais são os únicos tipos sanguíneos possíveis para os filhos desse casal?",
+        image: `${ASSET_BASE}/fases/genetica-sangue.png`, 
+        options: [
+          "Apenas AB ou O.",
+          "A, B, AB ou O.",
+          "Apenas A ou B (A criança herda A ou B do pai, e O da mãe).",
+          "Apenas o tipo O."
+        ],
+        correctAnswer: 2
+      },
+      {
+        type: "quiz",
+        title: "Fase 9: Respiração Celular",
+        question: "O ciclo de Krebs é uma etapa fundamental da respiração celular aeróbica. Onde ele ocorre nas células eucarióticas?",
+        image: `${ASSET_BASE}/fases/mitocondria.png`, 
+        options: [
+          "No citosol.",
+          "Na membrana celular.",
+          "Na matriz mitocondrial.",
+          "No estroma do cloroplasto."
+        ],
+        correctAnswer: 2
+      },
+      {
+        type: "quiz",
+        title: "Fase 10: Fisiologia Animal",
+        question: "Verdadeiro ou Falso: No sistema circulatório dos mamíferos, TODAS as artérias transportam sangue rico em oxigênio (arterial).",
+        image: `${ASSET_BASE}/fases/sistema-circulatorio.png`, 
+        options: [
+          "Verdadeiro",
+          "Falso (A artéria pulmonar leva sangue pobre em oxigênio para os pulmões)."
+        ],
+        correctAnswer: 1
+      }
+    ];
+
+    let currentLevel = 0;
+    let selectedPiece = null;
+    let score = 0;
+    let attempts = 0;
+    let correct = 0;
+    let startedAt = Date.now();
+    let logs = [];
+    let showHotspots = false;
+    let timerInterval = null;
+    let gameStarted = false;
+
+    const levelLabel = document.getElementById("levelLabel");
+    const totalLevelsLabel = document.getElementById("totalLevelsLabel");
+    const scoreLabel = document.getElementById("scoreLabel");
+    const timeLabel = document.getElementById("timeLabel");
+    const levelTitle = document.getElementById("levelTitle");
+    const questionText = document.getElementById("questionText");
+    
+    // Áreas do layout
+    const dragArea = document.getElementById("dragArea");
+    const quizArea = document.getElementById("quizArea");
+    const toggleZonesBtn = document.getElementById("toggleZonesBtn");
+
+    // Elementos Drag/Drop
+    const scene = document.getElementById("scene");
+    const sceneImage = document.getElementById("sceneImage");
+    const fallbackScene = document.getElementById("fallbackScene");
+    const hotspotsEl = document.getElementById("hotspots");
+    const placedTokens = document.getElementById("placedTokens");
+    const items = document.getElementById("items");
+    const feedbackDrag = document.getElementById("feedbackDrag");
+
+    // Elementos Quiz
+    const quizImageContainer = document.getElementById("quizImageContainer");
+    const quizImage = document.getElementById("quizImage");
+    const quizOptionsEl = document.getElementById("quizOptions");
+    const quizFeedback = document.getElementById("quizFeedback");
+
+    const historyEl = document.getElementById("history");
+    const endModal = document.getElementById("endModal");
+
+    totalLevelsLabel.textContent = levels.length;
+
+    function formatTime(ms) {
+      const total = Math.floor(ms / 1000);
+      const min = String(Math.floor(total / 60)).padStart(2, "0");
+      const sec = String(total % 60).padStart(2, "0");
+      return `${min}:${sec}`;
+    }
+
+    function updateTimer() {
+      timeLabel.textContent = formatTime(Date.now() - startedAt);
+    }
+
+    function setDragFeedback(message, type = "") {
+      feedbackDrag.textContent = message;
+      feedbackDrag.className = `feedback ${type}`.trim();
+    }
+
+    function setQuizFeedback(message, type = "") {
+      quizFeedback.textContent = message;
+      quizFeedback.className = `feedback ${type}`.trim();
+    }
+
+    function shuffle(array) {
+      return [...array].sort(() => Math.random() - 0.5);
+    }
+
+    function logAction(itemInfo, result) {
+      logs.push({
+        fase: currentLevel + 1,
+        item: itemInfo.name,
+        resultado: result,
+        tempo: formatTime(Date.now() - startedAt),
+        pontuacao: score
+      });
+      renderHistory();
+    }
+
+    function renderHistory() {
+      if (!logs.length) {
+        historyEl.innerHTML = "<p>Nenhuma ação registrada ainda.</p>";
+        return;
+      }
+      historyEl.innerHTML = logs.slice(-10).reverse().map(log => `
+        <div class="history-item">
+          <strong>Fase ${log.fase}</strong> - ${log.item}<br>
+          Resultado: ${log.resultado}<br>
+          Tempo: ${log.tempo} | Pontos: ${log.pontuacao}
+        </div>
+      `).join("");
+    }
+
+    function fallbackSVG(kind) {
+      const templates = {
+        body: `<svg class="fallback-art" viewBox="0 0 300 420"><circle cx="150" cy="55" r="38" fill="#fde7d7" stroke="#e8b08d" stroke-width="3"/><path d="M105 115 Q150 80 195 115 L215 220 Q190 255 150 255 Q110 255 85 220Z" fill="#9fd0f3" stroke="#69b1e5" stroke-width="3"/><path d="M95 145 Q58 190 67 260" stroke="#fde7d7" stroke-width="26" stroke-linecap="round"/><path d="M205 145 Q242 190 233 260" stroke="#fde7d7" stroke-width="26" stroke-linecap="round"/><path d="M120 255 L110 380" stroke="#a5d8ff" stroke-width="32" stroke-linecap="round"/><path d="M180 255 L190 380" stroke="#a5d8ff" stroke-width="32" stroke-linecap="round"/><ellipse cx="108" cy="394" rx="32" ry="12" fill="#6b7280"/><ellipse cx="192" cy="394" rx="32" ry="12" fill="#6b7280"/></svg>`,
+        torso: `<svg class="fallback-art" viewBox="0 0 300 420"><circle cx="150" cy="55" r="38" fill="#fde7d7" stroke="#e8b08d" stroke-width="3"/><path d="M98 115 Q150 82 202 115 L220 255 Q185 300 150 300 Q115 300 80 255Z" fill="#dff2ff" stroke="#69b1e5" stroke-width="3"/><text x="150" y="190" font-size="50" text-anchor="middle">🫁</text><text x="137" y="230" font-size="32" text-anchor="middle">❤️</text><text x="160" y="270" font-size="32" text-anchor="middle">🥣</text></svg>`,
+        digestive: `<svg class="fallback-art" viewBox="0 0 300 420"><circle cx="150" cy="55" r="38" fill="#fde7d7" stroke="#e8b08d" stroke-width="3"/><path d="M80 110 Q150 75 220 110 L235 280 Q190 340 150 340 Q110 340 65 280Z" fill="#dff2ff" stroke="#69b1e5" stroke-width="3"/><path d="M150 90 C150 160 150 200 150 245" stroke="#f59e0b" stroke-width="8" stroke-linecap="round"/><path d="M105 230 C145 205 210 220 205 270 C200 320 110 310 115 260" fill="none" stroke="#f97316" stroke-width="10" stroke-linecap="round"/></svg>`,
+        head: `<svg class="fallback-art" viewBox="0 0 420 420"><circle cx="210" cy="210" r="145" fill="#fde7d7" stroke="#e8b08d" stroke-width="4"/><path d="M105 165 C115 65 305 65 315 165 C292 95 128 95 105 165Z" fill="#7a4b2d"/><ellipse cx="160" cy="195" rx="35" ry="16" fill="#fff" stroke="#64748b" stroke-width="3"/><ellipse cx="260" cy="195" rx="35" ry="16" fill="#fff" stroke="#64748b" stroke-width="3"/><circle cx="160" cy="195" r="8" fill="#1e3a8a"/><circle cx="260" cy="195" r="8" fill="#1e3a8a"/><path d="M210 215 C195 255 195 280 210 295" fill="none" stroke="#d29d77" stroke-width="6" stroke-linecap="round"/><path d="M170 330 Q210 360 250 330" fill="#ef4444" stroke="#c62828" stroke-width="4"/><path d="M95 220 C70 210 70 170 105 160" fill="none" stroke="#e0a984" stroke-width="12" stroke-linecap="round"/><path d="M325 220 C350 210 350 170 315 160" fill="none" stroke="#e0a984" stroke-width="12" stroke-linecap="round"/></svg>`,
+        hygiene: `<svg class="fallback-art" viewBox="0 0 320 400"><circle cx="160" cy="70" r="45" fill="#fde7d7" stroke="#e8b08d" stroke-width="3"/><path d="M120 62 C130 30 190 30 200 62" fill="#7a4b2d"/><path d="M115 135 Q160 110 205 135 L225 250 Q195 285 160 285 Q125 285 95 250Z" fill="#dff2ff" stroke="#69b1e5" stroke-width="3"/><text x="160" y="85" font-size="24" text-anchor="middle">🪥</text><text x="78" y="260" font-size="28" text-anchor="middle">🧼</text><text x="232" y="260" font-size="28" text-anchor="middle">🚿</text></svg>`
+      };
+      return templates[kind] || templates.body;
+    }
+
+    function renderLevel() {
+      const level = levels[currentLevel];
+      
+      levelLabel.textContent = currentLevel + 1;
+      levelTitle.textContent = level.title;
+      questionText.textContent = level.question;
+      scoreLabel.textContent = score;
+      
+      const isQuiz = level.type === "quiz";
+
+      if (isQuiz) {
+        // --- PREPARAÇÃO DO MODO QUIZ ---
+        dragArea.style.display = "none";
+        quizArea.style.display = "flex";
+        toggleZonesBtn.style.display = "none";
+
+        setQuizFeedback("Escolha a alternativa correta abaixo.");
+        quizOptionsEl.innerHTML = "";
+
+        // Lógica de exibição da imagem do Quiz
+        if (level.image) {
+          quizImage.src = level.image;
+          quizImage.style.display = "inline-block"; // Garante que reapareça se outra fase tiver ocultado via onerror
+          quizImageContainer.style.display = "block";
+        } else {
+          quizImageContainer.style.display = "none";
+        }
+
+        level.options.forEach((optText, idx) => {
+          const btn = document.createElement("button");
+          btn.className = "quiz-option";
+          btn.textContent = optText;
+          btn.onclick = () => handleQuizAnswer(btn, idx, level);
+          quizOptionsEl.appendChild(btn);
+        });
+
+      } else {
+        // --- PREPARAÇÃO DO MODO DRAG/CLICK (Imagens) ---
+        dragArea.style.display = "grid";
+        quizArea.style.display = "none";
+        toggleZonesBtn.style.display = "inline-block";
+
+        selectedPiece = null;
+        scene.className = `scene ${level.sceneClass || ""} ${showHotspots ? "show-hotspots" : ""}`.trim();
+        sceneImage.style.display = "block";
+        sceneImage.src = level.image;
+        sceneImage.alt = level.title;
+        fallbackScene.innerHTML = fallbackSVG(level.fallback);
+        sceneImage.onerror = () => { sceneImage.style.display = "none"; };
+        
+        hotspotsEl.innerHTML = "";
+        placedTokens.innerHTML = "";
+        items.innerHTML = "";
+        setDragFeedback("Escolha uma peça para começar.");
+
+        level.hotspots.forEach(hotspot => {
+          const btn = document.createElement("button");
+          btn.className = "hotspot";
+          btn.type = "button";
+          btn.dataset.id = hotspot.id;
+          btn.style.left = `${hotspot.x}%`;
+          btn.style.top = `${hotspot.y}%`;
+          btn.style.width = `${hotspot.w}%`;
+          btn.style.height = `${hotspot.h}%`;
+          btn.textContent = hotspot.label || "?";
+          btn.setAttribute("aria-label", `Local: ${hotspot.label || hotspot.id}`);
+          btn.addEventListener("click", () => tryPlace(hotspot, btn));
+          hotspotsEl.appendChild(btn);
+        });
+
+        shuffle(level.pieces).forEach(piece => {
+          const item = document.createElement("button");
+          item.className = "item";
+          item.type = "button";
+          item.dataset.id = piece.id;
+          item.innerHTML = `
+            <div class="icon-box">${iconElement(piece)}</div>
+            <div>
+              <strong>${piece.name}</strong>
+              <small>${piece.hint}</small>
+            </div>
+          `;
+          item.addEventListener("click", () => selectPiece(piece.id));
+          items.appendChild(item);
+        });
+      }
+    }
+
+    function iconElement(piece) {
+      return `<img src="${piece.icon}" alt="${piece.name}" onerror="this.replaceWith(Object.assign(document.createElement('span'), {className:'emoji', textContent:'${piece.emoji || '❔'}'}))">`;
+    }
+
+    // --- Lógica de Resposta para Fases do tipo QUIZ ---
+    function handleQuizAnswer(btn, selectedIdx, level) {
+      attempts++;
+      const isCorrect = (selectedIdx === level.correctAnswer);
+
+      if (isCorrect) {
+        score += 10;
+        correct++;
+        scoreLabel.textContent = score;
+        
+        btn.classList.add("correct");
+        setQuizFeedback("Exato! Você acertou a resposta.", "ok");
+        logAction({ name: "Quiz: " + level.title }, "acerto");
+        
+        // Desativa todos os botões e avança
+        [...quizOptionsEl.children].forEach(b => b.disabled = true);
+        setTimeout(nextLevel, 1500);
+      } else {
+        score = Math.max(0, score - 2);
+        scoreLabel.textContent = score;
+        
+        btn.classList.add("wrong");
+        btn.disabled = true;
+        setQuizFeedback("Resposta incorreta. Tente analisar outra alternativa! (−2 pontos)", "err");
+        logAction({ name: "Quiz: " + level.title }, "erro");
+      }
+    }
+
+    // --- Lógica de Resposta para Fases do tipo DRAG/CLICK ---
+    function selectPiece(id) {
+      const level = levels[currentLevel];
+      if (level.type === "quiz") return;
+
+      const piece = level.pieces.find(p => p.id === id);
+      const itemEl = items.querySelector(`[data-id="${id}"]`);
+      if (!piece || itemEl.classList.contains("done")) return;
+
+      selectedPiece = piece;
+      items.querySelectorAll(".item").forEach(el => el.classList.remove("selected"));
+      itemEl.classList.add("selected");
+      hotspotsEl.querySelectorAll(".hotspot").forEach(el => {
+        if (!el.classList.contains("ok")) el.classList.add("active");
+      });
+      setDragFeedback(`Agora clique no local correto para: ${piece.name}.`);
+    }
+
+    function tryPlace(hotspot, hotspotEl) {
+      if (!selectedPiece) {
+        setDragFeedback("Primeiro escolha uma peça da lista.", "err");
+        return;
+      }
+
+      attempts++;
+      const correctPlace = selectedPiece.id === hotspot.id;
+
+      if (correctPlace) {
+        score += 10;
+        correct++;
+        scoreLabel.textContent = score;
+        hotspotEl.classList.remove("active");
+        hotspotEl.classList.add("ok");
+        hotspotEl.disabled = true;
+
+        addPlacedToken(selectedPiece, hotspot);
+
+        const itemEl = items.querySelector(`[data-id="${selectedPiece.id}"]`);
+        itemEl.classList.remove("selected");
+        itemEl.classList.add("done");
+        itemEl.disabled = true;
+
+        setDragFeedback(`Muito bem! Você acertou: ${selectedPiece.name}.`, "ok");
+        logAction(selectedPiece, "acerto");
+        selectedPiece = null;
+        hotspotsEl.querySelectorAll(".hotspot").forEach(el => el.classList.remove("active"));
+
+        if (isDragLevelComplete()) setTimeout(nextLevel, 950);
+      } else {
+        score = Math.max(0, score - 2);
+        scoreLabel.textContent = score;
+        setDragFeedback("Ainda não é esse lugar. Tente novamente! (−2 pontos)", "err");
+        logAction(selectedPiece, "erro");
+      }
+    }
+
+    function addPlacedToken(piece, hotspot) {
+      const token = document.createElement("div");
+      token.className = "placed-token";
+      token.style.left = `${hotspot.x + hotspot.w / 2}%`;
+      token.style.top = `${hotspot.y + hotspot.h / 2}%`;
+      token.innerHTML = iconElement(piece);
+      placedTokens.appendChild(token);
+    }
+
+    function isDragLevelComplete() {
+      return [...items.querySelectorAll(".item")].every(item => item.classList.contains("done"));
+    }
+
+    // --- Controle de Fluxo do Jogo ---
+    function nextLevel() {
+      if (currentLevel < levels.length - 1) {
+        currentLevel++;
+        renderLevel();
+      } else {
+        showEnd();
+      }
+    }
+
+    function showEnd() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      document.getElementById("finalScore").textContent = score;
+      document.getElementById("finalAttempts").textContent = attempts;
+      document.getElementById("finalCorrect").textContent = correct;
+      document.getElementById("finalTime").textContent = formatTime(Date.now() - startedAt);
+      endModal.classList.add("open");
+    }
+
+    function resetGame() {
+      currentLevel = 0;
+      selectedPiece = null;
+      score = 0;
+      attempts = 0;
+      correct = 0;
+      logs = [];
+      startedAt = Date.now();
+      endModal.classList.remove("open");
+      renderHistory();
+      renderLevel();
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(updateTimer, 1000);
+      updateTimer();
+    }
+
+    function startGame() {
+      document.getElementById("startScreen").classList.add("hidden");
+      gameStarted = true;
+      resetGame();
+    }
+
+    function speakQuestion() {
+      if (!("speechSynthesis" in window)) {
+        alert("Seu navegador não possui leitura por voz.");
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const text = `${levelTitle.textContent}. ${questionText.textContent}`;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "pt-BR";
+      utterance.rate = 0.9;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function downloadCSV() {
+      const header = "fase,item,resultado,tempo,pontuacao\n";
+      const rows = logs.map(l => `${l.fase},"${l.item}",${l.resultado},${l.tempo},${l.pontuacao}`).join("\n");
+      const summary = `\nResumo,"pontuacao final",${score},"tempo total",${formatTime(Date.now() - startedAt)}\n`;
+      const csv = header + rows + summary;
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "corpo_em_acao_resultados.csv";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function toggleHotspots() {
+      showHotspots = !showHotspots;
+      toggleZonesBtn.textContent = showHotspots ? "Ocultar locais" : "Mostrar locais";
+      scene.classList.toggle("show-hotspots", showHotspots);
+    }
+
+    document.getElementById("restartBtn").addEventListener("click", resetGame);
+    document.getElementById("playAgainBtn").addEventListener("click", resetGame);
+    document.getElementById("closeModalBtn").addEventListener("click", () => endModal.classList.remove("open"));
+    document.getElementById("speakBtn").addEventListener("click", speakQuestion);
+    document.getElementById("csvBtn").addEventListener("click", downloadCSV);
+    toggleZonesBtn.addEventListener("click", toggleHotspots);
+
+    document.getElementById("startPlayBtn").addEventListener("click", startGame);
+    document.getElementById("startInstrBtn").addEventListener("click", () => {
+      document.getElementById("instrModal").classList.add("open");
+    });
+    document.getElementById("closeInstrBtn").addEventListener("click", () => {
+      document.getElementById("instrModal").classList.remove("open");
+    });
+
+    // Inicia a renderização para que a primeira fase apareça atrás do modal
+    renderLevel();
+  </script>
+</body>
+</html>

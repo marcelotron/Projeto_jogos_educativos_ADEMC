@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>Super Higiene - Aventura do Corpo Limpo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap');
+
+  :root {
+    --sky: #5BC0EB;
+    --sky-dark: #3A8FBF;
+    --mint: #7DDCC0;
+    --mint-dark: #4FAD90;
+    --cream: #FFF8E7;
+    --coral: #FF6B6B;
+    --coral-dark: #E04848;
+    --sun: #FFC93D;
+    --navy: #1B3A4B;
+    --tooth: #FFFCF0;
+    --tooth-shadow: #E5DFC9;
+    --plaque: #B8954A;
+    --plaque-dark: #8A6E33;
+    --gum: #FF8FA3;
+    --gum-dark: #D96985;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(160deg, #BDE5F2 0%, #C9F0E5 45%, #FFE5C7 100%);
+    min-height: 100vh;
+    overflow-x: hidden;
+    color: var(--navy);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(255,255,255,0.4) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(255,255,255,0.3) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Floating bubbles in background */
+  .bubble {
+    position: fixed;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.6), rgba(255,255,255,0.1));
+    pointer-events: none;
+    z-index: 0;
+    animation: float linear infinite;
+  }
+  @keyframes float {
+    0% { transform: translateY(110vh) scale(0.8); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+  }
+
+  #game {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .screen {
+    display: none;
+    width: 100%;
+    animation: screenIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .screen.active { display: flex; flex-direction: column; align-items: center; }
+
+  @keyframes screenIn {
+    from { opacity: 0; transform: translateY(30px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* ========== START SCREEN ========== */
+  h1.title {
+    font-family: 'Fredoka', sans-serif;
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    font-weight: 700;
+    color: white;
+    text-align: center;
+    text-shadow:
+      0 4px 0 var(--sky-dark),
+      0 8px 20px rgba(27,58,75,0.3);
+    margin-bottom: 12px;
+    letter-spacing: -1px;
+    transform: rotate(-2deg);
+  }
+
+  .subtitle {
+    font-size: 1.1rem;
+    color: var(--navy);
+    text-align: center;
+    margin-bottom: 24px;
+    font-weight: 600;
+    opacity: 0.85;
+  }
+
+  /* Animated mascot */
+  .mascot {
+    width: 180px;
+    height: 200px;
+    margin: 0 auto 30px;
+    position: relative;
+    animation: bounce 2.5s ease-in-out infinite;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-12px) rotate(3deg); }
+  }
+  .mascot svg { width: 100%; height: 100%; filter: drop-shadow(0 10px 20px rgba(27,58,75,0.25)); }
+
+  .menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .btn {
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    font-size: 1.25rem;
+    padding: 18px 24px;
+    border: none;
+    border-radius: 18px;
+    cursor: pointer;
+    background: var(--sky);
+    color: white;
+    box-shadow: 0 6px 0 var(--sky-dark), 0 8px 16px rgba(27,58,75,0.2);
+    transition: all 0.15s;
+    position: relative;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .btn:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--sky-dark), 0 3px 8px rgba(27,58,75,0.2); }
+  .btn:hover { filter: brightness(1.05); }
+  .btn.coral { background: var(--coral); box-shadow: 0 6px 0 var(--coral-dark), 0 8px 16px rgba(27,58,75,0.2); }
+  .btn.coral:active { box-shadow: 0 2px 0 var(--coral-dark), 0 3px 8px rgba(27,58,75,0.2); }
+  .btn.mint { background: var(--mint); color: var(--navy); box-shadow: 0 6px 0 var(--mint-dark), 0 8px 16px rgba(27,58,75,0.2); text-shadow: none; }
+  .btn.mint:active { box-shadow: 0 2px 0 var(--mint-dark), 0 3px 8px rgba(27,58,75,0.2); }
+  .btn.sun { background: var(--sun); color: var(--navy); box-shadow: 0 6px 0 #D9A920, 0 8px 16px rgba(27,58,75,0.2); text-shadow: none; }
+  .btn.sun:active { box-shadow: 0 2px 0 #D9A920, 0 3px 8px rgba(27,58,75,0.2); }
+  .btn[disabled] { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+  .btn.small { font-size: 1rem; padding: 12px 20px; }
+
+  /* ========== QUIZ ========== */
+  .quiz-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+  }
+  .quiz-progress {
+    flex: 1;
+    height: 14px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 10px;
+    margin: 0 14px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .quiz-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--mint), var(--sky));
+    border-radius: 10px;
+    transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+    width: 0%;
+  }
+  .score-pill {
+    background: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 1rem;
+    color: var(--navy);
+    box-shadow: 0 3px 0 rgba(27,58,75,0.15);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .question-card {
+    background: white;
+    border-radius: 28px;
+    padding: 32px 24px;
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(27,58,75,0.15), 0 4px 0 rgba(27,58,75,0.05);
+    margin-bottom: 24px;
+    text-align: center;
+    position: relative;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .question-card::before {
+    content: '?';
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 44px;
+    height: 44px;
+    background: var(--sun);
+    border-radius: 50%;
+    color: var(--navy);
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 4px 0 #D9A920;
+  }
+  .question-text {
+    font-size: 1.3rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--navy);
+    margin-top: 12px;
+  }
+
+  .answer-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    width: 100%;
+  }
+  .answer-buttons .btn { font-size: 1.4rem; padding: 22px; }
+
+  .feedback {
+    background: white;
+    border-radius: 20px;
+    padding: 18px 20px;
+    margin-top: 16px;
+    box-shadow: 0 6px 16px rgba(27,58,75,0.1);
+    display: none;
+    border-left: 6px solid var(--mint);
+  }
+  .feedback.wrong { border-left-color: var(--coral); }
+  .feedback.show { display: block; animation: feedIn 0.4s ease; }
+  @keyframes feedIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .feedback strong { display: block; margin-bottom: 6px; font-size: 1.1rem; font-family: 'Fredoka', sans-serif; }
+  .feedback.right strong { color: var(--mint-dark); }
+  .feedback.wrong strong { color: var(--coral-dark); }
+
+  /* ========== CANVAS GAMES ========== */
+  .canvas-screen { width: 100%; }
+  .canvas-instructions {
+    background: white;
+    border-radius: 20px;
+    padding: 14px 18px;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 12px rgba(27,58,75,0.1);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .icon-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--sun);
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    font-size: 1.4rem;
+  }
+
+  canvas {
+    width: 100%;
+    max-width: 680px;
+    height: auto;
+    background: linear-gradient(180deg, #FFB8C8 0%, #FF8FA3 100%);
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(27,58,75,0.2), inset 0 4px 12px rgba(0,0,0,0.1);
+    display: block;
+    touch-action: none;
+    cursor: grab;
+  }
+  canvas:active { cursor: grabbing; }
+
+  .progress-row {
+    width: 100%;
+    margin-top: 14px;
+    background: white;
+    border-radius: 18px;
+    padding: 14px 18px;
+    box-shadow: 0 4px 12px rgba(27,58,75,0.1);
+  }
+  .progress-row-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-weight: 700;
+    font-family: 'Fredoka', sans-serif;
+  }
+  .clean-bar {
+    height: 16px;
+    background: rgba(0,0,0,0.08);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .clean-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--coral), var(--sun), var(--mint));
+    background-size: 200% 100%;
+    border-radius: 10px;
+    transition: width 0.2s ease;
+    background-position: right;
+  }
+
+  .next-btn-wrap { width: 100%; margin-top: 16px; display: flex; justify-content: center; }
+
+  /* ========== END SCREEN ========== */
+  .trophy {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 16px;
+    animation: spin 3s ease-in-out infinite;
+  }
+  @keyframes spin {
+    0%, 100% { transform: rotate(-5deg) scale(1); }
+    50% { transform: rotate(5deg) scale(1.05); }
+  }
+  .final-stats {
+    background: white;
+    border-radius: 24px;
+    padding: 24px;
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(27,58,75,0.15);
+    margin-bottom: 20px;
+  }
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 2px dashed rgba(27,58,75,0.1);
+    font-weight: 700;
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-row .stat-value { font-family: 'Fredoka', sans-serif; font-size: 1.4rem; color: var(--sky-dark); }
+  .final-message {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 16px;
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(125,220,192,0.3), rgba(91,192,235,0.3));
+    border-radius: 18px;
+  }
+
+  /* Sparkle effects */
+  .sparkle {
+    position: absolute;
+    pointer-events: none;
+    width: 20px;
+    height: 20px;
+    background: var(--sun);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--sun), 0 0 20px white;
+    animation: sparkleAnim 0.8s ease-out forwards;
+  }
+  @keyframes sparkleAnim {
+    0% { transform: scale(0) rotate(0deg); opacity: 1; }
+    50% { transform: scale(1.2) rotate(180deg); opacity: 1; }
+    100% { transform: scale(0) rotate(360deg); opacity: 0; }
+  }
+
+  .toast {
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: white;
+    padding: 14px 24px;
+    border-radius: 30px;
+    box-shadow: 0 8px 24px rgba(27,58,75,0.2);
+    font-weight: 700;
+    font-family: 'Fredoka', sans-serif;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 100;
+    border-left: 5px solid var(--mint);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 480px) {
+    #game { padding: 14px; }
+    .question-text { font-size: 1.15rem; }
+    .answer-buttons .btn { font-size: 1.2rem; padding: 18px; }
+  }
+</style>
+</head>
+<body>
+<div id="game">
+
+  <div class="screen active" id="screen-start">
+    <div class="mascot">
+      <svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 100 20 Q 60 20 45 50 Q 30 90 40 140 Q 50 180 70 195 Q 85 205 90 175 Q 95 150 100 150 Q 105 150 110 175 Q 115 205 130 195 Q 150 180 160 140 Q 170 90 155 50 Q 140 20 100 20 Z"
+              fill="#FFFCF0" stroke="#1B3A4B" stroke-width="4"/>
+        <ellipse cx="75" cy="60" rx="12" ry="20" fill="white" opacity="0.7"/>
+        <circle cx="80" cy="95" r="9" fill="#1B3A4B"/>
+        <circle cx="120" cy="95" r="9" fill="#1B3A4B"/>
+        <circle cx="83" cy="92" r="3" fill="white"/>
+        <circle cx="123" cy="92" r="3" fill="white"/>
+        <path d="M 75 120 Q 100 145 125 120" fill="none" stroke="#1B3A4B" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="65" cy="115" r="6" fill="#FF8FA3" opacity="0.6"/>
+        <circle cx="135" cy="115" r="6" fill="#FF8FA3" opacity="0.6"/>
+      </svg>
+    </div>
+    <h1 class="title">Super Higiene</h1>
+    <p class="subtitle">A grande aventura do corpo limpo!</p>
+    <div class="menu-buttons">
+      <button class="btn coral" onclick="startGame()">▶ Começar Aventura</button>
+      <button class="btn small mint" onclick="showHowTo()">Como jogar?</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-quiz">
+    <div class="quiz-header">
+      <span style="font-size:1.6rem;">🧼</span>
+      <div class="quiz-progress"><div class="quiz-progress-bar" id="progBar"></div></div>
+      <div class="score-pill">⭐ <span id="quizScore">0</span></div>
+    </div>
+    <div class="question-card">
+      <p class="question-text" id="questionText">Carregando...</p>
+    </div>
+    <div class="answer-buttons">
+      <button class="btn mint" onclick="answer(true)">✓ VERDADE</button>
+      <button class="btn coral" onclick="answer(false)">✗ MENTIRA</button>
+    </div>
+    <div class="feedback" id="feedback">
+      <strong id="feedbackTitle"></strong>
+      <span id="feedbackText"></span>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-brush">
+    <div class="canvas-instructions">
+      <div class="icon-circle">🪥</div>
+      <div>Ótimo quiz! Agora arraste a escova nos dentes pra tirar toda a placa!</div>
+    </div>
+    <canvas id="brushCanvas" width="680" height="500"></canvas>
+    <div class="progress-row">
+      <div class="progress-row-label">
+        <span>Limpeza</span>
+        <span id="brushPct">0%</span>
+      </div>
+      <div class="clean-bar"><div class="clean-bar-fill" id="brushBar"></div></div>
+    </div>
+    <div class="next-btn-wrap">
+      <button class="btn sun" id="brushNext" disabled onclick="goToFloss()">Próximo: Fio Dental →</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-floss">
+    <div class="canvas-instructions">
+      <div class="icon-circle">🧵</div>
+      <div>Arraste o fio pra cima e pra baixo entre os dentes pra tirar os restos de comida!</div>
+    </div>
+    <canvas id="flossCanvas" width="680" height="500"></canvas>
+    <div class="progress-row">
+      <div class="progress-row-label">
+        <span>Espaços limpos</span>
+        <span id="flossPct">0/0</span>
+      </div>
+      <div class="clean-bar"><div class="clean-bar-fill" id="flossBar"></div></div>
+    </div>
+    <div class="next-btn-wrap">
+      <button class="btn sun" id="flossNext" disabled onclick="showEnd()">Ver Resultado Final →</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-end">
+    <div class="trophy">
+      <svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 100 20 Q 60 20 45 50 Q 30 90 40 140 Q 50 180 70 195 Q 85 205 90 175 Q 95 150 100 150 Q 105 150 110 175 Q 115 205 130 195 Q 150 180 160 140 Q 170 90 155 50 Q 140 20 100 20 Z"
+              fill="#FFFCF0" stroke="#1B3A4B" stroke-width="4"/>
+        <ellipse cx="75" cy="60" rx="12" ry="20" fill="white" opacity="0.7"/>
+        <circle cx="80" cy="95" r="9" fill="#1B3A4B"/>
+        <circle cx="120" cy="95" r="9" fill="#1B3A4B"/>
+        <circle cx="83" cy="92" r="3" fill="white"/>
+        <circle cx="123" cy="92" r="3" fill="white"/>
+        <path d="M 70 115 Q 100 150 130 115" fill="#FF6B6B" stroke="#1B3A4B" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M 75 125 Q 100 140 125 125" fill="white" opacity="0.4"/>
+        <circle cx="65" cy="115" r="7" fill="#FF8FA3" opacity="0.6"/>
+        <circle cx="135" cy="115" r="7" fill="#FF8FA3" opacity="0.6"/>
+        <text x="20" y="40" font-size="24" fill="#FFC93D">★</text>
+        <text x="170" y="50" font-size="20" fill="#FFC93D">★</text>
+        <text x="180" y="180" font-size="22" fill="#FFC93D">★</text>
+        <text x="10" y="170" font-size="18" fill="#FFC93D">★</text>
+      </svg>
+    </div>
+    <h1 class="title" style="font-size: clamp(2rem, 6vw, 3rem);">Parabéns!</h1>
+    <div class="final-stats">
+      <div class="stat-row"><span>📚 Quiz Corpo</span><span class="stat-value" id="finalQuiz">0/0</span></div>
+      <div class="stat-row"><span>🪥 Escovação</span><span class="stat-value" id="finalBrush">0%</span></div>
+      <div class="stat-row"><span>🧵 Fio Dental</span><span class="stat-value" id="finalFloss">0/0</span></div>
+      <div class="stat-row"><span>⭐ Pontuação</span><span class="stat-value" id="finalScore">0</span></div>
+    </div>
+    <div class="final-message" id="finalMessage"></div>
+    <button class="btn coral" onclick="resetGame()">🔄 Jogar Novamente</button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ============== AUDIO SYSTEM ============== */
+let audioCtx = null;
+function ensureAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+
+function tone(freq, duration, type='sine', volume=0.08, attack=0.005) {
+  ensureAudio();
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.value = freq;
+  const now = audioCtx.currentTime;
+  gain.gain.setValueAtTime(0, now);
+  gain.gain.linearRampToValueAtTime(volume, now + attack);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+  osc.connect(gain).connect(audioCtx.destination);
+  osc.start(now);
+  osc.stop(now + duration);
+}
+
+function sfxClick() { tone(720, 0.06, 'square', 0.04); }
+function sfxCorrect() {
+  tone(523.25, 0.12, 'sine', 0.07);
+  setTimeout(() => tone(659.25, 0.12, 'sine', 0.07), 90);
+  setTimeout(() => tone(783.99, 0.22, 'sine', 0.08), 180);
+}
+function sfxWrong() {
+  tone(196, 0.14, 'sawtooth', 0.06);
+  setTimeout(() => tone(146.83, 0.25, 'sawtooth', 0.06), 110);
+}
+function sfxSparkle() {
+  for (let i = 0; i < 4; i++) {
+    setTimeout(() => tone(1200 + Math.random()*700, 0.08, 'sine', 0.04), i*40);
+  }
+}
+function sfxBrush() {
+  ensureAudio();
+  const bufferSize = audioCtx.sampleRate * 0.08;
+  const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) data[i] = (Math.random()*2-1) * 0.4;
+  const source = audioCtx.createBufferSource();
+  source.buffer = buffer;
+  const gain = audioCtx.createGain();
+  gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'highpass';
+  filter.frequency.value = 1800;
+  source.connect(filter).connect(gain).connect(audioCtx.destination);
+  source.start();
+}
+function sfxFloss() {
+  tone(880, 0.06, 'triangle', 0.04);
+  setTimeout(() => tone(1100, 0.05, 'triangle', 0.03), 50);
+}
+function sfxCheer() {
+  const notes = [523, 659, 784, 1046];
+  notes.forEach((n, i) => setTimeout(() => tone(n, 0.2, 'triangle', 0.08), i*120));
+}
+
+/* ============== STATE / POOL DE PERGUNTAS ============== */
+const POOL_QUESTIONS = [
+  // Mãos
+  { q: "Devemos lavar as mãos apenas antes de comer.", a: false, why: "Falso! Precisamos lavar as mãos depois de usar o banheiro, ao chegar da rua e depois de brincar." },
+  { q: "Lavar as mãos com água e sabão ajuda a prevenir a transmissão de doenças.", a: true, why: "Isso mesmo! O sabão elimina vírus e bactérias que causam doenças." },
+  // Banho
+  { q: "Tomar banho todos os dias ajuda a remover o suor, sujeira e bactérias do corpo.", a: true, why: "Correto! O banho diário deixa a pele limpa e cheirosa, além de evitar doenças de pele." },
+  { q: "Passar sabonete apenas na barriga já é suficiente para ficar limpo no banho.", a: false, why: "Não! Precisamos lavar bem todas as partes: axilas, pés, partes íntimas, pescoço e atrás das orelhas." },
+  // Roupas
+  { q: "Podemos usar a mesma roupa íntima (calcinha ou cueca) por vários dias seguidos sem problema.", a: false, why: "Errado! Roupas íntimas e meias devem ser trocadas todos os dias para evitar fungos e bactérias." },
+  { q: "Roupas sujas e suadas devem ser colocadas para lavar, e não guardadas de volta no armário.", a: true, why: "Verdade! Roupas usadas acumulam suor e podem causar mau cheiro e alergias se usadas sem lavar." },
+  // Unhas
+  { q: "Manter as unhas curtas e limpas evita o acúmulo de sujeira e micróbios.", a: true, why: "Isso aí! Unhas compridas e sujas são esconderijos perfeitos para germes." },
+  { q: "Roer as unhas é um hábito higiênico e saudável.", a: false, why: "Falso! Roer unhas machuca os dedos e leva várias bactérias direto para dentro da sua boca." },
+  // Cabelo
+  { q: "Não é necessário lavar o cabelo, a água da chuva ou suor já limpa.", a: false, why: "Errado! O cabelo precisa ser lavado com shampoo para tirar a oleosidade e evitar caspas." },
+  { q: "Compartilhar pentes, bonés e presilhas de cabelo com outras pessoas não tem risco de pegar piolho.", a: false, why: "Falso! Piolhos passam muito facilmente quando emprestamos bonés, escovas de cabelo e toalhas." },
+  // Ouvidos e Pés
+  { q: "Secar bem entre os dedos dos pés após o banho evita o chulé e frieiras.", a: true, why: "Perfeito! Os fungos adoram lugares úmidos e quentinhos. Secar bem os pés resolve isso!" },
+  { q: "Devemos usar hastes flexíveis (cotonetes) para limpar a parte bem funda do ouvido.", a: false, why: "Cuidado! Colocar coisas no fundo do ouvido pode machucar ou empurrar a cera. Limpe apenas a parte de fora com a toalha." },
+  // Saúde Bucal
+  { q: "Devemos escovar os dentes pelo menos 2 vezes ao dia.", a: true, why: "Isso mesmo! O ideal é escovar de manhã, depois das refeições e antes de dormir." },
+  { q: "O fio dental serve só para tirar comida presa, não é tão importante.", a: false, why: "Na verdade, o fio dental remove a placa entre os dentes onde a escova não chega. Use todos os dias!" },
+  { q: "Cárie é causada por bactérias que vivem na nossa boca.", a: true, why: "Exato! As bactérias transformam restos de açúcar em ácido, que ataca o esmalte dos dentes." },
+  { q: "É bom visitar o dentista a cada 6 meses, mesmo sem dor.", a: true, why: "Verdade! O dentista detecta problemas cedo, antes de virarem dor ou cárie grande." },
+  { q: "A língua também precisa ser escovada ou raspada.", a: true, why: "Verdade! A língua acumula bactérias que causam mau hálito. Limpe ela na hora de escovar os dentes." },
+  { q: "Comer doces o tempo todo não faz mal nenhum aos dentes.", a: false, why: "Cuidado! O açúcar alimenta as bactérias que causam cárie. Coma com moderação e escove depois." },
+  // Geral
+  { q: "Espirrar ou tossir cobrindo a boca com o braço/cotovelo evita espalhar vírus.", a: true, why: "Isso mesmo! A 'etiqueta da tosse' protege as pessoas ao seu redor de pegarem gripes ou resfriados." },
+  { q: "Andar descalço em banheiros públicos ou vestiários é totalmente seguro.", a: false, why: "Falso! Esses locais úmidos podem ter fungos e bactérias. Use sempre um chinelo!" },
+  { q: "Devemos lavar bem as frutas e verduras antes de comê-las.", a: true, why: "Verdade! Lavar os alimentos tira agrotóxicos e bichinhos que podem dar dor de barriga." },
+  { q: "Dormir com a roupa suja que você brincou o dia todo na rua faz bem para a pele.", a: false, why: "Errado! A sujeira e o suor da rua podem causar alergias e sujar a sua cama toda." }
+];
+
+let currentQuestions = [];
+let state = {
+  qIndex: 0,
+  qCorrect: 0,
+  qTotal: 10, // Sempre 10 perguntas por jogatina
+  brushClean: 0,
+  flossDone: 0,
+  flossTotal: 0,
+  totalScore: 0,
+  answered: false
+};
+
+/* ============== SCREEN MGMT ============== */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showToast(msg, color='mint') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderLeftColor = color === 'coral' ? 'var(--coral)' : color === 'sun' ? 'var(--sun)' : 'var(--mint)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function showHowTo() {
+  sfxClick();
+  showToast('Quiz da Higiene → Escovar → Fio Dental. Boa sorte!', 'sun');
+}
+
+function startGame() {
+  sfxClick();
+  ensureAudio();
+  
+  // Sorteia aleatoriamente as perguntas do Banco e pega exatamente 10
+  currentQuestions = [...POOL_QUESTIONS].sort(() => Math.random() - 0.5).slice(0, 10);
+  
+  state = { 
+    qIndex: 0, 
+    qCorrect: 0, 
+    qTotal: currentQuestions.length, 
+    brushClean: 0, 
+    flossDone: 0, 
+    flossTotal: 0, 
+    totalScore: 0, 
+    answered: false 
+  };
+  
+  showScreen('screen-quiz');
+  loadQuestion();
+}
+
+/* ============== QUIZ ============== */
+function loadQuestion() {
+  state.answered = false;
+  const q = currentQuestions[state.qIndex];
+  document.getElementById('questionText').textContent = q.q;
+  document.getElementById('quizScore').textContent = state.qCorrect;
+  document.getElementById('progBar').style.width = ((state.qIndex / state.qTotal) * 100) + '%';
+  document.getElementById('feedback').classList.remove('show');
+  // Re-enable buttons
+  document.querySelectorAll('#screen-quiz .answer-buttons .btn').forEach(b => b.disabled = false);
+}
+
+function answer(choice) {
+  if (state.answered) return;
+  state.answered = true;
+  const q = currentQuestions[state.qIndex];
+  const fb = document.getElementById('feedback');
+  const fbTitle = document.getElementById('feedbackTitle');
+  const fbText = document.getElementById('feedbackText');
+  document.querySelectorAll('#screen-quiz .answer-buttons .btn').forEach(b => b.disabled = true);
+
+  if (choice === q.a) {
+    state.qCorrect++;
+    state.totalScore += 10;
+    fb.className = 'feedback right show';
+    fbTitle.textContent = '🎉 Acertou!';
+    sfxCorrect();
+    spawnSparkles();
+  } else {
+    fb.className = 'feedback wrong show';
+    fbTitle.textContent = '😅 Quase lá!';
+    sfxWrong();
+  }
+  fbText.textContent = q.why;
+  document.getElementById('quizScore').textContent = state.qCorrect;
+
+  setTimeout(() => {
+    state.qIndex++;
+    if (state.qIndex >= state.qTotal) {
+      document.getElementById('progBar').style.width = '100%';
+      setTimeout(() => goToBrush(), 600);
+    } else {
+      loadQuestion();
+    }
+  }, 2800);
+}
+
+function spawnSparkles() {
+  const card = document.querySelector('#screen-quiz .question-card');
+  const rect = card.getBoundingClientRect();
+  for (let i = 0; i < 6; i++) {
+    const s = document.createElement('div');
+    s.className = 'sparkle';
+    s.style.left = (Math.random() * rect.width) + 'px';
+    s.style.top = (Math.random() * rect.height) + 'px';
+    s.style.background = ['#FFC93D','#7DDCC0','#5BC0EB','#FF8FA3'][Math.floor(Math.random()*4)];
+    card.appendChild(s);
+    setTimeout(() => s.remove(), 800);
+  }
+  sfxSparkle();
+}
+
+/* ============== BRUSH GAME ============== */
+const TEETH = [
+  // Top jaw - 6 teeth
+  { x: 90,  y: 130, w: 75, h: 110, row: 'top' },
+  { x: 175, y: 125, w: 80, h: 120, row: 'top' },
+  { x: 265, y: 122, w: 80, h: 125, row: 'top' },
+  { x: 355, y: 122, w: 80, h: 125, row: 'top' },
+  { x: 445, y: 125, w: 80, h: 120, row: 'top' },
+  { x: 535, y: 130, w: 75, h: 110, row: 'top' },
+  // Bottom jaw - 6 teeth
+  { x: 90,  y: 280, w: 75, h: 100, row: 'bot' },
+  { x: 175, y: 285, w: 80, h: 105, row: 'bot' },
+  { x: 265, y: 288, w: 80, h: 110, row: 'bot' },
+  { x: 355, y: 288, w: 80, h: 110, row: 'bot' },
+  { x: 445, y: 285, w: 80, h: 105, row: 'bot' },
+  { x: 535, y: 280, w: 75, h: 100, row: 'bot' }
+];
+
+let brushCanvas, brushCtx, brushPlaqueCanvas, brushPlaqueCtx;
+let brushState = {
+  pointer: { x: -100, y: -100 },
+  pressed: false,
+  lastX: 0, lastY: 0,
+  velocity: 0,
+  cleanliness: 0
+};
+
+function goToBrush() {
+  showScreen('screen-brush');
+  initBrushGame();
+}
+
+function initBrushGame() {
+  brushCanvas = document.getElementById('brushCanvas');
+  brushCtx = brushCanvas.getContext('2d');
+  brushPlaqueCanvas = document.createElement('canvas');
+  brushPlaqueCanvas.width = brushCanvas.width;
+  brushPlaqueCanvas.height = brushCanvas.height;
+  brushPlaqueCtx = brushPlaqueCanvas.getContext('2d');
+
+  drawPlaqueLayer();
+
+  brushState = {
+    pointer: { x: -100, y: -100 },
+    pressed: false,
+    lastX: 0, lastY: 0,
+    velocity: 0,
+    cleanliness: 0
+  };
+  document.getElementById('brushNext').disabled = true;
+  document.getElementById('brushBar').style.width = '0%';
+  document.getElementById('brushPct').textContent = '0%';
+
+  attachBrushEvents();
+  requestAnimationFrame(brushLoop);
+}
+
+function drawPlaqueLayer() {
+  brushPlaqueCtx.clearRect(0, 0, brushPlaqueCanvas.width, brushPlaqueCanvas.height);
+  TEETH.forEach(t => {
+    drawToothShape(brushPlaqueCtx, t, '#B8954A');
+    brushPlaqueCtx.fillStyle = 'rgba(110, 85, 30, 0.6)';
+    for (let i = 0; i < 8; i++) {
+      const px = t.x + Math.random() * t.w;
+      const py = t.y + Math.random() * t.h;
+      brushPlaqueCtx.beginPath();
+      brushPlaqueCtx.arc(px, py, 4 + Math.random()*5, 0, Math.PI*2);
+      brushPlaqueCtx.fill();
+    }
+  });
+}
+
+function drawToothShape(ctx, t, fill) {
+  ctx.fillStyle = fill;
+  ctx.beginPath();
+  const r = 18;
+  const x = t.x, y = t.y, w = t.w, h = t.h;
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function getCanvasCoords(canvas, e) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const cx = (e.touches ? e.touches[0].clientX : e.clientX);
+  const cy = (e.touches ? e.touches[0].clientY : e.clientY);
+  return { x: (cx - rect.left) * scaleX, y: (cy - rect.top) * scaleY };
+}
+
+let brushAudioTimer = 0;
+function attachBrushEvents() {
+  const c = brushCanvas;
+  const onDown = (e) => {
+    e.preventDefault();
+    ensureAudio();
+    const p = getCanvasCoords(c, e);
+    brushState.pressed = true;
+    brushState.lastX = p.x; brushState.lastY = p.y;
+    brushState.pointer = p;
+  };
+  const onMove = (e) => {
+    e.preventDefault();
+    const p = getCanvasCoords(c, e);
+    brushState.pointer = p;
+    if (brushState.pressed) {
+      const dx = p.x - brushState.lastX;
+      const dy = p.y - brushState.lastY;
+      const d = Math.hypot(dx, dy);
+      brushState.velocity = d;
+      if (d > 1) {
+        brushPlaqueCtx.globalCompositeOperation = 'destination-out';
+        brushPlaqueCtx.lineWidth = 38;
+        brushPlaqueCtx.lineCap = 'round';
+        brushPlaqueCtx.beginPath();
+        brushPlaqueCtx.moveTo(brushState.lastX, brushState.lastY);
+        brushPlaqueCtx.lineTo(p.x, p.y);
+        brushPlaqueCtx.stroke();
+        brushPlaqueCtx.globalCompositeOperation = 'source-over';
+      }
+      const now = performance.now();
+      if (d > 4 && now - brushAudioTimer > 90) {
+        brushAudioTimer = now;
+        sfxBrush();
+      }
+      brushState.lastX = p.x; brushState.lastY = p.y;
+    }
+  };
+  const onUp = () => { brushState.pressed = false; };
+
+  c.addEventListener('mousedown', onDown);
+  c.addEventListener('mousemove', onMove);
+  c.addEventListener('mouseup', onUp);
+  c.addEventListener('mouseleave', onUp);
+  c.addEventListener('touchstart', onDown, { passive: false });
+  c.addEventListener('touchmove', onMove, { passive: false });
+  c.addEventListener('touchend', onUp);
+}
+
+function brushLoop() {
+  if (!document.getElementById('screen-brush').classList.contains('active')) return;
+  const ctx = brushCtx;
+  const c = brushCanvas;
+  ctx.clearRect(0, 0, c.width, c.height);
+  
+  const grad = ctx.createLinearGradient(0, 0, 0, c.height);
+  grad.addColorStop(0, '#FFB8C8');
+  grad.addColorStop(1, '#FF8FA3');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, c.width, c.height);
+
+  ctx.fillStyle = 'rgba(150, 50, 70, 0.35)';
+  ctx.beginPath();
+  ctx.ellipse(c.width/2, 260, c.width*0.45, 30, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  ctx.fillStyle = '#E6677F';
+  ctx.fillRect(60, 105, c.width - 120, 35);
+  ctx.fillRect(60, 380, c.width - 120, 35);
+  ctx.fillStyle = 'rgba(255,255,255,0.2)';
+  ctx.fillRect(60, 105, c.width - 120, 8);
+  ctx.fillRect(60, 380, c.width - 120, 8);
+
+  TEETH.forEach(t => {
+    drawToothShape(ctx, t, '#FFFCF0');
+    ctx.strokeStyle = '#E5DFC9';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.fillRect(t.x + 8, t.y + 12, 8, t.h * 0.3);
+  });
+
+  ctx.drawImage(brushPlaqueCanvas, 0, 0);
+  drawBrush(ctx, brushState.pointer.x, brushState.pointer.y, brushState.pressed);
+  updateBrushCleanliness();
+  requestAnimationFrame(brushLoop);
+}
+
+function drawBrush(ctx, x, y, pressed) {
+  if (x < 0 || y < 0) return;
+  ctx.save();
+  ctx.translate(x, y);
+  if (pressed) ctx.rotate(Math.sin(performance.now()/40) * 0.08);
+  ctx.fillStyle = '#3A8FBF';
+  ctx.fillRect(-12, 0, 24, 90);
+  ctx.fillStyle = '#5BC0EB';
+  ctx.fillRect(-10, 5, 20, 80);
+  ctx.fillStyle = '#FFFCF0';
+  ctx.beginPath();
+  ctx.roundRect ? ctx.roundRect(-22, -28, 44, 18, 8) : (ctx.rect(-22, -28, 44, 18));
+  ctx.fill();
+  ctx.fillStyle = '#E5E5E5';
+  for (let i = 0; i < 8; i++) {
+    ctx.fillRect(-20 + i*5, -38, 3, 12);
+  }
+  ctx.fillStyle = '#7DDCC0';
+  for (let i = 0; i < 7; i++) {
+    ctx.fillRect(-18 + i*5, -42, 2, 8);
+  }
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.fillRect(-8, 10, 4, 70);
+  ctx.restore();
+}
+
+let brushCleanCheck = 0;
+function updateBrushCleanliness() {
+  brushCleanCheck++;
+  if (brushCleanCheck % 8 !== 0) return;
+
+  const data = brushPlaqueCtx.getImageData(0, 0, brushPlaqueCanvas.width, brushPlaqueCanvas.height).data;
+  let totalArea = 0, cleanArea = 0;
+  TEETH.forEach(t => {
+    const step = 6;
+    for (let yy = t.y; yy < t.y + t.h; yy += step) {
+      for (let xx = t.x; xx < t.x + t.w; xx += step) {
+        totalArea++;
+        const idx = (Math.floor(yy) * brushPlaqueCanvas.width + Math.floor(xx)) * 4;
+        if (data[idx + 3] < 30) cleanArea++;
+      }
+    }
+  });
+  const pct = totalArea ? (cleanArea / totalArea) : 0;
+  brushState.cleanliness = pct;
+  const pctRound = Math.round(pct * 100);
+  document.getElementById('brushBar').style.width = pctRound + '%';
+  document.getElementById('brushPct').textContent = pctRound + '%';
+  if (pct >= 0.92) {
+    document.getElementById('brushNext').disabled = false;
+    if (!brushState.celebrated) {
+      brushState.celebrated = true;
+      sfxCheer();
+      showToast('Dentes brilhando! ✨', 'sun');
+    }
+  }
+}
+
+/* ============== FLOSS GAME ============== */
+const GAPS = [
+  { x: 165, y: 180, w: 16, done: 0 },
+  { x: 250, y: 180, w: 16, done: 0 },
+  { x: 335, y: 180, w: 16, done: 0 },
+  { x: 420, y: 180, w: 16, done: 0 },
+  { x: 505, y: 180, w: 16, done: 0 }
+];
+
+let flossCanvas, flossCtx;
+let flossState = {
+  pointer: { x: -100, y: -100 },
+  pressed: false,
+  lastY: 0,
+  upDownChanges: 0,
+  lastDir: 0,
+  activeGap: -1,
+  doneCount: 0
+};
+
+function goToFloss() {
+  sfxClick();
+  showScreen('screen-floss');
+  initFlossGame();
+}
+
+function initFlossGame() {
+  flossCanvas = document.getElementById('flossCanvas');
+  flossCtx = flossCanvas.getContext('2d');
+  GAPS.forEach(g => g.done = 0);
+  flossState = { pointer: { x: -100, y: -100 }, pressed: false, lastY: 0, lastDir: 0, activeGap: -1, doneCount: 0 };
+  state.flossTotal = GAPS.length;
+  document.getElementById('flossNext').disabled = true;
+  document.getElementById('flossBar').style.width = '0%';
+  document.getElementById('flossPct').textContent = '0/' + GAPS.length;
+  attachFlossEvents();
+  requestAnimationFrame(flossLoop);
+}
+
+function attachFlossEvents() {
+  const c = flossCanvas;
+  const onDown = (e) => {
+    e.preventDefault();
+    ensureAudio();
+    const p = getCanvasCoords(c, e);
+    flossState.pressed = true;
+    flossState.pointer = p;
+    flossState.lastY = p.y;
+    flossState.activeGap = -1;
+    GAPS.forEach((g, i) => {
+      if (g.done >= 1) return;
+      if (p.x >= g.x - g.w/2 - 6 && p.x <= g.x + g.w/2 + 6 && p.y > 130 && p.y < 350) {
+        flossState.activeGap = i;
+      }
+    });
+  };
+  const onMove = (e) => {
+    e.preventDefault();
+    const p = getCanvasCoords(c, e);
+    flossState.pointer = p;
+    if (flossState.pressed && flossState.activeGap >= 0) {
+      const dy = p.y - flossState.lastY;
+      const dir = dy > 1 ? 1 : (dy < -1 ? -1 : 0);
+      if (dir !== 0 && flossState.lastDir !== 0 && dir !== flossState.lastDir) {
+        const g = GAPS[flossState.activeGap];
+        g.done = Math.min(1, g.done + 0.18);
+        sfxFloss();
+        if (g.done >= 1 && !g.cheered) {
+          g.cheered = true;
+          flossState.doneCount++;
+          sfxSparkle();
+          spawnFlossSparkle(g.x, g.y);
+        }
+      }
+      if (dir !== 0) flossState.lastDir = dir;
+      const g = GAPS[flossState.activeGap];
+      if (Math.abs(p.x - g.x) > g.w/2 + 12) flossState.activeGap = -1;
+      flossState.lastY = p.y;
+    }
+  };
+  const onUp = () => { flossState.pressed = false; flossState.activeGap = -1; flossState.lastDir = 0; };
+  c.addEventListener('mousedown', onDown);
+  c.addEventListener('mousemove', onMove);
+  c.addEventListener('mouseup', onUp);
+  c.addEventListener('mouseleave', onUp);
+  c.addEventListener('touchstart', onDown, { passive: false });
+  c.addEventListener('touchmove', onMove, { passive: false });
+  c.addEventListener('touchend', onUp);
+}
+
+function spawnFlossSparkle(cx, cy) {
+  const wrap = document.getElementById('screen-floss');
+  const rect = flossCanvas.getBoundingClientRect();
+  const screenRect = wrap.getBoundingClientRect();
+  const scale = rect.width / flossCanvas.width;
+  const px = (cx * scale) + (rect.left - screenRect.left);
+  const py = (cy * scale) + (rect.top - screenRect.top);
+  for (let i = 0; i < 8; i++) {
+    const s = document.createElement('div');
+    s.className = 'sparkle';
+    s.style.position = 'absolute';
+    s.style.left = (px + (Math.random()-0.5)*60) + 'px';
+    s.style.top = (py + (Math.random()-0.5)*60) + 'px';
+    s.style.background = ['#FFC93D','#7DDCC0','#5BC0EB'][Math.floor(Math.random()*3)];
+    wrap.style.position = 'relative';
+    wrap.appendChild(s);
+    setTimeout(() => s.remove(), 800);
+  }
+}
+
+function flossLoop() {
+  if (!document.getElementById('screen-floss').classList.contains('active')) return;
+  const ctx = flossCtx;
+  const c = flossCanvas;
+  ctx.clearRect(0, 0, c.width, c.height);
+
+  const grad = ctx.createLinearGradient(0, 0, 0, c.height);
+  grad.addColorStop(0, '#FFB8C8');
+  grad.addColorStop(1, '#E6677F');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, c.width, c.height);
+
+  ctx.fillStyle = '#D9667F';
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(c.width, 0);
+  ctx.lineTo(c.width, 145);
+  ctx.bezierCurveTo(c.width*0.75, 150, c.width*0.25, 150, 0, 145);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = '#D9667F';
+  ctx.beginPath();
+  ctx.moveTo(0, c.height);
+  ctx.lineTo(c.width, c.height);
+  ctx.lineTo(c.width, 355);
+  ctx.bezierCurveTo(c.width*0.75, 350, c.width*0.25, 350, 0, 355);
+  ctx.closePath();
+  ctx.fill();
+
+  const toothW = 75;
+  const startX = 90;
+  const gap = 10;
+  for (let i = 0; i < 6; i++) {
+    const tx = startX + i * (toothW + gap);
+    drawCloseTooth(ctx, tx, 130, toothW, 130, true);
+    drawCloseTooth(ctx, tx, 230, toothW, 130, false);
+  }
+
+  GAPS.forEach((g, i) => {
+    if (g.done < 1) {
+      const op = 1 - g.done;
+      ctx.fillStyle = `rgba(180, 130, 50, ${op})`;
+      ctx.beginPath(); ctx.ellipse(g.x, 200, 6, 14, 0, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = `rgba(120, 90, 30, ${op*0.8})`;
+      ctx.beginPath(); ctx.ellipse(g.x - 2, 195, 2, 5, 0, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(g.x + 2, 220, 3, 6, 0, 0, Math.PI*2); ctx.fill();
+
+      if (g.done === 0 && flossState.activeGap !== i) {
+        ctx.strokeStyle = 'rgba(255, 201, 61, 0.7)';
+        ctx.lineWidth = 3;
+        ctx.setLineDash([6, 4]);
+        ctx.beginPath(); ctx.moveTo(g.x, 155); ctx.lineTo(g.x, 345); ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    } else {
+      const t = performance.now() / 200;
+      ctx.fillStyle = `rgba(255, 255, 255, ${0.5 + Math.sin(t + i)*0.3})`;
+      ctx.beginPath(); ctx.arc(g.x, 200, 5, 0, Math.PI*2); ctx.fill();
+    }
+  });
+
+  drawFloss(ctx, flossState.pointer.x, flossState.pointer.y, flossState.pressed);
+
+  const completed = GAPS.filter(g => g.done >= 1).length;
+  const pct = (completed / GAPS.length) * 100;
+  document.getElementById('flossBar').style.width = pct + '%';
+  document.getElementById('flossPct').textContent = completed + '/' + GAPS.length;
+
+  if (completed === GAPS.length) {
+    if (!flossState.celebrated) {
+      flossState.celebrated = true;
+      sfxCheer();
+      showToast('Todos os espaços limpos! 🎉', 'mint');
+    }
+    document.getElementById('flossNext').disabled = false;
+  }
+
+  requestAnimationFrame(flossLoop);
+}
+
+function drawCloseTooth(ctx, x, y, w, h, isTop) {
+  ctx.fillStyle = '#E5DFC9';
+  if (isTop) { roundedRectPath(ctx, x+2, y+2, w, h, 12); } 
+  else { roundedRectPath(ctx, x+2, y+2, w, h, 12); }
+  ctx.fill();
+  ctx.fillStyle = '#FFFCF0';
+  roundedRectPath(ctx, x, y, w, h, 12);
+  ctx.fill();
+  ctx.strokeStyle = '#E5DFC9';
+  ctx.lineWidth = 2;
+  roundedRectPath(ctx, x, y, w, h, 12);
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.fillRect(x + 10, y + (isTop ? 15 : 10), 8, h * 0.5);
+  ctx.strokeStyle = 'rgba(229, 223, 201, 0.7)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(x + w*0.5, y + 8); ctx.lineTo(x + w*0.5, y + h - 8); ctx.stroke();
+}
+
+function roundedRectPath(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r); ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h); ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r); ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath();
+}
+
+function drawFloss(ctx, x, y, pressed) {
+  if (x < 0 || y < 0) return;
+  ctx.save();
+  ctx.strokeStyle = pressed ? '#7DDCC0' : 'rgba(255,255,255,0.9)';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(x - 50, y); ctx.lineTo(x + 50, y); ctx.stroke();
+  ctx.fillStyle = '#FFCBA4';
+  ctx.beginPath(); ctx.ellipse(x - 60, y, 22, 16, 0, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = '#1B3A4B'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(x + 60, y, 22, 16, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.beginPath(); ctx.ellipse(x - 65, y - 4, 5, 3, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(x + 55, y - 4, 5, 3, 0, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+
+/* ============== END SCREEN ============== */
+function showEnd() {
+  sfxClick();
+  const brushPct = Math.round(brushState.cleanliness * 100);
+  const flossDone = GAPS.filter(g => g.done >= 1).length;
+  state.totalScore += Math.round(brushPct * 0.5); 
+  state.totalScore += flossDone * 10; 
+
+  document.getElementById('finalQuiz').textContent = state.qCorrect + '/' + state.qTotal;
+  document.getElementById('finalBrush').textContent = brushPct + '%';
+  document.getElementById('finalFloss').textContent = flossDone + '/' + GAPS.length;
+  document.getElementById('finalScore').textContent = state.totalScore;
+
+  let msg;
+  if (state.totalScore >= 180) msg = '⭐ Mestre da Higiene! Seu corpo todo agradece!';
+  else if (state.totalScore >= 130) msg = '😄 Muito bem! Continue cuidando assim da sua higiene!';
+  else if (state.totalScore >= 80) msg = '👍 Bom trabalho! Pratique um pouco mais e fica perfeito!';
+  else msg = '💪 Continua firme! Quanto mais você praticar, melhor fica!';
+  document.getElementById('finalMessage').textContent = msg;
+
+  showScreen('screen-end');
+  setTimeout(() => sfxCheer(), 300);
+}
+
+function resetGame() {
+  sfxClick();
+  showScreen('screen-start');
+}
+
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+    if (typeof r === 'number') r = [r,r,r,r];
+    this.beginPath();
+    this.moveTo(x + r[0], y); this.lineTo(x + w - r[1], y);
+    this.quadraticCurveTo(x + w, y, x + w, y + r[1]); this.lineTo(x + w, y + h - r[2]);
+    this.quadraticCurveTo(x + w, y + h, x + w - r[2], y + h); this.lineTo(x + r[3], y + h);
+    this.quadraticCurveTo(x, y + h, x, y + h - r[3]); this.lineTo(x, y + r[0]);
+    this.quadraticCurveTo(x, y, x + r[0], y); this.closePath();
+    return this;
+  };
+}
+
+function spawnBubbles() {
+  for (let i = 0; i < 12; i++) {
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    const size = 20 + Math.random() * 60;
+    b.style.width = size + 'px'; b.style.height = size + 'px';
+    b.style.left = Math.random() * 100 + 'vw';
+    b.style.animationDuration = (10 + Math.random() * 12) + 's';
+    b.style.animationDelay = (Math.random() * 10) + 's';
+    document.body.appendChild(b);
+  }
+}
+spawnBubbles();
+</script>
+</body>
+</html>

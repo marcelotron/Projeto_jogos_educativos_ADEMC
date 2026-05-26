@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alfagramas</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #314459; /* Cor de fundo escura das laterais */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .header-title {
+            width: 100%;
+            max-width: 900px;
+            color: #1abc9c;
+            font-size: 24px;
+            margin-bottom: 10px;
+            font-weight: normal;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stars {
+            color: #f1c40f;
+            font-size: 14px;
+        }
+        .stars span { color: #1abc9c; font-size: 12px; }
+
+        .game-container {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 900px;
+            height: 600px;
+            position: relative;
+            border-radius: 4px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 30px;
+            font-size: 28px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        /* Área Central do Jogo */
+        .play-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-grow: 1;
+        }
+
+        .image-container img {
+            max-height: 180px;
+            object-fit: contain;
+            margin-bottom: 20px;
+            /* Placeholder background caso a imagem não carregue */
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="%23f0f0f0"/><text x="50" y="50" font-family="Arial" font-size="12" text-anchor="middle" alignment-baseline="middle" fill="%23888">Imagem</text></svg>') no-repeat center center;
+            min-width: 180px;
+        }
+
+        /* Letras Soltas (Origem) */
+        .letters-source {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            min-height: 70px;
+        }
+
+        .letter-btn {
+            width: 65px;
+            height: 65px;
+            background-color: #646464;
+            color: white;
+            font-size: 38px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: 0 3px 0 #4a4a4a;
+            transition: transform 0.1s;
+            text-transform: lowercase;
+        }
+
+        .letter-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 0 0 #4a4a4a;
+        }
+
+        /* Área de Destino (Caixa com linhas) */
+        .target-area {
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            padding: 10px 20px;
+            display: flex;
+            gap: 10px;
+            min-width: 460px;
+            height: 85px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .target-slot {
+            width: 65px;
+            height: 65px;
+            border-bottom: 4px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Bottom Bar */
+        .bottom-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: #fff;
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            font-size: 30px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            gap: 15px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+        }
+
+        /* Modal de Sucesso (Oculto por padrão) */
+        #success-msg {
+            display: none;
+            color: #27ae60;
+            font-size: 32px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-title">
+        <span>ALFAGRAMAS: Letras em ordem alfabética</span>
+        <div class="stars">★★★☆☆ <span>(1 votes, average: 3,00)</span></div>
+    </div>
+
+    <div class="game-container">
+        <!-- Topo: Relógio e Pontuação -->
+        <div class="top-bar">
+            <div id="timer">1:48</div>
+            <div id="score">✓ 11</div>
+        </div>
+
+        <!-- Área de Jogo -->
+        <div class="play-area">
+            <div class="image-container">
+                <!-- Referência EXATA ao arquivo solicitado -->
+                <img src="image_94785f.png" alt="Árvore">
+            </div>
+
+            <!-- Letras que o usuário pode clicar -->
+            <div class="letters-source" id="source">
+                <!-- Preenchido via JavaScript -->
+            </div>
+
+            <!-- Espaços para formar a palavra -->
+            <div class="target-area" id="target">
+                <!-- Preenchido via JavaScript -->
+            </div>
+
+            <div id="success-msg">Correto! 🎉</div>
+        </div>
+
+        <!-- Rodapé: Controles -->
+        <div class="bottom-bar">
+            <button class="icon-btn">☰</button>
+            <div class="pagination">
+                <button class="icon-btn">◁</button>
+                <span>3 de 18</span>
+                <button class="icon-btn">▷</button>
+            </div>
+            <div class="controls">
+                <button class="icon-btn">🔊</button>
+                <button class="icon-btn">⛶</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuração do Nível
+        const targetWord = "arvore";
+        // As letras conforme mostradas embaralhadas na imagem
+        const initialScramble = ['r', 'r', 'a', 'v', 'o', 'e']; 
+        
+        // Estado do jogo
+        let letters = initialScramble.map((char, index) => ({
+            id: index,
+            char: char,
+            position: 'source' // Pode ser 'source' ou índice no target (0 a 5)
+        }));
+        
+        let targetSlots = new Array(targetWord.length).fill(null);
+        let timeInSeconds = 108; // 1:48
+        let timerInterval;
+
+        // Elementos do DOM
+        const sourceContainer = document.getElementById('source');
+        const targetContainer = document.getElementById('target');
+        const timerDisplay = document.getElementById('timer');
+        const successMsg = document.getElementById('success-msg');
+
+        // Iniciar Relógio
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeInSeconds++;
+                let minutes = Math.floor(timeInSeconds / 60);
+                let seconds = timeInSeconds % 60;
+                timerDisplay.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            }, 1000);
+        }
+
+        // Renderizar o estado atual na tela
+        function render() {
+            sourceContainer.innerHTML = '';
+            targetContainer.innerHTML = '';
+
+            // Desenhar os slots de destino
+            for (let i = 0; i < targetWord.length; i++) {
+                const slotDiv = document.createElement('div');
+                slotDiv.className = 'target-slot';
+                
+                // Se houver uma letra neste slot, renderizá-la
+                if (targetSlots[i] !== null) {
+                    const letterObj = letters.find(l => l.id === targetSlots[i]);
+                    const btn = createLetterButton(letterObj, () => moveToSource(letterObj.id, i));
+                    // Posicionamento absoluto para cobrir o slot
+                    btn.style.position = 'absolute'; 
+                    btn.style.top = '-10px';
+                    slotDiv.appendChild(btn);
+                }
+                
+                targetContainer.appendChild(slotDiv);
+            }
+
+            // Desenhar as letras disponíveis na origem
+            letters.forEach(letterObj => {
+                if (letterObj.position === 'source') {
+                    const btn = createLetterButton(letterObj, () => moveToTarget(letterObj.id));
+                    sourceContainer.appendChild(btn);
+                }
+            });
+
+            checkWinCondition();
+        }
+
+        // Criar um botão de letra
+        function createLetterButton(letterObj, onClickHandler) {
+            const btn = document.createElement('div');
+            btn.className = 'letter-btn';
+            btn.innerText = letterObj.char;
+            btn.onclick = onClickHandler;
+            return btn;
+        }
+
+        // Mover letra para a caixa de destino
+        function moveToTarget(letterId) {
+            // Encontrar o primeiro espaço vazio
+            const emptyIndex = targetSlots.indexOf(null);
+            if (emptyIndex !== -1) {
+                targetSlots[emptyIndex] = letterId;
+                letters.find(l => l.id === letterId).position = emptyIndex;
+                render();
+            }
+        }
+
+        // Devolver letra para a origem
+        function moveToSource(letterId, slotIndex) {
+            targetSlots[slotIndex] = null;
+            letters.find(l => l.id === letterId).position = 'source';
+            render();
+        }
+
+        // Checar se a palavra formada está correta
+        function checkWinCondition() {
+            // Verifica se todos os slots estão preenchidos
+            if (!targetSlots.includes(null)) {
+                // Monta a palavra atual baseada nos IDs contidos nos slots
+                const currentWord = targetSlots.map(id => letters.find(l => l.id === id).char).join('');
+                
+                if (currentWord === targetWord) {
+                    clearInterval(timerInterval);
+                    successMsg.style.display = 'block';
+                    // Desabilitar cliques após vencer
+                    document.querySelectorAll('.letter-btn').forEach(btn => btn.onclick = null);
+                }
+            }
+        }
+
+        // Inicialização
+        startTimer();
+        render();
+
+    </script>
+</body>
+</html>

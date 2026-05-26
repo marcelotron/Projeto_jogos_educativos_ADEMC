@@ -1,0 +1,1378 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Corrida — Quiz de Matemática</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Fredoka:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --grass-1:#3fa14a;
+    --grass-2:#2d7a36;
+    --track:#c95e3b;
+    --track-dark:#9d4426;
+    --track-line:#fff7e6;
+    --sky-1:#ffd64a;
+    --sky-2:#ffa12c;
+    --sky-3:#ff5f6d;
+    --player:#1f6feb;
+    --player-shirt:#ffd400;
+    --cpu:#e93a3a;
+    --cpu-shirt:#ffffff;
+    --ink:#16202a;
+    --paper:#fffdf6;
+    --right:#19c37d;
+    --wrong:#ff4757;
+    --gold:#ffd400;
+    --silver:#cfd6df;
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden;background:#0e1116;color:var(--ink);font-family:"Fredoka",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer}
+
+  /* ---------- Stage layout (responsive 16:9 stadium) ---------- */
+  #stage{
+    position:fixed;inset:0;
+    background:
+      radial-gradient(ellipse at 50% 90%, rgba(0,0,0,.35), transparent 60%),
+      linear-gradient(180deg, var(--sky-1) 0%, var(--sky-2) 35%, var(--sky-3) 70%, #4b2a52 100%);
+    overflow:hidden;
+    user-select:none;
+  }
+  /* faint stadium grid stripes far back */
+  #stage::before{
+    content:"";position:absolute;inset:0;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 2px, transparent 2px 80px);
+    pointer-events:none;
+    mix-blend-mode:overlay;
+  }
+  /* sun */
+  .sun{
+    position:absolute;left:50%;top:18%;width:160px;height:160px;
+    transform:translate(-50%,-50%);
+    background:radial-gradient(circle at 50% 50%, #fff5b8 0%, #ffd64a 40%, rgba(255,214,74,0) 70%);
+    border-radius:50%;
+    filter:blur(.5px);
+    animation:sunPulse 6s ease-in-out infinite;
+  }
+  @keyframes sunPulse{50%{transform:translate(-50%,-50%) scale(1.06)}}
+
+  /* clouds */
+  .cloud{
+    position:absolute;background:#fff;border-radius:999px;opacity:.85;
+    box-shadow:30px 8px 0 -4px #fff, -30px 6px 0 -6px #fff, 0 -10px 0 -8px #fff;
+    animation:drift linear infinite;
+  }
+  @keyframes drift{from{transform:translateX(-20vw)}to{transform:translateX(120vw)}}
+
+  /* ---------- HUD ---------- */
+  #hud{
+    position:absolute;top:14px;left:14px;right:14px;
+    display:flex;justify-content:space-between;gap:10px;
+    z-index:5;pointer-events:none;
+  }
+  .panel{
+    background:#16202a;color:#fff;
+    border:3px solid #000;border-radius:14px;
+    padding:8px 14px;
+    box-shadow:0 4px 0 #000, 0 8px 18px rgba(0,0,0,.25);
+    font-family:"Share Tech Mono",monospace;
+    letter-spacing:.05em;
+    display:flex;align-items:center;gap:10px;
+  }
+  .panel .lbl{font-size:11px;opacity:.7;text-transform:uppercase}
+  .panel .val{font-size:22px;color:var(--gold);font-weight:700;min-width:2ch;text-align:right}
+  .panel.tempo .val{color:#7af}
+
+  /* ---------- Track ---------- */
+  #field{
+    position:absolute;left:0;right:0;bottom:0;height:62%;
+    background:
+      linear-gradient(180deg, var(--grass-1) 0%, var(--grass-2) 100%);
+  }
+  /* grass texture */
+  #field::before{
+    content:"";position:absolute;inset:0;
+    background-image:
+      repeating-linear-gradient(135deg, rgba(0,0,0,.05) 0 2px, transparent 2px 8px);
+    pointer-events:none;
+  }
+
+  .lane{
+    position:absolute;left:0;right:0;height:90px;
+    background:linear-gradient(180deg, var(--track) 0%, var(--track-dark) 100%);
+    border-top:4px solid #000;border-bottom:4px solid #000;
+  }
+  .lane.player{top:18%}
+  .lane.cpu{top:52%}
+  /* dashed lane markers */
+  .lane::before{
+    content:"";position:absolute;left:0;right:0;top:50%;height:6px;transform:translateY(-50%);
+    background-image:linear-gradient(90deg, var(--track-line) 50%, transparent 50%);
+    background-size:40px 6px;
+    opacity:.7;
+  }
+  /* start line */
+  .start{
+    position:absolute;top:18%;height:calc(52% - 18% + 90px);width:8px;left:6%;
+    background:repeating-linear-gradient(0deg,#000 0 12px,#fff 12px 24px);
+    border:2px solid #000;
+    z-index:2;
+  }
+  /* finish line */
+  .finish{
+    position:absolute;top:18%;height:calc(52% - 18% + 90px);width:18px;right:6%;
+    background:
+      repeating-conic-gradient(#000 0 25%, #fff 0 50%) 0 0/18px 18px;
+    border:2px solid #000;
+    z-index:2;
+    box-shadow:0 0 0 4px rgba(255,212,0,.0);
+    transition:box-shadow .3s;
+  }
+  .finish.glow{box-shadow:0 0 0 6px rgba(255,212,0,.85), 0 0 30px 6px rgba(255,212,0,.6)}
+
+  /* ---------- Runners ---------- */
+  .runner{
+    position:absolute;
+    width:80px;height:96px;
+    transform-origin:50% 100%;
+    transition:left .55s cubic-bezier(.18,.9,.31,1.2);
+    z-index:3;
+    will-change:left,transform;
+  }
+  .runner.player{top:calc(18% - 28px)}
+  .runner.cpu{top:calc(52% - 28px)}
+  .runner.bump{animation:bumpAnim .35s}
+  @keyframes bumpAnim{
+    0%{transform:translateY(0) scale(1)}
+    30%{transform:translateY(-14px) scale(1.05)}
+    100%{transform:translateY(0) scale(1)}
+  }
+  .runner.shake{animation:shakeAnim .35s}
+  @keyframes shakeAnim{
+    0%,100%{transform:translateX(0)}
+    25%{transform:translateX(-6px) rotate(-3deg)}
+    50%{transform:translateX(6px) rotate(3deg)}
+    75%{transform:translateX(-4px)}
+  }
+  .runner svg{width:100%;height:100%;display:block;filter:drop-shadow(0 6px 0 rgba(0,0,0,.25))}
+
+  /* dust puffs behind runner */
+  .dust{
+    position:absolute;bottom:-6px;left:-10px;width:50px;height:14px;
+    background:radial-gradient(circle, rgba(255,255,255,.75), transparent 60%);
+    border-radius:50%;
+    opacity:0;
+  }
+  .runner.run .dust{animation:dustPuff .5s ease-out}
+  @keyframes dustPuff{
+    0%{opacity:0;transform:scale(.5) translateX(0)}
+    40%{opacity:.9;transform:scale(1) translateX(-12px)}
+    100%{opacity:0;transform:scale(1.3) translateX(-30px)}
+  }
+
+  /* leg cycling animation */
+  .runner .leg-l, .runner .leg-r, .runner .arm-l, .runner .arm-r{
+    transform-origin:var(--ox,50%) var(--oy,0%);
+    transform:rotate(0deg);
+    transition:transform .22s ease-in-out;
+  }
+  .runner.run .leg-l{transform:rotate(28deg)}
+  .runner.run .leg-r{transform:rotate(-28deg)}
+  .runner.run .arm-l{transform:rotate(-32deg)}
+  .runner.run .arm-r{transform:rotate(32deg)}
+
+  /* CPU idle bob */
+  .runner.cpu{animation:bob 1.6s ease-in-out infinite}
+  @keyframes bob{50%{transform:translateY(-3px)}}
+
+  /* ---------- Quiz card ---------- */
+  #quiz{
+    position:absolute;left:50%;top:14%;transform:translateX(-50%);
+    width:min(560px, 92vw);
+    background:var(--paper);
+    border:4px solid #000;border-radius:22px;
+    padding:18px 22px 16px;
+    box-shadow:0 6px 0 #000, 0 14px 30px rgba(0,0,0,.25);
+    z-index:6;
+    animation:cardIn .35s cubic-bezier(.2,1,.3,1.2);
+  }
+  @keyframes cardIn{from{transform:translate(-50%,-12px) scale(.96);opacity:0}to{transform:translateX(-50%) scale(1);opacity:1}}
+  #quiz .label{
+    font-family:"Bungee",sans-serif;font-size:12px;letter-spacing:.18em;color:#888;text-transform:uppercase;
+  }
+  #question{
+    font-family:"Bungee",sans-serif;
+    font-size:clamp(26px, 5vw, 46px);
+    line-height:1.05;
+    margin:6px 0 14px;
+    color:var(--ink);
+    text-align:center;
+    letter-spacing:.02em;
+    word-wrap:break-word;
+  }
+  #question .op{color:var(--sky-3)}
+  #answer-row{display:flex;gap:10px;align-items:stretch}
+  #answer{
+    flex:1;font-family:"Share Tech Mono",monospace;
+    font-size:34px;font-weight:700;
+    border:3px solid #000;border-radius:12px;
+    padding:6px 14px;background:#fff;color:var(--ink);
+    outline:none;
+    box-shadow:inset 0 3px 0 rgba(0,0,0,.06);
+    -moz-appearance:textfield;
+  }
+  #answer::-webkit-outer-spin-button,#answer::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  #answer:focus{border-color:var(--player);box-shadow:0 0 0 4px rgba(31,111,235,.25), inset 0 3px 0 rgba(0,0,0,.06)}
+  #submit{
+    font-family:"Bungee",sans-serif;font-size:20px;letter-spacing:.04em;
+    border:3px solid #000;border-radius:12px;
+    background:var(--gold);color:var(--ink);
+    padding:0 18px;
+    box-shadow:0 4px 0 #000;
+    transition:transform .1s, box-shadow .1s;
+  }
+  #submit:hover{transform:translateY(-1px)}
+  #submit:active{transform:translateY(3px);box-shadow:0 1px 0 #000}
+
+  /* feedback flash */
+  #flash{
+    position:absolute;left:50%;top:58%;transform:translate(-50%,-50%) scale(.3);
+    font-family:"Bungee",sans-serif;font-size:80px;letter-spacing:.05em;
+    color:#fff;-webkit-text-stroke:4px #000;text-stroke:4px #000;
+    pointer-events:none;opacity:0;z-index:8;
+    text-shadow:0 6px 0 rgba(0,0,0,.35);
+  }
+  #flash.show{animation:flashAnim .9s cubic-bezier(.2,.9,.3,1.2) forwards}
+  @keyframes flashAnim{
+    0%{opacity:0;transform:translate(-50%,-50%) scale(.4) rotate(-8deg)}
+    25%{opacity:1;transform:translate(-50%,-50%) scale(1.1) rotate(-4deg)}
+    60%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0)}
+    100%{opacity:0;transform:translate(-50%,-50%) scale(.95) rotate(0)}
+  }
+
+  /* ---------- Modal screens (start / end) ---------- */
+  .modal{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    background:rgba(10,12,16,.55);backdrop-filter:blur(4px);
+    z-index:20;
+  }
+  .modal.hidden{display:none}
+  .card{
+    background:var(--paper);
+    border:4px solid #000;border-radius:24px;
+    box-shadow:0 8px 0 #000, 0 18px 40px rgba(0,0,0,.4);
+    padding:28px 30px;width:min(520px, 92vw);text-align:center;
+    animation:popIn .4s cubic-bezier(.2,1,.3,1.2);
+  }
+  @keyframes popIn{from{transform:translateY(-12px) scale(.96);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+  .card h1{
+    font-family:"Bungee",sans-serif;
+    font-size:clamp(36px, 6vw, 56px);
+    margin:0 0 4px;line-height:1;
+    color:var(--ink);
+  }
+  .card h1.win{color:#19a36f}
+  .card h1.lose{color:#c0392b}
+  .card .sub{
+    font-size:16px;color:#5c6470;margin:0 0 16px;
+  }
+  .card .stats{
+    display:flex;gap:14px;justify-content:center;margin:12px 0 18px;flex-wrap:wrap;
+  }
+  .stat{
+    background:#16202a;color:#fff;border:3px solid #000;border-radius:12px;
+    padding:8px 14px;font-family:"Share Tech Mono",monospace;
+  }
+  .stat b{display:block;color:var(--gold);font-size:22px}
+  .stat span{font-size:11px;text-transform:uppercase;opacity:.7;letter-spacing:.1em}
+  .btn{
+    display:inline-block;font-family:"Bungee",sans-serif;
+    font-size:22px;letter-spacing:.04em;
+    border:3px solid #000;border-radius:14px;
+    background:var(--gold);color:var(--ink);
+    padding:10px 24px;
+    box-shadow:0 5px 0 #000;
+    transition:transform .1s, box-shadow .1s;
+  }
+  .btn:hover{transform:translateY(-1px)}
+  .btn:active{transform:translateY(4px);box-shadow:0 1px 0 #000}
+  .btn.primary{background:var(--player);color:#fff}
+
+  .rules{
+    text-align:left;background:#fff7da;border:3px dashed #000;border-radius:12px;
+    padding:12px 14px;margin:10px 0 16px;font-size:15px;line-height:1.45;
+  }
+  .rules b{color:var(--sky-3)}
+
+  /* countdown */
+  #countdown{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    z-index:15;pointer-events:none;
+  }
+  #countdown.hidden{display:none}
+  #countdown .num{
+    font-family:"Bungee",sans-serif;font-size:200px;color:#fff;
+    -webkit-text-stroke:6px #000;
+    text-shadow:0 10px 0 rgba(0,0,0,.4);
+    animation:countPop .9s ease-out forwards;
+  }
+  @keyframes countPop{
+    0%{transform:scale(.2);opacity:0}
+    20%{transform:scale(1.15);opacity:1}
+    80%{transform:scale(1);opacity:1}
+    100%{transform:scale(1.4);opacity:0}
+  }
+
+  /* confetti */
+  .confetti{position:absolute;width:10px;height:14px;top:-20px;z-index:25;pointer-events:none;animation:fall linear forwards}
+  @keyframes fall{
+    0%{transform:translateY(-20px) rotate(0)}
+    100%{transform:translateY(110vh) rotate(720deg)}
+  }
+
+  /* ---------- Mode selector ---------- */
+  .modes{
+    display:grid;gap:10px;margin:6px 0 14px;
+  }
+  .mode-btn{
+    --accent:var(--player);
+    display:flex;align-items:center;gap:14px;
+    background:#fff;border:3px solid #000;border-radius:14px;
+    padding:12px 14px 12px 22px;text-align:left;
+    box-shadow:0 4px 0 #000;
+    font-family:inherit;cursor:pointer;
+    transition:transform .12s, box-shadow .12s, background .15s;
+    position:relative;overflow:hidden;
+    color:var(--ink);
+  }
+  .mode-btn::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:10px;background:var(--accent);
+  }
+  .mode-btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 #000;background:#fffaf0}
+  .mode-btn:active{transform:translateY(2px);box-shadow:0 2px 0 #000}
+  .mode-icon{
+    font-size:28px;flex-shrink:0;
+    width:52px;height:52px;display:flex;align-items:center;justify-content:center;
+    background:var(--accent);color:#fff;
+    border-radius:12px;border:3px solid #000;
+    box-shadow:inset 0 -3px 0 rgba(0,0,0,.2);
+  }
+  .mode-text{flex:1;min-width:0}
+  .mode-title{
+    font-family:"Bungee",sans-serif;font-size:18px;line-height:1;color:var(--ink);
+    letter-spacing:.01em;
+  }
+  .mode-desc{
+    font-size:13px;color:#5c6470;margin-top:4px;line-height:1.3;
+  }
+  .mode-arrow{
+    font-family:"Bungee",sans-serif;font-size:22px;color:var(--accent);
+    flex-shrink:0;padding-right:4px;
+  }
+  .rules-mini{
+    font-size:13px;color:#5c6470;margin:4px 0 0;line-height:1.45;
+  }
+  .rules-mini b{color:var(--ink)}
+
+  /* ---------- True/False answer row ---------- */
+  #tf-row{display:flex;gap:10px}
+  .tf-btn{
+    flex:1;font-family:"Bungee",sans-serif;font-size:22px;letter-spacing:.04em;
+    border:3px solid #000;border-radius:12px;
+    padding:14px 8px;color:#fff;
+    box-shadow:0 4px 0 #000;
+    transition:transform .1s, box-shadow .1s, filter .15s;
+    cursor:pointer;
+  }
+  .tf-true{background:var(--right)}
+  .tf-false{background:var(--wrong)}
+  .tf-btn:hover{transform:translateY(-1px);filter:brightness(1.05)}
+  .tf-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #000}
+  .tf-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:0 4px 0 #000}
+  .tf-hint{
+    font-size:11px;color:#888;text-align:center;margin-top:8px;
+    font-family:"Share Tech Mono",monospace;letter-spacing:.05em;
+  }
+  .tf-hint kbd{
+    background:#16202a;color:#fff;border-radius:4px;padding:1px 5px;
+    border:1px solid #000;font-family:inherit;font-size:11px;
+  }
+
+  /* ---------- End modal actions row ---------- */
+  .actions{
+    display:flex;gap:10px;justify-content:center;flex-wrap:wrap;
+  }
+  .btn.secondary{background:#fff;color:var(--ink)}
+
+  .mode-badge{
+    display:inline-block;font-family:"Bungee",sans-serif;font-size:11px;
+    letter-spacing:.1em;text-transform:uppercase;
+    background:var(--accent,#1f6feb);color:#fff;
+    border:2px solid #000;border-radius:999px;padding:3px 10px;
+    margin-bottom:8px;
+    box-shadow:0 2px 0 #000;
+  }
+
+  .hidden-soft{display:none !important}
+
+  /* ---------- History modal ---------- */
+  #history-modal .card{
+    max-height:85vh;overflow-y:auto;width:min(600px,92vw);
+    scrollbar-width:thin;scrollbar-color:#555 transparent;
+  }
+  #history-modal .card::-webkit-scrollbar{width:6px}
+  #history-modal .card::-webkit-scrollbar-thumb{background:#aaa;border-radius:3px}
+  .hist-entry{
+    background:#fff;border:2px solid #000;border-radius:12px;
+    padding:10px 12px;margin-bottom:10px;
+  }
+  .hist-header{
+    display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;
+  }
+  .hist-result{font-family:"Bungee",sans-serif;font-size:13px}
+  .hist-win{color:var(--right)}
+  .hist-lose{color:var(--wrong)}
+  .hist-date{font-size:11px;color:#888;margin-left:auto;font-family:"Share Tech Mono",monospace}
+  .hist-stats{display:flex;gap:6px;justify-content:space-around}
+  .hist-stat{
+    text-align:center;background:#16202a;
+    border-radius:8px;padding:6px 8px;flex:1;min-width:0;
+  }
+  .hist-val{
+    font-family:"Share Tech Mono",monospace;font-size:17px;
+    color:var(--gold);font-weight:700;
+  }
+  .hist-delta{font-size:12px;font-family:"Share Tech Mono",monospace;min-height:16px;line-height:1}
+  .hist-lbl{font-size:10px;text-transform:uppercase;color:rgba(255,255,255,.55);letter-spacing:.07em;margin-top:2px}
+  .delta-up{color:var(--right)}
+  .delta-down{color:var(--wrong)}
+  .delta-none{color:#888}
+  #btn-history{
+    width:100%;margin:6px 0 10px;
+    font-size:16px;padding:9px 16px;
+    background:#fff;color:var(--ink);
+  }
+  .hist-empty{text-align:center;color:#888;padding:24px 0;font-size:15px;line-height:1.7}
+
+  /* mobile tweaks */
+  @media (max-width: 640px){
+    .runner{width:64px;height:78px}
+    .runner.player{top:calc(18% - 22px)}
+    .runner.cpu{top:calc(52% - 22px)}
+    .lane{height:74px}
+    .panel .val{font-size:18px}
+    #quiz{top:11%;padding:14px 16px 12px}
+    #question{font-size:34px}
+    #answer{font-size:26px}
+    #submit{font-size:16px;padding:0 12px}
+    .tf-btn{font-size:18px;padding:12px 6px}
+    .mode-icon{width:44px;height:44px;font-size:22px}
+    .mode-title{font-size:16px}
+    .mode-desc{font-size:12px}
+  }
+</style>
+</head>
+<body>
+<div id="stage" aria-live="polite">
+
+  <div class="sun"></div>
+  <div class="cloud" style="top:8%;width:80px;height:24px;animation-duration:55s;animation-delay:-10s"></div>
+  <div class="cloud" style="top:16%;width:120px;height:32px;animation-duration:80s;animation-delay:-30s"></div>
+  <div class="cloud" style="top:5%;width:60px;height:18px;animation-duration:65s;animation-delay:-50s"></div>
+
+  <!-- HUD -->
+  <div id="hud">
+    <div class="panel" aria-label="Pontos">
+      <span class="lbl">Pontos</span>
+      <span class="val" id="hud-pontos">0</span>
+    </div>
+    <div class="panel tempo" aria-label="Tempo">
+      <span class="lbl">Tempo</span>
+      <span class="val" id="hud-tempo">0</span>
+    </div>
+  </div>
+
+  <!-- Field with 2 lanes -->
+  <div id="field">
+    <div class="lane player"></div>
+    <div class="lane cpu"></div>
+    <div class="start" aria-hidden="true"></div>
+    <div class="finish" id="finishLine" aria-hidden="true"></div>
+
+    <!-- Player runner (Ben) -->
+    <div class="runner player" id="player" style="left:6%">
+      <div class="dust"></div>
+      <svg viewBox="0 0 80 96" xmlns="http://www.w3.org/2000/svg" aria-label="Você">
+        <!-- back leg -->
+        <g class="leg-l" style="--ox:50%;--oy:62%">
+          <rect x="34" y="60" width="10" height="28" rx="3" fill="#1f2a36"/>
+          <rect x="32" y="84" width="14" height="6" rx="2" fill="#000"/>
+        </g>
+        <!-- back arm -->
+        <g class="arm-l" style="--ox:50%;--oy:42%">
+          <rect x="20" y="40" width="8" height="22" rx="3" fill="#f1c08a"/>
+        </g>
+        <!-- body / shirt -->
+        <rect x="22" y="34" width="36" height="32" rx="6" fill="var(--player-shirt)" stroke="#000" stroke-width="2"/>
+        <rect x="22" y="46" width="36" height="6" fill="var(--player)"/>
+        <text x="40" y="56" text-anchor="middle" font-family="Bungee, sans-serif" font-size="11" fill="#000">1</text>
+        <!-- shorts -->
+        <rect x="26" y="62" width="28" height="14" rx="3" fill="var(--player)" stroke="#000" stroke-width="2"/>
+        <!-- head -->
+        <circle cx="40" cy="22" r="13" fill="#f1c08a" stroke="#000" stroke-width="2"/>
+        <!-- hair -->
+        <path d="M27 18 Q34 6 50 10 Q55 14 53 22 L48 18 Q42 14 35 18 Z" fill="#3b2718"/>
+        <!-- eye -->
+        <circle cx="46" cy="22" r="1.6" fill="#000"/>
+        <!-- mouth -->
+        <path d="M44 28 Q47 30 50 28" stroke="#000" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+        <!-- front leg -->
+        <g class="leg-r" style="--ox:50%;--oy:62%">
+          <rect x="38" y="60" width="10" height="28" rx="3" fill="#1f2a36"/>
+          <rect x="36" y="84" width="14" height="6" rx="2" fill="#000"/>
+        </g>
+        <!-- front arm -->
+        <g class="arm-r" style="--ox:50%;--oy:42%">
+          <rect x="52" y="40" width="8" height="22" rx="3" fill="#f1c08a"/>
+        </g>
+      </svg>
+    </div>
+
+    <!-- CPU runner (Jordyn) -->
+    <div class="runner cpu" id="cpu" style="left:6%">
+      <svg viewBox="0 0 80 96" xmlns="http://www.w3.org/2000/svg" aria-label="Adversário">
+        <g class="leg-l" style="--ox:50%;--oy:62%">
+          <rect x="34" y="60" width="10" height="28" rx="3" fill="#1f2a36"/>
+          <rect x="32" y="84" width="14" height="6" rx="2" fill="#000"/>
+        </g>
+        <g class="arm-l" style="--ox:50%;--oy:42%">
+          <rect x="20" y="40" width="8" height="22" rx="3" fill="#e6b6a4"/>
+        </g>
+        <!-- body -->
+        <rect x="22" y="34" width="36" height="32" rx="6" fill="var(--cpu)" stroke="#000" stroke-width="2"/>
+        <rect x="22" y="46" width="36" height="6" fill="#fff"/>
+        <text x="40" y="56" text-anchor="middle" font-family="Bungee, sans-serif" font-size="11" fill="#000">2</text>
+        <rect x="26" y="62" width="28" height="14" rx="3" fill="#1f2a36" stroke="#000" stroke-width="2"/>
+        <!-- head -->
+        <circle cx="40" cy="22" r="13" fill="#e6b6a4" stroke="#000" stroke-width="2"/>
+        <!-- ponytail/hair -->
+        <path d="M27 20 Q28 5 42 5 Q50 8 50 17 Q46 13 40 13 Q33 13 27 18 Z" fill="#5a2f1a"/>
+        <path d="M27 18 Q16 24 18 38 L26 30 Z" fill="#5a2f1a"/>
+        <circle cx="46" cy="22" r="1.6" fill="#000"/>
+        <path d="M44 28 Q47 30 50 28" stroke="#000" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+        <g class="leg-r" style="--ox:50%;--oy:62%">
+          <rect x="38" y="60" width="10" height="28" rx="3" fill="#1f2a36"/>
+          <rect x="36" y="84" width="14" height="6" rx="2" fill="#000"/>
+        </g>
+        <g class="arm-r" style="--ox:50%;--oy:42%">
+          <rect x="52" y="40" width="8" height="22" rx="3" fill="#e6b6a4"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Quiz card -->
+  <div id="quiz" class="hidden" hidden>
+    <div class="label" id="quiz-label">Pergunta</div>
+    <div id="question">— + — = ?</div>
+    <div id="answer-row">
+      <input id="answer" type="number" step="1" autocomplete="off" placeholder="sua resposta">
+      <button id="submit" type="button">Responder</button>
+    </div>
+    <div id="tf-row" class="hidden-soft">
+      <button class="tf-btn tf-true" type="button" data-val="true">Verdadeiro</button>
+      <button class="tf-btn tf-false" type="button" data-val="false">Falso</button>
+    </div>
+    <div id="tf-hint" class="tf-hint hidden-soft">
+      Atalhos: <kbd>V</kbd> verdadeiro · <kbd>F</kbd> falso
+    </div>
+  </div>
+
+  <div id="flash" aria-hidden="true"></div>
+  <div id="countdown" class="hidden"><div class="num" id="countdown-num">3</div></div>
+
+  <!-- Start modal -->
+  <div class="modal" id="start-modal">
+    <div class="card">
+      <h1>Corrida Quiz</h1>
+      <p class="sub">Escolha seu modo de jogo</p>
+      <div class="modes">
+        <button class="mode-btn" data-mode="basico" type="button" style="--accent:#19a36f">
+          <div class="mode-icon">➕</div>
+          <div class="mode-text">
+            <div class="mode-title">Modo Básico</div>
+            <div class="mode-desc">Adição e subtração de 1 a 10, sem resultados negativos</div>
+          </div>
+          <div class="mode-arrow">▶</div>
+        </button>
+        <button class="mode-btn" data-mode="avancado" type="button" style="--accent:#1f6feb">
+          <div class="mode-icon">✖</div>
+          <div class="mode-text">
+            <div class="mode-title">Modo Avançado</div>
+            <div class="mode-desc">Soma, subtração, multiplicação e divisão</div>
+          </div>
+          <div class="mode-arrow">▶</div>
+        </button>
+        <button class="mode-btn" data-mode="desafio" type="button" style="--accent:#9b5de5">
+          <div class="mode-icon">🤔</div>
+          <div class="mode-text">
+            <div class="mode-title">Modo Desafio</div>
+            <div class="mode-desc">Verdadeiro ou falso: par/ímpar, primo, raiz</div>
+          </div>
+          <div class="mode-arrow">▶</div>
+        </button>
+      </div>
+      <button class="btn" id="btn-history" type="button">📊 Comparar Resultados</button>
+      <p class="rules-mini">
+        🏁 <b>Acerto:</b> +30 m e +3 pts &nbsp;·&nbsp; 💥 <b>Erro:</b> −10 m e −1 pt &nbsp;·&nbsp; 🤖 CPU avança a cada 7 s
+      </p>
+    </div>
+  </div>
+
+  <!-- History / Comparison modal -->
+  <div class="modal hidden" id="history-modal">
+    <div class="card">
+      <h1 style="font-size:clamp(28px,5vw,40px)">Histórico</h1>
+      <p class="sub">Compare seu desempenho a cada partida</p>
+      <div id="history-content"></div>
+      <div class="actions" style="margin-top:14px">
+        <button class="btn secondary" id="btn-clear-history" type="button">Limpar</button>
+        <button class="btn primary" id="btn-close-history" type="button">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- End modal -->
+  <div class="modal hidden" id="end-modal">
+    <div class="card">
+      <span id="end-mode-badge" class="mode-badge">Modo Básico</span>
+      <h1 id="end-title" class="win">Vitória!</h1>
+      <p class="sub" id="end-sub">Você cruzou a linha de chegada primeiro!</p>
+      <div class="stats">
+        <div class="stat"><b id="end-pontos">0</b><span>Pontos</span></div>
+        <div class="stat"><b id="end-tempo">0s</b><span>Tempo</span></div>
+        <div class="stat"><b id="end-acertos">0</b><span>Acertos</span></div>
+        <div class="stat"><b id="end-erros">0</b><span>Erros</span></div>
+      </div>
+      <div class="actions">
+        <button class="btn secondary" id="btn-mode" type="button">Trocar modo</button>
+        <button class="btn primary" id="btn-restart" type="button">Jogar de novo</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+"use strict";
+
+/* ====================================================================
+   CORRIDA QUIZ MATEMÁTICA  —  port do Scratch (Corrida_QuizMatematica_final2.sb3)
+   --------------------------------------------------------------------
+   Mecânica espelhada do projeto original:
+     - Ben (jogador) e Jordyn (CPU) começam em x=-220 (~6% da tela)
+     - Linha de chegada em x=200 (~94% da tela)
+     - Acerto: +30 px, +3 pontos.   Erro: -10 px, -1 ponto.
+     - Jordyn anda 30 px a cada 4 segundos
+     - Vitória se Ben chega antes; Derrota se Jordyn chega antes
+
+   Modos de jogo:
+     1) basico   – + e − com a,b ∈ [1..30], subtração sempre ≥ 0
+     2) avancado – +, −, ×, ÷ (divisões sempre exatas)
+     3) desafio  – verdadeiro/falso: par/ímpar, primo, raiz quadrada
+   ==================================================================== */
+
+const TRACK_LEFT_PCT = 6;          // posição inicial (% da largura)
+const TRACK_RIGHT_PCT = 94;        // chegada
+const TRACK_RANGE_PCT = TRACK_RIGHT_PCT - TRACK_LEFT_PCT;
+const TRACK_PX_TOTAL = 420;        // mesma régua do Scratch (-220 a 200)
+const STEP_RIGHT_PX = 30;          // acerto
+const STEP_BACK_PX  = 10;          // erro
+const CPU_INTERVAL_MS = 7000;      // intervalo da CPU
+const CPU_STEP_PX = 30;
+
+const $ = sel => document.querySelector(sel);
+
+// ---------- Estado do jogo ----------
+const state = {
+  running:false,
+  mode:"basico",         // 'basico' | 'avancado' | 'desafio'
+  currentQ:null,         // { type:'numeric'|'truefalse', display, answer }
+  playerPx: 0,           // distância em "px do scratch" (0..420)
+  cpuPx: 0,
+  pontos: 0,
+  acertos: 0,
+  erros: 0,
+  tempo: 0,
+  cpuTimer:null,
+  tempoTimer:null,
+  rafId:null,
+  startedAt:0,
+  acceptingInput:false,
+};
+
+// ---------- Web Audio (sem arquivos externos) ----------
+let AC = null;
+function audioCtx(){
+  if(!AC){
+    const C = window.AudioContext || window.webkitAudioContext;
+    if(!C) return null;
+    AC = new C();
+  }
+  if(AC.state === "suspended") AC.resume();
+  return AC;
+}
+function envGain(t0, attack=0.01, decay=0.18, peak=0.25, sustain=0, release=0.05){
+  const ctx = audioCtx(); if(!ctx) return null;
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(peak, t0+attack);
+  g.gain.exponentialRampToValueAtTime(Math.max(sustain,0.0001), t0+attack+decay);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0+attack+decay+release);
+  return g;
+}
+function tone(freq, t0, dur=0.18, type="sine", peak=0.22){
+  const ctx = audioCtx(); if(!ctx) return;
+  const osc = ctx.createOscillator();
+  const g = envGain(t0, 0.005, dur*0.6, peak, 0, dur*0.4);
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, t0);
+  osc.connect(g).connect(ctx.destination);
+  osc.start(t0); osc.stop(t0+dur+0.05);
+}
+function sweep(f1, f2, t0, dur=0.25, type="square", peak=0.18){
+  const ctx = audioCtx(); if(!ctx) return;
+  const osc = ctx.createOscillator();
+  const g = envGain(t0, 0.005, dur*0.7, peak, 0, dur*0.3);
+  osc.type = type;
+  osc.frequency.setValueAtTime(f1, t0);
+  osc.frequency.exponentialRampToValueAtTime(f2, t0+dur);
+  osc.connect(g).connect(ctx.destination);
+  osc.start(t0); osc.stop(t0+dur+0.05);
+}
+function noiseHit(t0, dur=0.18, peak=0.18){
+  const ctx = audioCtx(); if(!ctx) return;
+  const buf = ctx.createBuffer(1, ctx.sampleRate*dur, ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for(let i=0;i<d.length;i++) d[i] = (Math.random()*2-1)*(1-i/d.length);
+  const src = ctx.createBufferSource(); src.buffer = buf;
+  const g = envGain(t0, 0.001, dur*0.5, peak, 0, dur*0.5);
+  const flt = ctx.createBiquadFilter(); flt.type="bandpass"; flt.frequency.value=900; flt.Q.value=0.7;
+  src.connect(flt).connect(g).connect(ctx.destination);
+  src.start(t0); src.stop(t0+dur+0.05);
+}
+const SFX = {
+  correct(){
+    const ctx = audioCtx(); if(!ctx) return;
+    const t = ctx.currentTime;
+    tone(880, t,    0.12, "triangle", 0.22);
+    tone(1175,t+0.09,0.16,"triangle", 0.22);
+    tone(1568,t+0.22,0.20,"triangle", 0.22);
+  },
+  wrong(){
+    const ctx = audioCtx(); if(!ctx) return;
+    const t = ctx.currentTime;
+    sweep(220, 110, t, 0.28, "sawtooth", 0.20);
+    noiseHit(t+0.02, 0.15, 0.10);
+  },
+  win(){
+    const ctx = audioCtx(); if(!ctx) return;
+    const t = ctx.currentTime;
+    const notes = [523, 659, 784, 1047, 1319]; // C E G C E
+    notes.forEach((f,i)=> tone(f, t+i*0.12, 0.22, "triangle", 0.24));
+    // fanfarra
+    setTimeout(()=>{
+      const t2 = audioCtx().currentTime;
+      tone(784, t2,      0.18, "square", 0.18);
+      tone(1047,t2+0.18, 0.30, "square", 0.20);
+    }, 700);
+  },
+  lose(){
+    const ctx = audioCtx(); if(!ctx) return;
+    const t = ctx.currentTime;
+    [415, 370, 311, 277].forEach((f,i)=> tone(f, t+i*0.18, 0.30, "sawtooth", 0.18));
+  },
+  cpuStep(){
+    const ctx = audioCtx(); if(!ctx) return;
+    const t = ctx.currentTime;
+    noiseHit(t, 0.07, 0.05);
+    tone(180, t, 0.06, "square", 0.06);
+  },
+  countdown(){ tone(660, audioCtx()?.currentTime||0, 0.12, "square", 0.18); },
+  go(){
+    const ctx = audioCtx(); if(!ctx) return;
+    const t = ctx.currentTime;
+    tone(880, t, 0.18, "square", 0.22);
+    tone(1320,t+0.05,0.30,"square", 0.22);
+  },
+};
+
+// ---------- Helpers ----------
+const randInt = (lo, hi) => Math.floor(Math.random()*(hi-lo+1))+lo;
+
+function pxToPercent(px){
+  // 0..TRACK_PX_TOTAL  -> TRACK_LEFT_PCT..TRACK_RIGHT_PCT
+  const ratio = Math.max(0, Math.min(1, px/TRACK_PX_TOTAL));
+  return TRACK_LEFT_PCT + ratio*TRACK_RANGE_PCT;
+}
+
+function placeRunner(el, px){
+  el.style.left = pxToPercent(px) + "%";
+}
+
+// ---------- Modos de jogo ----------
+function isPrime(n){
+  if(n < 2) return false;
+  if(n < 4) return true;
+  if(n % 2 === 0) return false;
+  for(let i=3; i*i<=n; i+=2){ if(n%i===0) return false; }
+  return true;
+}
+
+const MODES = {
+  basico: {
+    name: "Modo Básico",
+    color: "#19a36f",
+    generate(){
+      const op = randInt(1,2);
+      let a = randInt(1,15);
+      let b = randInt(1,15);
+      if (op === 2 && b > a) { const t = a; a = b; b = t; } // subtração nunca negativa
+      const sym = op === 1 ? "+" : "−";
+      return {
+        type: "numeric",
+        display: `${a} <span class="op">${sym}</span> ${b} = ?`,
+        answer: op === 1 ? a + b : a - b,
+      };
+    },
+  },
+
+  avancado: {
+    name: "Modo Avançado",
+    color: "#1f6feb",
+    generate(){
+      const op = randInt(1,4); // 1=+, 2=-, 3=×, 4=÷
+      let a, b, sym, ans;
+      if(op === 1){
+        a = randInt(2,20); b = randInt(2,20);
+        sym = "+"; ans = a + b;
+      } else if(op === 2){
+        a = randInt(2,20); b = randInt(2,20);
+        sym = "−"; ans = a - b;
+      } else if(op === 3){
+        a = randInt(2,10); b = randInt(2,10);
+        sym = "×"; ans = a * b;
+      } else {
+        // ÷ exata: escolhe quociente e divisor, calcula dividendo
+        b   = randInt(2,10);
+        ans = randInt(2,10);
+        a   = b * ans;
+        sym = "÷";
+      }
+      return {
+        type: "numeric",
+        display: `${a} <span class="op">${sym}</span> ${b} = ?`,
+        answer: ans,
+      };
+    },
+  },
+
+  desafio: {
+    name: "Modo Desafio",
+    color: "#9b5de5",
+    generate(){
+      const kind = randInt(1,3);
+      // kind 1: par/ímpar
+      if(kind === 1){
+        const x = randInt(1,50);
+        const askEven = Math.random() < 0.5;
+        const really  = (x % 2 === 0);
+        const truth   = askEven ? really : !really;
+        return {
+          type: "truefalse",
+          display: `${x} é um número <span class="op">${askEven ? "par" : "ímpar"}</span>?`,
+          answer: truth,
+        };
+      }
+      // kind 2: primo
+      if(kind === 2){
+        const x = randInt(2,50);
+        return {
+          type: "truefalse",
+          display: `${x} é um <span class="op">número primo</span>?`,
+          answer: isPrime(x),
+        };
+      }
+      // kind 3: raiz quadrada
+      const squares = [4,9,16,25,36,49,64,81,100,121,144];
+      const x = squares[randInt(0, squares.length-1)];
+      const realRoot = Math.sqrt(x);
+      let y;
+      if(Math.random() < 0.5){
+        y = realRoot;                 // afirmação verdadeira
+      } else {
+        // candidato falso plausível: ±1 a ±3, sempre > 0
+        const delta = randInt(1,3) * (Math.random() < 0.5 ? -1 : 1);
+        y = realRoot + delta;
+        if(y <= 0) y = realRoot + Math.abs(delta) + 1;
+      }
+      return {
+        type: "truefalse",
+        display: `A <span class="op">raiz quadrada</span> de ${x} é ${y}?`,
+        answer: (y === realRoot),
+      };
+    },
+  },
+};
+
+// ---------- Pergunta ----------
+function newQuestion(){
+  const mode = MODES[state.mode] || MODES.basico;
+  const q = mode.generate();
+  state.currentQ = q;
+
+  $("#question").innerHTML = q.display;
+
+  const numericRow = $("#answer-row");
+  const tfRow      = $("#tf-row");
+  const tfHint     = $("#tf-hint");
+  const inp        = $("#answer");
+
+  if(q.type === "numeric"){
+    numericRow.classList.remove("hidden-soft");
+    tfRow.classList.add("hidden-soft");
+    tfHint.classList.add("hidden-soft");
+    inp.value = "";
+    inp.disabled = false;
+    $("#submit").disabled = false;
+    if(matchMedia("(pointer:fine)").matches) inp.focus();
+  } else {
+    // truefalse
+    numericRow.classList.add("hidden-soft");
+    tfRow.classList.remove("hidden-soft");
+    tfHint.classList.remove("hidden-soft");
+    document.querySelectorAll(".tf-btn").forEach(b => b.disabled = false);
+  }
+
+  state.acceptingInput = true;
+}
+
+function submitNumeric(){
+  if(!state.acceptingInput || !state.running) return;
+  if(!state.currentQ || state.currentQ.type !== "numeric") return;
+
+  const inp = $("#answer");
+  const raw = inp.value.trim();
+  if(raw === "" || isNaN(Number(raw))){
+    inp.focus();
+    inp.classList.remove("shake");
+    void inp.offsetWidth;
+    inp.classList.add("shake");
+    return;
+  }
+  const v = Number(raw);
+  state.acceptingInput = false;
+  inp.disabled = true;
+  $("#submit").disabled = true;
+
+  if(v === state.currentQ.answer) onCorrect(); else onWrong();
+}
+
+function submitTrueFalse(value){
+  if(!state.acceptingInput || !state.running) return;
+  if(!state.currentQ || state.currentQ.type !== "truefalse") return;
+
+  state.acceptingInput = false;
+  document.querySelectorAll(".tf-btn").forEach(b => b.disabled = true);
+
+  if(value === state.currentQ.answer) onCorrect(); else onWrong();
+}
+
+function onCorrect(){
+  state.acertos++;
+  state.pontos += 3;
+  state.playerPx = Math.min(TRACK_PX_TOTAL, state.playerPx + STEP_RIGHT_PX);
+  movePlayer("forward");
+  flash("ACERTOU!", "var(--right)");
+  SFX.correct();
+  updateHUD();
+  setTimeout(checkOrContinue, 380);
+}
+
+function onWrong(){
+  state.erros++;
+  state.pontos -= 1;
+  state.playerPx = Math.max(0, state.playerPx - STEP_BACK_PX);
+  movePlayer("back");
+  flash("ERROU!", "var(--wrong)");
+  SFX.wrong();
+  updateHUD();
+  setTimeout(checkOrContinue, 380);
+}
+
+function movePlayer(dir){
+  const el = $("#player");
+  el.classList.remove("run","bump","shake");
+  void el.offsetWidth;
+  el.classList.add("run");
+  el.classList.add(dir === "forward" ? "bump" : "shake");
+  placeRunner(el, state.playerPx);
+  setTimeout(()=> el.classList.remove("run","bump","shake"), 600);
+}
+
+function moveCPU(){
+  if(!state.running) return;
+  state.cpuPx = Math.min(TRACK_PX_TOTAL, state.cpuPx + CPU_STEP_PX);
+  const el = $("#cpu");
+  el.classList.remove("run");
+  void el.offsetWidth;
+  el.classList.add("run");
+  placeRunner(el, state.cpuPx);
+  SFX.cpuStep();
+  setTimeout(()=> el.classList.remove("run"), 500);
+  if(state.cpuPx >= TRACK_PX_TOTAL){
+    finish(false); // cpu chegou primeiro
+  }
+}
+
+function checkOrContinue(){
+  if(state.playerPx >= TRACK_PX_TOTAL){
+    finish(true);
+    return;
+  }
+  if(!state.running) return;
+  newQuestion();
+}
+
+// ---------- HUD ----------
+function updateHUD(){
+  $("#hud-pontos").textContent = state.pontos;
+  $("#hud-tempo").textContent  = state.tempo;
+}
+
+function flash(text, color){
+  const f = $("#flash");
+  f.textContent = text;
+  f.style.color = color || "#fff";
+  f.classList.remove("show");
+  void f.offsetWidth;
+  f.classList.add("show");
+}
+
+// ---------- Loop / fluxo ----------
+function startCountdown(then){
+  const el = $("#countdown");
+  const num = $("#countdown-num");
+  el.classList.remove("hidden");
+  let n = 3;
+  num.textContent = n;
+  SFX.countdown();
+  const iv = setInterval(()=>{
+    n--;
+    if(n > 0){
+      num.textContent = n;
+      // re-animate
+      num.style.animation = "none"; void num.offsetWidth;
+      num.style.animation = "";
+      SFX.countdown();
+    } else {
+      clearInterval(iv);
+      num.textContent = "JÁ!";
+      num.style.animation = "none"; void num.offsetWidth;
+      num.style.animation = "";
+      SFX.go();
+      setTimeout(()=>{
+        el.classList.add("hidden");
+        then();
+      }, 700);
+    }
+  }, 900);
+}
+
+function startGame(mode){
+  if(mode && MODES[mode]) state.mode = mode;
+  // reset
+  state.running = true;
+  state.playerPx = 0; state.cpuPx = 0;
+  state.pontos = 0; state.acertos = 0; state.erros = 0; state.tempo = 0;
+  placeRunner($("#player"), 0);
+  placeRunner($("#cpu"), 0);
+  $("#finishLine").classList.add("glow");
+  updateHUD();
+
+  // hide modals, hide quiz card until countdown finishes
+  $("#start-modal").classList.add("hidden");
+  $("#quiz").hidden = true;
+  $("#end-modal").classList.add("hidden");
+
+  audioCtx(); // unlock on user gesture
+
+  startCountdown(()=>{
+    if(!state.running) return;
+    $("#quiz").hidden = false;
+    state.startedAt = performance.now();
+    state.tempoTimer = setInterval(()=>{
+      state.tempo++;
+      updateHUD();
+    }, 1000);
+    state.cpuTimer = setInterval(moveCPU, CPU_INTERVAL_MS);
+    newQuestion();
+  });
+}
+
+function showModeSelect(){
+  // for "Trocar modo" — para tudo e volta pra tela de seleção
+  state.running = false;
+  clearInterval(state.cpuTimer); state.cpuTimer = null;
+  clearInterval(state.tempoTimer); state.tempoTimer = null;
+  state.acceptingInput = false;
+  $("#answer").disabled = true;
+  $("#submit").disabled = true;
+  $("#quiz").hidden = true;
+  $("#end-modal").classList.add("hidden");
+  $("#start-modal").classList.remove("hidden");
+  // resets visuais
+  state.playerPx = 0; state.cpuPx = 0;
+  placeRunner($("#player"), 0);
+  placeRunner($("#cpu"), 0);
+  $("#finishLine").classList.remove("glow");
+}
+
+function finish(playerWon){
+  if(!state.running) return;
+  state.running = false;
+  state.acceptingInput = false;
+  clearInterval(state.cpuTimer); state.cpuTimer = null;
+  clearInterval(state.tempoTimer); state.tempoTimer = null;
+  $("#answer").disabled = true;
+  $("#submit").disabled = true;
+  document.querySelectorAll(".tf-btn").forEach(b => b.disabled = true);
+  $("#quiz").hidden = true;
+
+  // avança CPU graficamente até o fim caso tenha vencido
+  if(!playerWon){
+    state.cpuPx = TRACK_PX_TOTAL;
+    placeRunner($("#cpu"), state.cpuPx);
+  } else {
+    state.playerPx = TRACK_PX_TOTAL;
+    placeRunner($("#player"), state.playerPx);
+  }
+
+  setTimeout(()=>{
+    const title = $("#end-title");
+    const sub   = $("#end-sub");
+    saveResult(playerWon);
+    if(playerWon){
+      title.textContent = "Vitória!";
+      title.className = "win";
+      sub.textContent  = "Você cruzou a linha de chegada primeiro!";
+      SFX.win();
+      confettiBurst();
+    } else {
+      title.textContent = "Derrota";
+      title.className = "lose";
+      sub.textContent  = "O adversário foi mais rápido. Tenta de novo!";
+      SFX.lose();
+    }
+    // Badge do modo
+    const modeInfo = MODES[state.mode] || MODES.basico;
+    const badge = $("#end-mode-badge");
+    badge.textContent = modeInfo.name;
+    badge.style.setProperty("--accent", modeInfo.color);
+    badge.style.background = modeInfo.color;
+
+    $("#end-pontos").textContent  = state.pontos;
+    $("#end-tempo").textContent   = state.tempo + "s";
+    $("#end-acertos").textContent = state.acertos;
+    $("#end-erros").textContent   = state.erros;
+    $("#end-modal").classList.remove("hidden");
+  }, 600);
+}
+
+function confettiBurst(){
+  const colors = ["#ffd400","#19c37d","#1f6feb","#ff5f6d","#ff9a3c","#9b5de5"];
+  const stage = $("#stage");
+  for(let i=0;i<70;i++){
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.style.left = (Math.random()*100)+"%";
+    c.style.background = colors[i%colors.length];
+    c.style.animationDuration = (1.6 + Math.random()*1.6)+"s";
+    c.style.animationDelay = (Math.random()*0.3)+"s";
+    c.style.transform = `rotate(${Math.random()*360}deg)`;
+    stage.appendChild(c);
+    setTimeout(()=> c.remove(), 3500);
+  }
+}
+
+// ---------- Histórico / Comparação ----------
+const HISTORY_KEY = "corrida_quiz_history";
+
+function loadHistory(){
+  try{ return JSON.parse(localStorage.getItem(HISTORY_KEY)||"[]"); }
+  catch(e){ return []; }
+}
+
+function saveResult(playerWon){
+  const history = loadHistory();
+  history.push({
+    ts: Date.now(),
+    date: new Date().toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}),
+    mode: state.mode,
+    result: playerWon ? "vitoria" : "derrota",
+    pontos: state.pontos,
+    tempo: state.tempo,
+    acertos: state.acertos,
+    erros: state.erros,
+  });
+  if(history.length > 60) history.splice(0, history.length - 60);
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+}
+
+function deltaBadge(current, prev, lowerIsBetter){
+  if(prev == null) return '<span class="delta-none">1ª</span>';
+  const diff = current - prev;
+  if(diff === 0) return '<span class="delta-none">=</span>';
+  const better = lowerIsBetter ? diff < 0 : diff > 0;
+  const cls = better ? "delta-up" : "delta-down";
+  const arrow = diff > 0 ? "▲" : "▼";
+  return `<span class="${cls}">${arrow}${Math.abs(diff)}</span>`;
+}
+
+function renderHistory(){
+  const history = loadHistory();
+  const content = $("#history-content");
+
+  if(history.length === 0){
+    content.innerHTML = '<p class="hist-empty">Nenhuma partida registrada ainda.<br>Jogue uma partida para ver o histórico!</p>';
+    return;
+  }
+
+  // Build per-mode previous entry map (chronological order)
+  const lastByMode = {};
+  const processed = history.map(entry => {
+    const prev = lastByMode[entry.mode] || null;
+    lastByMode[entry.mode] = entry;
+    return { ...entry, prev };
+  });
+
+  // Display newest first
+  let html = "";
+  [...processed].reverse().forEach(entry => {
+    const modeInfo = MODES[entry.mode] || MODES.basico;
+    const isWin = entry.result === "vitoria";
+    const p = entry.prev;
+
+    const dPontos  = deltaBadge(entry.pontos,   p?.pontos,   false);
+    const dTempo   = deltaBadge(entry.tempo,     p?.tempo,    true);
+    const dAcertos = deltaBadge(entry.acertos,   p?.acertos,  false);
+    const dErros   = deltaBadge(entry.erros,     p?.erros,    true);
+
+    html += `
+      <div class="hist-entry">
+        <div class="hist-header">
+          <span class="mode-badge" style="background:${modeInfo.color};--accent:${modeInfo.color};font-size:10px;padding:2px 8px">${modeInfo.name}</span>
+          <span class="hist-result ${isWin?"hist-win":"hist-lose"}">${isWin?"🏆 Vitória":"💀 Derrota"}</span>
+          <span class="hist-date">${entry.date}</span>
+        </div>
+        <div class="hist-stats">
+          <div class="hist-stat">
+            <div class="hist-val">${entry.pontos}</div>
+            <div class="hist-delta">${dPontos}</div>
+            <div class="hist-lbl">Pontos</div>
+          </div>
+          <div class="hist-stat">
+            <div class="hist-val">${entry.tempo}s</div>
+            <div class="hist-delta">${dTempo}</div>
+            <div class="hist-lbl">Tempo</div>
+          </div>
+          <div class="hist-stat">
+            <div class="hist-val">${entry.acertos}</div>
+            <div class="hist-delta">${dAcertos}</div>
+            <div class="hist-lbl">Acertos</div>
+          </div>
+          <div class="hist-stat">
+            <div class="hist-val">${entry.erros}</div>
+            <div class="hist-delta">${dErros}</div>
+            <div class="hist-lbl">Erros</div>
+          </div>
+        </div>
+      </div>`;
+  });
+
+  content.innerHTML = html;
+}
+
+function showHistory(){
+  renderHistory();
+  $("#start-modal").classList.add("hidden");
+  $("#history-modal").classList.remove("hidden");
+}
+
+function closeHistory(){
+  $("#history-modal").classList.add("hidden");
+  $("#start-modal").classList.remove("hidden");
+}
+
+// ---------- Wire up ----------
+// Botões de seleção de modo (start screen)
+document.querySelectorAll(".mode-btn").forEach(btn => {
+  btn.addEventListener("click", ()=> startGame(btn.dataset.mode));
+});
+
+// Botões do modal de fim
+$("#btn-restart").addEventListener("click", ()=> startGame(state.mode));
+$("#btn-mode").addEventListener("click", showModeSelect);
+
+// Histórico
+$("#btn-history").addEventListener("click", showHistory);
+$("#btn-close-history").addEventListener("click", closeHistory);
+$("#btn-clear-history").addEventListener("click", ()=>{
+  if(confirm("Apagar todo o histórico de partidas?"))
+    localStorage.removeItem(HISTORY_KEY);
+  renderHistory();
+});
+
+// Resposta numérica
+$("#submit").addEventListener("click", submitNumeric);
+$("#answer").addEventListener("keydown", (e)=>{
+  if(e.key === "Enter"){ e.preventDefault(); submitNumeric(); }
+});
+
+// Resposta verdadeiro/falso
+document.querySelectorAll(".tf-btn").forEach(btn => {
+  btn.addEventListener("click", ()=>{
+    submitTrueFalse(btn.dataset.val === "true");
+  });
+});
+
+// Atalhos de teclado globais
+document.addEventListener("keydown", (e)=>{
+  // Em jogo + modo desafio: V/F respondem
+  if(state.running && state.acceptingInput &&
+     state.currentQ && state.currentQ.type === "truefalse"){
+    if(e.key === "v" || e.key === "V"){ e.preventDefault(); submitTrueFalse(true);  return; }
+    if(e.key === "f" || e.key === "F"){ e.preventDefault(); submitTrueFalse(false); return; }
+    if(e.key === "ArrowLeft"){ e.preventDefault(); submitTrueFalse(true);  return; }
+    if(e.key === "ArrowRight"){ e.preventDefault(); submitTrueFalse(false); return; }
+  }
+  // Fora de jogo: Enter/Espaço na tela de fim re-inicia o mesmo modo
+  if(!state.running){
+    if(!$("#end-modal").classList.contains("hidden") && (e.key === "Enter" || e.key === " ")){
+      e.preventDefault();
+      startGame(state.mode);
+    }
+  }
+});
+
+// Posições iniciais
+placeRunner($("#player"), 0);
+placeRunner($("#cpu"), 0);
+</script>
+</body>
+</html>

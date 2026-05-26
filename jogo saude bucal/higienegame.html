@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jogo da Higiene</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#d8ecf3;
+    --grid:#c4e0ea;
+    --card:#ffffff;
+    --blue:#2f93d4;
+    --blue-dark:#1f6fa8;
+    --red:#ee5a3f;
+    --red-dark:#d4452c;
+    --gray:#d0d6da;
+    --gray-text:#5b6b74;
+    --green:#5cb85c;
+    --footer:#bfe0eb;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:'Fredoka',sans-serif;
+    background:var(--bg);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+    overflow:hidden;
+  }
+  /* fundo com grade quadriculada */
+  .stage{
+    position:relative;
+    width:min(960px,100%);
+    height:min(700px,96vh);
+    background:var(--bg);
+    background-image:
+      linear-gradient(var(--grid) 1.5px,transparent 1.5px),
+      linear-gradient(90deg,var(--grid) 1.5px,transparent 1.5px);
+    background-size:84px 84px;
+    border-radius:22px;
+    overflow:hidden;
+    box-shadow:0 18px 50px rgba(31,111,168,.25);
+  }
+  .screen{
+    position:absolute;inset:0;
+    display:none;
+    flex-direction:column;
+    padding:38px 44px 0;
+  }
+  .screen.active{display:flex;animation:fade .35s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+  /* barra inferior */
+  .footer{
+    position:absolute;left:0;right:0;bottom:0;
+    height:150px;
+    background:linear-gradient(180deg,#cfe6ef 0%,var(--footer) 55%,#aed6e3 100%);
+  }
+  .btn{
+    font-family:'Fredoka',sans-serif;
+    font-weight:600;
+    font-size:22px;
+    letter-spacing:1px;
+    color:#fff;
+    background:var(--red);
+    border:none;
+    border-radius:40px;
+    padding:18px 56px;
+    cursor:pointer;
+    box-shadow:0 6px 0 var(--red-dark);
+    transition:transform .08s ease, box-shadow .08s ease, opacity .2s;
+    text-transform:uppercase;
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--red-dark);}
+  .btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:0 6px 0 var(--red-dark);}
+  .btn-wrap{
+    position:absolute;left:0;right:0;bottom:46px;
+    display:flex;justify-content:center;z-index:5;
+  }
+
+  /* ---------- TELA INICIAL ---------- */
+  #start{align-items:center;justify-content:center;text-align:center;padding-bottom:150px;}
+  #start h1{
+    color:var(--blue);
+    font-size:60px;
+    font-weight:700;
+    line-height:1.05;
+    text-transform:uppercase;
+    text-shadow:0 3px 0 #fff;
+  }
+  #start p{
+    color:var(--gray-text);
+    font-size:21px;
+    margin:18px 0 30px;
+    max-width:520px;
+  }
+  .hero{margin-bottom:20px;}
+
+  /* ---------- TELA DE PERGUNTA ---------- */
+  .topbar{
+    display:flex;align-items:center;gap:14px;
+    margin-bottom:6px;
+  }
+  .progress-track{
+    flex:1;height:14px;background:#fff;border-radius:10px;
+    box-shadow:inset 0 1px 3px rgba(0,0,0,.12);overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;background:var(--green);border-radius:10px;
+    width:0%;transition:width .4s ease;
+  }
+  .progress-label{
+    color:var(--blue-dark);font-weight:600;font-size:16px;
+    white-space:nowrap;
+  }
+  .q-main{
+    display:flex;gap:30px;margin-top:18px;
+  }
+  .q-left{flex:1;}
+  .q-text{
+    color:var(--blue);
+    font-size:33px;
+    font-weight:600;
+    line-height:1.18;
+    text-transform:uppercase;
+    margin-bottom:26px;
+  }
+  .q-pic{
+    width:200px;height:200px;flex-shrink:0;
+    background:#fff;
+    border:5px solid var(--blue-dark);
+    border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    padding:14px;
+  }
+  .q-pic svg{width:100%;height:100%;}
+  .options{display:flex;flex-direction:column;gap:8px;}
+  .option{
+    display:flex;align-items:center;gap:16px;
+    padding:8px 6px;
+    cursor:pointer;
+    border-radius:14px;
+    transition:background .15s;
+  }
+  .option:hover{background:rgba(47,147,212,.08);}
+  .bullet{
+    width:34px;height:34px;flex-shrink:0;
+    border-radius:50%;
+    background:var(--gray);
+    border:3px solid #c2c8cc;
+    transition:all .15s;
+  }
+  .option.selected .bullet{
+    background:var(--blue);border-color:var(--blue-dark);
+    box-shadow:0 0 0 4px rgba(47,147,212,.25);
+  }
+  .option.correct .bullet{background:var(--green);border-color:#3f8f3f;}
+  .option.wrong .bullet{background:var(--red);border-color:var(--red-dark);}
+  .option-text{
+    color:var(--gray-text);
+    font-size:24px;font-weight:500;
+    text-transform:uppercase;
+  }
+  .option.selected .option-text{color:var(--blue-dark);}
+  .shake{animation:shake .4s;}
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    20%,60%{transform:translateX(-9px);}
+    40%,80%{transform:translateX(9px);}
+  }
+
+  /* ---------- TELA DE FEEDBACK ---------- */
+  .feedback{flex-direction:row;align-items:center;gap:24px;padding-bottom:150px;}
+  .fb-char{width:300px;flex-shrink:0;display:flex;justify-content:center;}
+  .fb-char svg{width:260px;height:auto;}
+  .fb-text{
+    color:var(--blue);
+    font-size:33px;font-weight:600;line-height:1.22;
+    text-transform:uppercase;
+  }
+  .fb-text.bad{color:var(--red);}
+
+  /* ---------- TELA FINAL ---------- */
+  #end{align-items:center;justify-content:center;text-align:center;padding-bottom:150px;}
+  #end h1{
+    color:var(--blue);font-size:52px;font-weight:700;
+    text-transform:uppercase;text-shadow:0 3px 0 #fff;
+  }
+  .score-badge{
+    margin:22px 0 10px;
+    background:#fff;border:5px solid var(--blue-dark);
+    border-radius:20px;padding:20px 46px;
+  }
+  .score-badge .num{
+    color:var(--green);font-size:64px;font-weight:700;line-height:1;
+  }
+  .score-badge .lbl{
+    color:var(--gray-text);font-size:18px;font-weight:500;
+    text-transform:uppercase;letter-spacing:1px;
+  }
+  #end p{color:var(--gray-text);font-size:22px;margin-bottom:8px;}
+
+  /* cronometro na barra de perguntas */
+  .timer-chip{
+    display:flex;align-items:center;gap:6px;
+    background:#fff;border-radius:10px;
+    padding:4px 12px;
+    color:var(--blue-dark);font-weight:600;font-size:16px;
+    box-shadow:0 1px 3px rgba(0,0,0,.12);
+  }
+  .timer-chip svg{width:16px;height:16px;}
+
+  /* botao secundario (tela inicial) */
+  .btn-ghost{
+    font-family:'Fredoka',sans-serif;
+    font-weight:600;font-size:18px;letter-spacing:1px;
+    color:var(--blue-dark);
+    background:#fff;
+    border:3px solid var(--blue);
+    border-radius:40px;
+    padding:12px 38px;
+    cursor:pointer;
+    text-transform:uppercase;
+    transition:transform .08s ease, background .15s;
+  }
+  .btn-ghost:hover{transform:translateY(-2px);background:#eef7fc;}
+  .btn-ghost:active{transform:translateY(1px);}
+
+  .stat-line{
+    color:var(--blue-dark);font-size:22px;font-weight:500;
+    margin-bottom:4px;
+  }
+
+  /* ---------- TELA DE HISTORICO ---------- */
+  #history{padding-bottom:150px;}
+  #history h1{
+    color:var(--blue);font-size:40px;font-weight:700;
+    text-transform:uppercase;text-align:center;
+    text-shadow:0 2px 0 #fff;margin-bottom:6px;
+  }
+  .hist-sub{
+    text-align:center;color:var(--gray-text);font-size:17px;margin-bottom:14px;
+  }
+  .hist-list{
+    flex:1;overflow-y:auto;
+    display:flex;flex-direction:column;gap:9px;
+    padding-right:6px;
+  }
+  .hist-row{
+    display:flex;align-items:center;gap:14px;
+    background:#fff;border-radius:14px;
+    padding:12px 18px;
+    box-shadow:0 2px 6px rgba(31,111,168,.12);
+  }
+  .hist-rank{
+    width:34px;height:34px;flex-shrink:0;
+    background:var(--blue);color:#fff;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:16px;
+  }
+  .hist-row.best .hist-rank{background:var(--green);}
+  .hist-info{flex:1;}
+  .hist-date{color:var(--gray-text);font-size:14px;}
+  .hist-main{color:var(--blue-dark);font-size:20px;font-weight:600;}
+  .hist-trend{
+    font-size:15px;font-weight:600;white-space:nowrap;
+    display:flex;align-items:center;gap:5px;
+  }
+  .trend-up{color:var(--green);}
+  .trend-down{color:var(--red);}
+  .trend-same{color:var(--gray-text);}
+  .hist-empty{
+    text-align:center;color:var(--gray-text);
+    font-size:20px;margin-top:60px;
+  }
+  .hist-actions{
+    display:flex;justify-content:center;gap:14px;
+    margin-top:12px;
+  }
+
+  @media(max-width:680px){
+    .stage{height:96vh;}
+    .screen{padding:24px 22px 0;}
+    .q-text{font-size:24px;}
+    .q-pic{width:130px;height:130px;}
+    .option-text{font-size:18px;}
+    #start h1{font-size:40px;}
+    .feedback{flex-direction:column;gap:12px;}
+    .fb-char svg{width:160px;}
+    .fb-text{font-size:23px;}
+  }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+
+  <!-- ====== TELA INICIAL ====== -->
+  <section class="screen active" id="start">
+    <div class="hero">
+      <!-- sabonete com bolhas -->
+      <svg width="190" height="170" viewBox="0 0 190 170">
+        <ellipse cx="95" cy="150" rx="70" ry="12" fill="#1f6fa8" opacity=".15"/>
+        <rect x="40" y="78" width="110" height="62" rx="20" fill="#7ec8ec"/>
+        <rect x="40" y="70" width="110" height="62" rx="20" fill="#a8dbf3"/>
+        <ellipse cx="78" cy="92" rx="22" ry="14" fill="#fff" opacity=".55"/>
+        <circle cx="60" cy="48" r="16" fill="#fff" opacity=".9"/>
+        <circle cx="92" cy="32" r="22" fill="#fff" opacity=".95"/>
+        <circle cx="128" cy="50" r="14" fill="#fff" opacity=".9"/>
+        <circle cx="112" cy="60" r="9" fill="#fff" opacity=".8"/>
+        <circle cx="86" cy="30" r="6" fill="#bfe6f7"/>
+        <circle cx="56" cy="46" r="4" fill="#bfe6f7"/>
+      </svg>
+    </div>
+    <h1>Jogo da Higiene</h1>
+    <p>Responda as perguntas e aprenda como cuidar do corpo e ficar sempre saudável!</p>
+    <button class="btn-ghost" id="historyBtn">Ver resultados</button>
+    <div class="btn-wrap">
+      <button class="btn" id="startBtn">Começar</button>
+    </div>
+  </section>
+
+  <!-- ====== TELA DE PERGUNTA ====== -->
+  <section class="screen" id="quiz">
+    <div class="topbar">
+      <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+      <div class="timer-chip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 13V9M9 2h6"/></svg>
+        <span id="timer">00:00</span>
+      </div>
+      <div class="progress-label" id="counter">1 / 10</div>
+    </div>
+    <div class="q-main">
+      <div class="q-left">
+        <div class="q-text" id="qText">Pergunta</div>
+        <div class="options" id="options"></div>
+      </div>
+      <div class="q-pic" id="qPic"></div>
+    </div>
+    <div class="btn-wrap">
+      <button class="btn" id="confirmBtn" disabled>Confirmar</button>
+    </div>
+  </section>
+
+  <!-- ====== TELA DE FEEDBACK ====== -->
+  <section class="screen" id="feedback">
+    <div class="feedback">
+      <div class="fb-char" id="fbChar"></div>
+      <div class="fb-text" id="fbText"></div>
+    </div>
+    <div class="btn-wrap">
+      <button class="btn" id="continueBtn">Continuar</button>
+    </div>
+  </section>
+
+  <!-- ====== TELA FINAL ====== -->
+  <section class="screen" id="end">
+    <h1 id="endTitle">Parabéns!</h1>
+    <div class="score-badge">
+      <div class="num" id="finalScore">0</div>
+      <div class="lbl">acertos de 10</div>
+    </div>
+    <div class="stat-line">⏱ Tempo: <strong id="finalTime">00:00</strong></div>
+    <p id="endMsg">Você é craque na higiene!</p>
+    <div class="btn-wrap" style="gap:14px;align-items:center;">
+      <button class="btn-ghost" id="endHomeBtn">Início</button>
+      <button class="btn" id="restartBtn">Jogar de novo</button>
+    </div>
+  </section>
+
+  <!-- ====== TELA DE HISTÓRICO ====== -->
+  <section class="screen" id="history">
+    <h1>Resultados</h1>
+    <div class="hist-sub" id="histSub">Compare suas partidas e veja sua evolução</div>
+    <div class="hist-list" id="histList"></div>
+    <div class="hist-actions">
+      <button class="btn-ghost" id="clearHistBtn">Limpar histórico</button>
+      <button class="btn-ghost" id="backHistBtn">Voltar</button>
+    </div>
+  </section>
+
+  <div class="footer"></div>
+</div>
+
+<script>
+/* ================= EFEITOS SONOROS (Web Audio API) ================= */
+let actx;
+function audio(){ if(!actx) actx = new (window.AudioContext||window.webkitAudioContext)(); return actx; }
+function tone(freq,start,dur,type='sine',vol=.25){
+  const a=audio();
+  const o=a.createOscillator(), g=a.createGain();
+  o.type=type; o.frequency.value=freq;
+  o.connect(g); g.connect(a.destination);
+  const t=a.currentTime+start;
+  g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(vol,t+.03);
+  g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.start(t); o.stop(t+dur+.05);
+}
+const sfx={
+  click(){ tone(420,0,.09,'triangle',.18); },
+  correct(){ [523,659,784,1047].forEach((f,i)=>tone(f,i*.1,.32,'triangle',.22)); },
+  wrong(){ tone(220,0,.22,'sawtooth',.18); tone(160,.12,.3,'sawtooth',.18); },
+  win(){ [523,587,659,784,880,1047].forEach((f,i)=>tone(f,i*.13,.5,'triangle',.22)); }
+};
+
+/* ================= ILUSTRAÇÕES (SVG inline) ================= */
+const PIC = {
+  toalha:`<svg viewBox="0 0 120 120"><rect x="14" y="24" width="92" height="9" rx="4" fill="#7a4a36"/><circle cx="14" cy="28" r="7" fill="#5e3526"/><circle cx="106" cy="28" r="7" fill="#5e3526"/><path d="M40 30h44v60a8 8 0 0 1-8 8H48a8 8 0 0 1-8-8z" fill="#f4cf3a"/><path d="M70 30h14v60a8 8 0 0 1-8 8h-6z" fill="#e0b424"/><rect x="40" y="84" width="44" height="4" fill="#e0b424"/><rect x="40" y="91" width="44" height="4" fill="#e0b424"/></svg>`,
+
+  maca:`<svg viewBox="0 0 120 120"><path d="M60 34c-10-12-30-10-34 6-5 20 8 56 24 56 4 0 7-2 10-2s6 2 10 2c16 0 29-36 24-56-4-16-24-18-34-6z" fill="#e8453a"/><path d="M60 34c-10-12-30-10-34 6-3 12 0 30 6 44 0-26 8-44 28-50z" fill="#f06b5e"/><rect x="57" y="14" width="6" height="22" rx="3" fill="#7a4a2e"/><path d="M63 22c10-12 26-10 24 2-12 4-20 2-24-2z" fill="#5cb85c"/></svg>`,
+
+  escova:`<svg viewBox="0 0 120 120"><rect x="20" y="58" width="78" height="14" rx="7" fill="#3fa9d4" transform="rotate(-22 60 65)"/><rect x="20" y="58" width="30" height="14" rx="7" fill="#fff" transform="rotate(-22 60 65)"/><g transform="rotate(-22 60 65)"><rect x="22" y="50" width="3" height="9" fill="#7ec8ec"/><rect x="28" y="49" width="3" height="11" fill="#7ec8ec"/><rect x="34" y="50" width="3" height="9" fill="#7ec8ec"/><rect x="40" y="49" width="3" height="11" fill="#7ec8ec"/></g><path d="M80 30c-8 0-10 8-4 12 5 3 14 3 18 0 5-4 2-12-4-12-3 0-4 3-5 3s-2-3-5-3z" fill="#5cb85c"/></svg>`,
+
+  maos:`<svg viewBox="0 0 120 120"><circle cx="60" cy="30" r="9" fill="#9fd9ef"/><circle cx="42" cy="42" r="7" fill="#bfe6f7"/><circle cx="78" cy="42" r="7" fill="#bfe6f7"/><path d="M30 58c0-6 5-9 10-9h40c5 0 10 3 10 9 0 16-13 30-30 30S30 74 30 58z" fill="#f0b98d"/><path d="M38 58c0-3 3-5 6-5h32c3 0 6 2 6 5 0 13-10 24-22 24S38 71 38 58z" fill="#f7cda6"/><circle cx="50" cy="64" r="5" fill="#fff" opacity=".8"/><circle cx="68" cy="70" r="6" fill="#fff" opacity=".8"/></svg>`,
+
+  sabonete:`<svg viewBox="0 0 120 120"><ellipse cx="60" cy="92" rx="40" ry="8" fill="#1f6fa8" opacity=".15"/><rect x="26" y="56" width="68" height="34" rx="14" fill="#7ec8ec"/><rect x="26" y="48" width="68" height="34" rx="14" fill="#a8dbf3"/><ellipse cx="48" cy="60" rx="14" ry="8" fill="#fff" opacity=".55"/><circle cx="44" cy="30" r="13" fill="#fff"/><circle cx="68" cy="22" r="16" fill="#fff"/><circle cx="86" cy="36" r="10" fill="#fff"/></svg>`,
+
+  espirro:`<svg viewBox="0 0 120 120"><circle cx="54" cy="52" r="34" fill="#f7cda6"/><path d="M54 18a34 34 0 0 0-34 34c0-14 30-20 34-30z" fill="#fbe0c6"/><circle cx="44" cy="48" r="4" fill="#3a3a3a"/><circle cx="64" cy="48" r="4" fill="#3a3a3a"/><path d="M40 66q14 12 28 0" stroke="#c98b5e" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M70 60l32-6-6 14-26 4z" fill="#fff" stroke="#cfd6da" stroke-width="2"/><circle cx="100" cy="44" r="3" fill="#bfe6f7"/><circle cx="108" cy="56" r="4" fill="#bfe6f7"/><circle cx="102" cy="66" r="3" fill="#bfe6f7"/></svg>`,
+
+  tesoura:`<svg viewBox="0 0 120 120"><line x1="48" y1="60" x2="96" y2="36" stroke="#9aa4ab" stroke-width="6" stroke-linecap="round"/><line x1="48" y1="60" x2="96" y2="84" stroke="#b7c0c6" stroke-width="6" stroke-linecap="round"/><circle cx="36" cy="42" r="14" fill="none" stroke="#ee5a3f" stroke-width="7"/><circle cx="36" cy="78" r="14" fill="none" stroke="#ee5a3f" stroke-width="7"/><circle cx="50" cy="60" r="5" fill="#5b6b74"/></svg>`,
+
+  vaso:`<svg viewBox="0 0 120 120"><rect x="40" y="22" width="44" height="14" rx="4" fill="#cdd6da"/><rect x="44" y="34" width="36" height="10" fill="#e3e9ec"/><ellipse cx="58" cy="64" rx="34" ry="22" fill="#e8eef1"/><ellipse cx="58" cy="64" rx="22" ry="12" fill="#a8dbf3"/><path d="M24 64c0 26 14 34 34 34s34-8 34-34z" fill="#cdd6da" opacity="0"/><rect x="34" y="80" width="48" height="22" rx="6" fill="#dfe6ea"/><rect x="80" y="50" width="14" height="40" rx="5" fill="#cdd6da"/></svg>`,
+
+  shampoo:`<svg viewBox="0 0 120 120"><ellipse cx="60" cy="100" rx="34" ry="7" fill="#1f6fa8" opacity=".15"/><rect x="52" y="20" width="16" height="12" rx="3" fill="#1f6fa8"/><rect x="44" y="32" width="32" height="10" rx="4" fill="#3fa9d4"/><path d="M40 44h40c4 0 7 3 7 7v40a8 8 0 0 1-8 8H41a8 8 0 0 1-8-8V51c0-4 3-7 7-7z" fill="#7ec8ec"/><rect x="42" y="58" width="36" height="26" rx="5" fill="#fff"/><circle cx="60" cy="71" r="9" fill="#a8dbf3"/></svg>`,
+
+  banho:`<svg viewBox="0 0 120 120"><rect x="58" y="14" width="6" height="20" fill="#9aa4ab"/><path d="M40 34h42l-6 12H46z" fill="#b7c0c6"/><path d="M44 46h34l-4 8H48z" fill="#cdd6da"/><g fill="#7ec8ec"><circle cx="48" cy="64" r="4"/><circle cx="60" cy="60" r="4"/><circle cx="72" cy="64" r="4"/><circle cx="54" cy="78" r="4"/><circle cx="66" cy="76" r="4"/><circle cx="60" cy="92" r="4"/><circle cx="48" cy="90" r="3"/><circle cx="72" cy="90" r="3"/></g></svg>`
+};
+
+/* ================= PERSONAGEM (feedback) ================= */
+function charSVG(happy){
+  const mouth = happy
+    ? `<path d="M86 118q14 14 28 0" stroke="#5e3526" stroke-width="5" fill="none" stroke-linecap="round"/>`
+    : `<path d="M86 122q14 -8 28 0" stroke="#5e3526" stroke-width="5" fill="none" stroke-linecap="round"/>`;
+  const brow = happy
+    ? `<path d="M82 90q8 -5 16 0" stroke="#3a2418" stroke-width="4" fill="none" stroke-linecap="round"/>
+       <path d="M102 90q8 -5 16 0" stroke="#3a2418" stroke-width="4" fill="none" stroke-linecap="round"/>`
+    : `<path d="M82 92q8 4 16 0" stroke="#3a2418" stroke-width="4" fill="none" stroke-linecap="round"/>
+       <path d="M102 92q8 4 16 0" stroke="#3a2418" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+  return `<svg viewBox="0 0 200 280">
+    <ellipse cx="100" cy="266" rx="58" ry="12" fill="#1f6fa8" opacity=".15"/>
+    <!-- pernas -->
+    <rect x="82" y="196" width="16" height="58" rx="8" fill="#f1f1ef"/>
+    <rect x="104" y="196" width="16" height="58" rx="8" fill="#e7e7e4"/>
+    <ellipse cx="88" cy="258" rx="14" ry="8" fill="#5e3526"/>
+    <ellipse cx="114" cy="258" rx="14" ry="8" fill="#5e3526"/>
+    <!-- corpo -->
+    <path d="M70 132h60c8 0 14 6 14 14v44c0 8-6 14-14 14H70c-8 0-14-6-14-14v-44c0-8 6-14 14-14z" fill="#ef8b3f"/>
+    <!-- bracos -->
+    <rect x="44" y="138" width="18" height="56" rx="9" fill="#ef8b3f"/>
+    <rect x="138" y="138" width="18" height="56" rx="9" fill="#ef8b3f"/>
+    <circle cx="53" cy="196" r="11" fill="#f7cda6"/>
+    <circle cx="147" cy="196" r="11" fill="#f7cda6"/>
+    <!-- cabeca -->
+    <circle cx="100" cy="98" r="50" fill="#f7cda6"/>
+    <path d="M100 48c-30 0-50 20-50 46 0 8 2 14 4 18 2-22 8-34 22-40-2 6-2 12 0 16 6-12 16-20 30-22 12-2 24 2 32 12 4 6 6 14 6 22 4-6 6-14 6-22 0-30-22-50-50-50z" fill="#3a2418"/>
+    ${brow}
+    <circle cx="90" cy="102" r="6" fill="#3a2418"/>
+    <circle cx="110" cy="102" r="6" fill="#3a2418"/>
+    <circle cx="92" cy="100" r="2" fill="#fff"/>
+    <circle cx="112" cy="100" r="2" fill="#fff"/>
+    ${mouth}
+    <circle cx="78" cy="116" r="6" fill="#f0a98a" opacity=".6"/>
+    <circle cx="122" cy="116" r="6" fill="#f0a98a" opacity=".6"/>
+  </svg>`;
+}
+
+/* ================= PERGUNTAS ================= */
+const QUESTIONS = [
+  {
+    pic:'toalha',
+    q:'O que pode acontecer se não nos secarmos direito?',
+    options:['A roupa fica mais colorida.','A pele pode ter coceira e fungos.','O cabelo cresce mais rápido.'],
+    answer:1,
+    good:'Que legal! Você se secou direitinho depois do banho, principalmente nas dobrinhas do corpo. Assim, evita fungos e se mantém saudável!'
+  },
+  {
+    pic:'maca',
+    q:'O que usamos para lavar as frutas?',
+    options:['Uma esponja suja.','Água limpa.','Um guardanapo seco.'],
+    answer:1,
+    good:'Isso mesmo! Lavar as frutas com água limpa tira a sujeira e os germes antes de comer.'
+  },
+  {
+    pic:'escova',
+    q:'Quantas vezes devemos escovar os dentes por dia?',
+    options:['Pelo menos três vezes.','Só uma vez por semana.','Nunca precisa escovar.'],
+    answer:0,
+    good:'Muito bem! Escovar os dentes pela manhã, depois das refeições e antes de dormir deixa o sorriso saudável!'
+  },
+  {
+    pic:'maos',
+    q:'O que devemos fazer antes de comer?',
+    options:['Brincar na terra.','Lavar as mãos com água e sabão.','Assistir televisão.'],
+    answer:1,
+    good:'Perfeito! Lavar as mãos antes de comer evita que os germes entrem no nosso corpo.'
+  },
+  {
+    pic:'sabonete',
+    q:'O que usamos para lavar o corpo no banho?',
+    options:['Areia e folhas.','Sabonete e água.','Apenas uma toalha.'],
+    answer:1,
+    good:'Show! O sabonete com água tira a sujeira e o suor, deixando o corpo limpinho e cheiroso.'
+  },
+  {
+    pic:'espirro',
+    q:'O que devemos fazer ao espirrar ou tossir?',
+    options:['Cobrir a boca e o nariz.','Espirrar na comida.','Não fazer nada.'],
+    answer:0,
+    good:'Boa! Cobrir a boca e o nariz com o braço ou um lenço evita espalhar germes para os amigos.'
+  },
+  {
+    pic:'tesoura',
+    q:'Por que devemos cortar as unhas?',
+    options:['Para ficarem bem grandes.','Para não acumular sujeira e germes.','Para arranhar os colegas.'],
+    answer:1,
+    good:'Exatamente! Unhas curtas e limpas não guardam sujeira nem germes embaixo delas.'
+  },
+  {
+    pic:'vaso',
+    q:'O que fazemos depois de usar o banheiro?',
+    options:['Saímos correndo.','Lavamos bem as mãos.','Comemos um lanche.'],
+    answer:1,
+    good:'Ótimo! Lavar as mãos depois do banheiro é uma das maneiras mais importantes de ficar saudável.'
+  },
+  {
+    pic:'shampoo',
+    q:'Com o que lavamos o cabelo?',
+    options:['Com shampoo e água.','Com refrigerante.','Com tinta colorida.'],
+    answer:0,
+    good:'Isso aí! O shampoo com água limpa o couro cabeludo e deixa o cabelo saudável.'
+  },
+  {
+    pic:'banho',
+    q:'Com que frequência devemos tomar banho?',
+    options:['Uma vez por mês.','Todos os dias.','Só no aniversário.'],
+    answer:1,
+    good:'Maravilha! Tomar banho todos os dias remove o suor e a sujeira e mantém o corpo cheiroso.'
+  }
+];
+
+/* ================= LÓGICA DO JOGO ================= */
+const screens = {
+  start:document.getElementById('start'),
+  quiz:document.getElementById('quiz'),
+  feedback:document.getElementById('feedback'),
+  end:document.getElementById('end'),
+  history:document.getElementById('history')
+};
+function show(name){
+  Object.values(screens).forEach(s=>s.classList.remove('active'));
+  screens[name].classList.add('active');
+}
+
+let current=0, score=0, selected=null, locked=false;
+let deck=[];               // perguntas embaralhadas da partida
+let elapsed=0, timerId=null, startTime=0;
+
+/* ---- embaralhar (Fisher-Yates) ---- */
+function shuffle(arr){
+  const a=arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+/* ---- cronômetro ---- */
+function fmtTime(s){
+  const m=Math.floor(s/60), r=s%60;
+  return String(m).padStart(2,'0')+':'+String(r).padStart(2,'0');
+}
+function startTimer(){
+  elapsed=0; startTime=Date.now();
+  document.getElementById('timer').textContent='00:00';
+  clearInterval(timerId);
+  timerId=setInterval(()=>{
+    elapsed=Math.floor((Date.now()-startTime)/1000);
+    document.getElementById('timer').textContent=fmtTime(elapsed);
+  },1000);
+}
+function stopTimer(){ clearInterval(timerId); }
+
+/* ---- início de partida ---- */
+function newGame(){
+  current=0; score=0;
+  deck=shuffle(QUESTIONS);
+  startTimer();
+  loadQuestion();
+  show('quiz');
+}
+
+function loadQuestion(){
+  const q=deck[current];
+  selected=null; locked=false;
+  document.getElementById('confirmBtn').disabled=true;
+  document.getElementById('qPic').innerHTML=PIC[q.pic];
+  document.getElementById('qText').textContent=q.q;
+  document.getElementById('counter').textContent=(current+1)+' / '+deck.length;
+  document.getElementById('progress').style.width=(current/deck.length*100)+'%';
+
+  const box=document.getElementById('options');
+  box.innerHTML='';
+  q.options.forEach((text,i)=>{
+    const el=document.createElement('div');
+    el.className='option';
+    el.innerHTML='<div class="bullet"></div><div class="option-text">'+text+'</div>';
+    el.onclick=()=>{
+      if(locked) return;
+      sfx.click();
+      [...box.children].forEach(c=>c.classList.remove('selected'));
+      el.classList.add('selected');
+      selected=i;
+      document.getElementById('confirmBtn').disabled=false;
+    };
+    box.appendChild(el);
+  });
+}
+
+function confirmAnswer(){
+  if(locked||selected===null) return;
+  locked=true;
+  const q=deck[current];
+  const opts=document.getElementById('options').children;
+  document.getElementById('confirmBtn').disabled=true;
+
+  if(selected===q.answer){
+    opts[selected].classList.add('correct');
+    score++;
+    sfx.correct();
+    setTimeout(()=>showFeedback(true,q.good),700);
+  }else{
+    opts[selected].classList.add('wrong');
+    opts[q.answer].classList.add('correct');
+    sfx.wrong();
+    document.querySelector('.q-main').classList.add('shake');
+    setTimeout(()=>document.querySelector('.q-main').classList.remove('shake'),420);
+    const correctText=q.options[q.answer].toLowerCase();
+    setTimeout(()=>showFeedback(false,
+      'Ops! Não foi dessa vez. A resposta certa é: '+correctText+' Continue tentando!'),900);
+  }
+}
+
+function showFeedback(good,text){
+  document.getElementById('fbChar').innerHTML=charSVG(good);
+  const ft=document.getElementById('fbText');
+  ft.textContent=text;
+  ft.classList.toggle('bad',!good);
+  show('feedback');
+}
+
+function nextStep(){
+  sfx.click();
+  current++;
+  if(current>=deck.length){
+    finish();
+  }else{
+    loadQuestion();
+    show('quiz');
+  }
+}
+
+function finish(){
+  stopTimer();
+  const total=deck.length;
+  document.getElementById('finalScore').textContent=score;
+  document.getElementById('finalTime').textContent=fmtTime(elapsed);
+  let title,msg;
+  if(score===total){ title='Incrível!'; msg='Você é um verdadeiro mestre da higiene!'; }
+  else if(score>=total*0.7){ title='Muito bem!'; msg='Você sabe cuidar muito bem do seu corpo!'; }
+  else if(score>=total*0.4){ title='Bom trabalho!'; msg='Continue praticando os hábitos de higiene!'; }
+  else { title='Continue assim!'; msg='Vamos jogar de novo e aprender mais sobre higiene!'; }
+  document.getElementById('endTitle').textContent=title;
+  document.getElementById('endMsg').textContent=msg;
+  saveResult(score,total,elapsed);
+  sfx.win();
+  show('end');
+}
+
+/* ================= HISTÓRICO DE PARTIDAS ================= */
+const HKEY='higienegame_historico';
+
+function loadHistory(){
+  try{ return JSON.parse(localStorage.getItem(HKEY))||[]; }
+  catch(e){ return []; }
+}
+function saveResult(score,total,time){
+  try{
+    const h=loadHistory();
+    h.push({score,total,time,date:Date.now()});
+    localStorage.setItem(HKEY,JSON.stringify(h.slice(-30)));
+  }catch(e){/* armazenamento indisponível */}
+}
+
+function renderHistory(){
+  const list=document.getElementById('histList');
+  const sub=document.getElementById('histSub');
+  const h=loadHistory();
+  list.innerHTML='';
+
+  if(h.length===0){
+    sub.textContent='Compare suas partidas e veja sua evolução';
+    list.innerHTML='<div class="hist-empty">Nenhuma partida registrada ainda.<br>Jogue para começar a comparar!</div>';
+    return;
+  }
+
+  const bestScore=Math.max(...h.map(g=>g.score));
+  const last=h[h.length-1];
+  const first=h[0];
+  if(h.length>=2){
+    const diff=last.score-first.score;
+    if(diff>0) sub.textContent='Você melhorou '+diff+' acerto(s) desde a primeira partida! 🎉';
+    else if(diff<0) sub.textContent='Atenção: caiu '+Math.abs(diff)+' acerto(s) desde a primeira partida.';
+    else sub.textContent='Seu desempenho está estável. Tente superar seu recorde!';
+  }else{
+    sub.textContent='Jogue mais uma vez para comparar a evolução.';
+  }
+
+  // mais recentes no topo
+  [...h].reverse().forEach((g,idx)=>{
+    const realIndex=h.length-idx;          // nº da partida (1 = primeira)
+    const prev=h[h.length-idx-2];          // partida anterior
+    const row=document.createElement('div');
+    row.className='hist-row'+(g.score===bestScore?' best':'');
+
+    let trend='<span class="trend-same">—</span>';
+    if(prev){
+      const d=g.score-prev.score;
+      if(d>0) trend='<span class="hist-trend trend-up">▲ +'+d+'</span>';
+      else if(d<0) trend='<span class="hist-trend trend-down">▼ '+d+'</span>';
+      else trend='<span class="hist-trend trend-same">= igual</span>';
+    }
+
+    const dt=new Date(g.date);
+    const dataStr=String(dt.getDate()).padStart(2,'0')+'/'+
+                  String(dt.getMonth()+1).padStart(2,'0')+'/'+dt.getFullYear()+
+                  ' às '+String(dt.getHours()).padStart(2,'0')+':'+
+                  String(dt.getMinutes()).padStart(2,'0');
+
+    row.innerHTML=
+      '<div class="hist-rank">'+realIndex+'</div>'+
+      '<div class="hist-info">'+
+        '<div class="hist-main">'+g.score+'/'+g.total+' acertos · ⏱ '+fmtTime(g.time)+
+        (g.score===bestScore?'  🏆':'')+'</div>'+
+        '<div class="hist-date">Partida '+realIndex+' — '+dataStr+'</div>'+
+      '</div>'+
+      trend;
+    list.appendChild(row);
+  });
+}
+
+/* ================= BOTÕES ================= */
+document.getElementById('startBtn').onclick=()=>{
+  audio(); sfx.click();
+  newGame();
+};
+document.getElementById('confirmBtn').onclick=()=>{ sfx.click(); confirmAnswer(); };
+document.getElementById('continueBtn').onclick=nextStep;
+document.getElementById('restartBtn').onclick=()=>{
+  audio(); sfx.click();
+  newGame();
+};
+document.getElementById('endHomeBtn').onclick=()=>{
+  sfx.click();
+  show('start');
+};
+document.getElementById('historyBtn').onclick=()=>{
+  audio(); sfx.click();
+  renderHistory();
+  show('history');
+};
+document.getElementById('backHistBtn').onclick=()=>{
+  sfx.click();
+  show('start');
+};
+document.getElementById('clearHistBtn').onclick=()=>{
+  sfx.click();
+  if(confirm('Apagar todo o histórico de partidas?')){
+    try{ localStorage.removeItem(HKEY); }catch(e){}
+    renderHistory();
+  }
+};
+</script>
+</body>
+</html>
