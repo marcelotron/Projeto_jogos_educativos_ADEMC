@@ -584,6 +584,195 @@
   .hist-btn-danger:hover { background: rgba(192,57,43,0.07); }
   .hist-btn-danger:active { transform: translateY(2px); }
 
+  /* ============ MENU / HOW-TO / THEORY OVERLAYS ============ */
+  .ov-chalk {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.62);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 110;
+    backdrop-filter: blur(5px);
+  }
+  .ov-chalk.show { display: flex; }
+
+  .cboard {
+    background:
+      radial-gradient(ellipse at 22% 18%, rgba(255,255,255,0.07) 0%, transparent 52%),
+      linear-gradient(145deg, #2f5e3e 0%, #1c3a28 100%);
+    border: 8px solid #8b5a2b;
+    border-radius: 18px;
+    padding: 28px 30px 34px;
+    text-align: center;
+    box-shadow:
+      0 18px 40px rgba(0,0,0,0.6),
+      inset 0 0 28px rgba(0,0,0,0.38);
+    max-width: 92%;
+    width: 430px;
+    position: relative;
+  }
+  /* chalk dust bottom ledge */
+  .cboard::after {
+    content: '';
+    position: absolute;
+    bottom: -20px; left: 6%;
+    width: 88%; height: 12px;
+    background: linear-gradient(180deg, #c9844f, #8b5a2b);
+    border-radius: 0 0 6px 6px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  }
+  .cboard-md  { width: 520px; }
+  .cboard-lg  { width: 600px; }
+
+  .cboard-title {
+    font-family: 'Caveat', cursive;
+    font-size: 46px;
+    font-weight: 700;
+    color: #f5f5dc;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.45);
+    margin-bottom: 2px;
+    line-height: 1.1;
+  }
+  .cboard-sub {
+    font-family: 'Patrick Hand', cursive;
+    font-size: 14px;
+    color: rgba(245,245,220,0.55);
+    margin-bottom: 18px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+  }
+  .cboard-line {
+    width: 80%; height: 2px;
+    background: rgba(245,245,220,0.2);
+    margin: 0 auto 20px;
+    border-radius: 1px;
+  }
+
+  /* ----- Menu buttons ----- */
+  .menu-btns { display: flex; flex-direction: column; gap: 10px; }
+
+  .mbtn {
+    display: flex; align-items: center; gap: 13px;
+    padding: 13px 20px;
+    border: none; border-radius: 50px;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 700; font-size: 19px;
+    cursor: pointer;
+    transition: transform 0.12s, filter 0.12s;
+    text-align: left; width: 100%;
+    letter-spacing: 0.3px;
+  }
+  .mbtn:hover  { transform: translateY(-2px); filter: brightness(1.12); }
+  .mbtn:active { transform: translateY(1px);  filter: brightness(0.93); }
+  .mbtn-icon  { font-size: 22px; flex-shrink: 0; }
+  .mbtn-label { flex: 1; }
+
+  .mbtn-play {
+    background: linear-gradient(135deg, #27ae60, #34d870);
+    color: #fff;
+    box-shadow: 0 5px 0 #1a7a44, 0 8px 14px rgba(0,0,0,0.3);
+  }
+  .mbtn-how {
+    background: rgba(255,255,255,0.09);
+    color: #f5f5dc;
+    border: 2px solid rgba(255,255,255,0.22) !important;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.3);
+  }
+  .mbtn-theory {
+    background: rgba(52,152,219,0.18);
+    color: #9fd4f8;
+    border: 2px solid rgba(52,152,219,0.35) !important;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.3);
+  }
+  .mbtn-hist {
+    background: rgba(241,196,15,0.1);
+    color: #f5d76e;
+    border: 2px solid rgba(241,196,15,0.28) !important;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.3);
+  }
+
+  /* ----- How to play ----- */
+  .how-steps { display: flex; flex-direction: column; gap: 10px; text-align: left; margin-bottom: 18px; }
+  .how-step {
+    display: flex; align-items: flex-start; gap: 12px;
+    background: rgba(255,255,255,0.07);
+    border-left: 4px solid rgba(255,255,255,0.2);
+    border-radius: 10px;
+    padding: 10px 13px;
+  }
+  .how-step-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+  .how-step-text {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 15px; color: #f0ead8; line-height: 1.5;
+  }
+  .how-step-text strong { color: #ffd700; }
+  .how-example {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: rgba(0,0,0,0.28);
+    border-radius: 8px; padding: 2px 10px;
+    font-family: 'Caveat', cursive; font-size: 17px;
+    color: #fff8c0; letter-spacing: 2px; margin-top: 4px;
+    vertical-align: middle;
+  }
+  .how-dash { color: #ffd700; font-weight: bold; }
+
+  /* ----- Theory ----- */
+  .theory-scroll {
+    max-height: 370px; overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(245,245,220,0.28) transparent;
+    padding-right: 5px; margin-bottom: 14px; text-align: left;
+  }
+  .theory-scroll::-webkit-scrollbar { width: 5px; }
+  .theory-scroll::-webkit-scrollbar-thumb { background: rgba(245,245,220,0.28); border-radius: 3px; }
+
+  .t-card {
+    background: rgba(255,255,255,0.06);
+    border-left: 4px solid;
+    border-radius: 10px;
+    padding: 11px 14px; margin-bottom: 10px;
+  }
+  .t-card-title {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 16px; font-weight: 700;
+    margin-bottom: 7px;
+    display: flex; align-items: center; gap: 7px;
+  }
+  .t-card-body {
+    font-family: 'Patrick Hand', cursive;
+    font-size: 14px; color: rgba(245,245,220,0.82); line-height: 1.6;
+  }
+  .t-ex {
+    display: inline-block;
+    background: rgba(0,0,0,0.28);
+    border-radius: 6px; padding: 1px 8px;
+    margin: 2px 2px;
+    font-family: 'Caveat', cursive; font-size: 15px;
+    color: #fff8c0; letter-spacing: 1.5px;
+  }
+  .t-sep { color: #ffd700; font-weight: bold; }
+  .t-rule {
+    display: inline-block;
+    background: rgba(0,0,0,0.22);
+    border-radius: 5px; padding: 1px 7px;
+    font-family: 'Fredoka', sans-serif; font-size: 14px;
+    font-weight: 700; margin: 1px;
+  }
+
+  /* ----- Back button (shared) ----- */
+  .cback-btn {
+    background: rgba(255,255,255,0.1);
+    color: #f0ead8;
+    border: 2px solid rgba(255,255,255,0.24) !important;
+    padding: 10px 32px; border-radius: 30px;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 700; font-size: 17px; cursor: pointer;
+    transition: background 0.14s, transform 0.1s;
+    flex-shrink: 0;
+  }
+  .cback-btn:hover  { background: rgba(255,255,255,0.18); }
+  .cback-btn:active { transform: translateY(1px); }
+
   /* responsive */
   @media (max-width: 720px) {
     .panel { width: 88px; padding: 10px 8px; top: 24%; }
@@ -685,6 +874,163 @@
     </div>
   </div>
 
+  <!-- ===== MENU PRINCIPAL ===== -->
+  <div class="ov-chalk" id="menuOverlay">
+    <div class="cboard">
+      <div class="cboard-title">Separar Sílabas ✏️</div>
+      <div class="cboard-sub">Jogo Educativo de Português</div>
+      <div class="cboard-line"></div>
+      <div class="menu-btns">
+        <button class="mbtn mbtn-play" id="btnMenuPlay">
+          <span class="mbtn-icon">🎮</span>
+          <span class="mbtn-label">Jogar!</span>
+        </button>
+        <button class="mbtn mbtn-how" id="btnMenuHow">
+          <span class="mbtn-icon">📖</span>
+          <span class="mbtn-label">Como Jogar</span>
+        </button>
+        <button class="mbtn mbtn-theory" id="btnMenuTheory">
+          <span class="mbtn-icon">📚</span>
+          <span class="mbtn-label">Aprender a Separar Sílabas</span>
+        </button>
+        <button class="mbtn mbtn-hist" id="btnMenuHist">
+          <span class="mbtn-icon">📊</span>
+          <span class="mbtn-label">Comparar Resultados</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== COMO JOGAR ===== -->
+  <div class="ov-chalk" id="howToPlayOverlay">
+    <div class="cboard cboard-md">
+      <div class="cboard-title">Como Jogar 📖</div>
+      <div class="cboard-line"></div>
+      <div class="how-steps">
+        <div class="how-step">
+          <span class="how-step-icon">👀</span>
+          <div class="how-step-text">Observe as <strong>6 palavras</strong> escritas na lousa — você precisa separar cada uma em sílabas.</div>
+        </div>
+        <div class="how-step">
+          <span class="how-step-icon">👆</span>
+          <div class="how-step-text">
+            Clique <strong>entre as letras</strong> onde deve haver uma divisão silábica. Um traço amarelo aparece. Clique de novo para apagar.<br>
+            <span class="how-example">B<span class="how-dash">|</span>O<span class="how-dash">|</span>L<span class="how-dash"> </span>A → <span style="color:#ffd700">bo</span><span class="how-dash">-</span><span style="color:#ffd700">la</span></span>
+          </div>
+        </div>
+        <div class="how-step">
+          <span class="how-step-icon">✅</span>
+          <div class="how-step-text">Quando terminar, pressione o botão <strong>CHECK</strong> para conferir suas respostas.</div>
+        </div>
+        <div class="how-step">
+          <span class="how-step-icon">⭐</span>
+          <div class="how-step-text">Palavras <strong>certas</strong> desaparecem e valem <strong>+10 pontos</strong> cada. Palavras erradas ficam na lousa para tentar de novo.</div>
+        </div>
+        <div class="how-step">
+          <span class="how-step-icon">❤️</span>
+          <div class="how-step-text">Você tem <strong>5 vidas</strong> e <strong>120 segundos</strong>. Cada CHECK com erro custa 1 vida. Boa sorte!</div>
+        </div>
+      </div>
+      <button class="cback-btn" id="btnHowBack">⬅ Voltar ao Menu</button>
+    </div>
+  </div>
+
+  <!-- ===== TEORIA DAS SÍLABAS ===== -->
+  <div class="ov-chalk" id="theoryOverlay">
+    <div class="cboard cboard-lg">
+      <div class="cboard-title">Separando Sílabas 📚</div>
+      <div class="cboard-sub">Regras e exemplos</div>
+      <div class="cboard-line"></div>
+      <div class="theory-scroll">
+
+        <div class="t-card" style="border-left-color:#ffd700;">
+          <div class="t-card-title" style="color:#ffd700;">✨ O que é uma Sílaba?</div>
+          <div class="t-card-body">
+            É o <strong style="color:#f5f5dc;">menor grupo de sons</strong> que pronunciamos de uma vez. Toda sílaba tem pelo menos uma <strong style="color:#f5f5dc;">vogal</strong> (a, e, i, o, u).<br>
+            <span class="t-ex">ca<span class="t-sep">-</span>sa</span> (2 sílabas) &nbsp;·&nbsp;
+            <span class="t-ex">bo<span class="t-sep">-</span>ne<span class="t-sep">-</span>ca</span> (3 sílabas) &nbsp;·&nbsp;
+            <span class="t-ex">com<span class="t-sep">-</span>pu<span class="t-sep">-</span>ta<span class="t-sep">-</span>dor</span> (4 sílabas)
+          </div>
+        </div>
+
+        <div class="t-card" style="border-left-color:#2ecc71;">
+          <div class="t-card-title" style="color:#2ecc71;">🔒 Dígrafos que NÃO separam</div>
+          <div class="t-card-body">
+            <span class="t-rule" style="color:#2ecc71;">ch · lh · nh · qu · gu</span>
+            — Essas duas letras formam um único som e ficam sempre juntas na mesma sílaba.<br>
+            <span class="t-ex">chu<span class="t-sep">-</span>va</span>
+            <span class="t-ex">fo<span class="t-sep">-</span>lha</span>
+            <span class="t-ex">so<span class="t-sep">-</span>nho</span>
+            <span class="t-ex">quar<span class="t-sep">-</span>to</span>
+            <span class="t-ex">a<span class="t-sep">-</span>gua</span>
+          </div>
+        </div>
+
+        <div class="t-card" style="border-left-color:#e74c3c;">
+          <div class="t-card-title" style="color:#e74c3c;">✂️ Dígrafos que SEPARAM</div>
+          <div class="t-card-body">
+            <span class="t-rule" style="color:#e74c3c;">rr · ss · sc · sç · xc · xs</span>
+            — Cada letra fica em uma sílaba diferente.<br>
+            <span class="t-ex">car<span class="t-sep">-</span>ro</span>
+            <span class="t-ex">pás<span class="t-sep">-</span>sa<span class="t-sep">-</span>ro</span>
+            <span class="t-ex">nas<span class="t-sep">-</span>cer</span>
+            <span class="t-ex">des<span class="t-sep">-</span>cer</span>
+          </div>
+        </div>
+
+        <div class="t-card" style="border-left-color:#3498db;">
+          <div class="t-card-title" style="color:#3498db;">🔗 Encontros Consonantais (NÃO separam)</div>
+          <div class="t-card-body">
+            <span class="t-rule" style="color:#3498db;">bl · br · cl · cr · dr · fl · fr · gl · gr · pl · pr · tr · vr</span>
+            — Consoante + <strong style="color:#f5f5dc;">l</strong> ou <strong style="color:#f5f5dc;">r</strong> ficam sempre juntas.<br>
+            <span class="t-ex">pra<span class="t-sep">-</span>to</span>
+            <span class="t-ex">li<span class="t-sep">-</span>vro</span>
+            <span class="t-ex">dra<span class="t-sep">-</span>gão</span>
+            <span class="t-ex">flo<span class="t-sep">-</span>res<span class="t-sep">-</span>ta</span>
+            <span class="t-ex">bra<span class="t-sep">-</span>ço</span>
+          </div>
+        </div>
+
+        <div class="t-card" style="border-left-color:#9b59b6;">
+          <div class="t-card-title" style="color:#9b59b6;">🌊 Ditongos (NÃO separam)</div>
+          <div class="t-card-body">
+            Duas vogais na <strong style="color:#f5f5dc;">mesma sílaba</strong>, pronunciadas numa só emissão de voz:
+            <span class="t-rule" style="color:#9b59b6;">ai · ei · oi · ui · au · eu · iu · ou · ão · ãe · ões</span><br>
+            <span class="t-ex">pei<span class="t-sep">-</span>xe</span>
+            <span class="t-ex">prai<span class="t-sep">-</span>a</span>
+            <span class="t-ex">dra<span class="t-sep">-</span>gão</span>
+            <span class="t-ex">ou<span class="t-sep">-</span>ro</span>
+            <span class="t-ex">mãe</span>
+          </div>
+        </div>
+
+        <div class="t-card" style="border-left-color:#e67e22;">
+          <div class="t-card-title" style="color:#e67e22;">💧 Hiatos (SEPARAM)</div>
+          <div class="t-card-body">
+            Duas vogais seguidas que ficam em <strong style="color:#f5f5dc;">sílabas diferentes</strong>, cada uma pronunciada separadamente.<br>
+            <span class="t-ex">lu<span class="t-sep">-</span>a</span>
+            <span class="t-ex">pi<span class="t-sep">-</span>a<span class="t-sep">-</span>no</span>
+            <span class="t-ex">sa<span class="t-sep">-</span>ú<span class="t-sep">-</span>de</span>
+            <span class="t-ex">a<span class="t-sep">-</span>mi<span class="t-sep">-</span>go</span>
+          </div>
+        </div>
+
+        <div class="t-card" style="border-left-color:#f5f5dc;">
+          <div class="t-card-title" style="color:#f5f5dc;">📏 Regra Geral</div>
+          <div class="t-card-body">
+            Uma consoante sozinha entre vogais vai com a vogal <strong style="color:#f5f5dc;">seguinte</strong>. Duas consoantes (sem ser dígrafo ou encontro) ficam separadas.<br>
+            <span class="t-ex">ca<span class="t-sep">-</span>sa</span>
+            <span class="t-ex">me<span class="t-sep">-</span>sa</span>
+            <span class="t-ex">ca<span class="t-sep">-</span>der<span class="t-sep">-</span>no</span>
+            <span class="t-ex">jan<span class="t-sep">-</span>e<span class="t-sep">-</span>la</span>
+          </div>
+        </div>
+
+      </div>
+      <button class="cback-btn" id="btnTheoryBack">⬅ Voltar ao Menu</button>
+    </div>
+  </div>
+
   <!-- History overlay -->
   <div class="overlay" id="histOverlay">
     <div class="history-modal">
@@ -755,6 +1101,32 @@ const WORDS = [
   { w: "Computador", b: [2, 4, 6] },  // com-pu-ta-dor
   { w: "Borboleta",  b: [2, 4, 6] },  // bor-bo-le-ta
   { w: "Telefone",   b: [1, 3, 5] },  // te-le-fo-ne
+
+  // ── Palavras novas ──────────────────────────────────────
+  // 2 sílabas
+  { w: "Cobra",  b: [1] },            // co-bra  (cluster br)
+  { w: "Pedra",  b: [1] },            // pe-dra  (cluster dr)
+  { w: "Porta",  b: [2] },            // por-ta
+  { w: "Folha",  b: [1] },            // fo-lha  (dígrafo lh)
+  { w: "Cinza",  b: [2] },            // cin-za
+  { w: "Peixe",  b: [2] },            // pei-xe  (ditongo ei)
+  { w: "Tempo",  b: [2] },            // tem-po
+  { w: "Tigre",  b: [1] },            // ti-gre  (cluster gr)
+  { w: "Jardim", b: [2] },            // jar-dim
+  { w: "Dragão", b: [2] },            // dra-gão (cluster dr + ditongo ão)
+
+  // 3 sílabas
+  { w: "Girafa",  b: [1, 3] },        // gi-ra-fa
+  { w: "Caneta",  b: [1, 3] },        // ca-ne-ta
+  { w: "Cavalo",  b: [1, 3] },        // ca-va-lo
+  { w: "Planeta", b: [2, 4] },        // pla-ne-ta (cluster pl)
+  { w: "Formiga", b: [2, 4] },        // for-mi-ga
+  { w: "Ameixa",  b: [0, 3] },        // a-mei-xa (ditongo ei)
+  { w: "Pássaro", b: [2, 4] },        // pás-sa-ro (ss separa)
+
+  // 4 sílabas
+  { w: "Amarelo",   b: [0, 2, 4] },   // a-ma-re-lo
+  { w: "Tartaruga", b: [2, 4, 6] },   // tar-ta-ru-ga
 ];
 
 /* OBS sobre "Carro": em PT-BR o dígrafo "rr" SEPARA na divisão
@@ -777,6 +1149,7 @@ const state = {
   soundOn: true,
   musicOn: false,
   checked: false,
+  histFromMenu: false,
 };
 
 const BOARD_SIZE = 6;     // palavras na lousa ao mesmo tempo
@@ -1116,14 +1489,19 @@ function showHistory() {
 
 function closeHistory() {
   document.getElementById('histOverlay').classList.remove('show');
-  showOverlay(
-    'Separar Sílabas',
-    'Clique entre as letras para marcar onde cada sílaba termina.<br>Depois aperte <b>CHECK</b> para conferir!',
-    'Continuar',
-    () => resetGame(),
-    '📊 Comparar Resultados',
-    () => showHistory()
-  );
+  if (state.histFromMenu) {
+    state.histFromMenu = false;
+    showMenu();
+  } else {
+    showOverlay(
+      'Separar Sílabas',
+      'Clique entre as letras para marcar onde cada sílaba termina.<br>Depois aperte <b>CHECK</b> para conferir!',
+      'Continuar',
+      () => resetGame(),
+      '📊 Comparar Resultados',
+      () => showHistory()
+    );
+  }
 }
 
 function gameOver() {
@@ -1248,24 +1626,55 @@ document.getElementById('btnClearHist').addEventListener('click', () => {
 });
 
 /* =============================================================
+   MENU PRINCIPAL
+   ============================================================= */
+function showMenu() {
+  document.getElementById('menuOverlay').classList.add('show');
+  state.paused = true;
+}
+function hideMenu() {
+  document.getElementById('menuOverlay').classList.remove('show');
+}
+
+document.getElementById('btnMenuPlay').addEventListener('click', () => {
+  initAudio();
+  hideMenu();
+  resetGame();
+});
+
+document.getElementById('btnMenuHow').addEventListener('click', () => {
+  document.getElementById('howToPlayOverlay').classList.add('show');
+});
+document.getElementById('btnHowBack').addEventListener('click', () => {
+  document.getElementById('howToPlayOverlay').classList.remove('show');
+});
+
+document.getElementById('btnMenuTheory').addEventListener('click', () => {
+  document.getElementById('theoryOverlay').classList.add('show');
+});
+document.getElementById('btnTheoryBack').addEventListener('click', () => {
+  document.getElementById('theoryOverlay').classList.remove('show');
+});
+
+document.getElementById('btnMenuHist').addEventListener('click', () => {
+  initAudio();
+  state.histFromMenu = true;
+  hideMenu();
+  showHistory();
+});
+
+/* =============================================================
    INÍCIO
    ============================================================= */
 function init() {
+  state.histFromMenu = false;
   state.currentWords = pickInitialBoard();
   renderScore();
   renderHearts();
   renderSolved();
   renderTimer();
   renderWords();
-
-  showOverlay(
-    'Separar Sílabas',
-    'Clique entre as letras para marcar onde cada sílaba termina.<br>Depois aperte <b>CHECK</b> para conferir!',
-    'Começar',
-    () => { resetGame(); },
-    '📊 Comparar Resultados',
-    () => showHistory()
-  );
+  showMenu();
 }
 
 init();

@@ -221,6 +221,58 @@
   .hist-empty{text-align:center;font-style:italic;color:var(--ink-soft);padding:24px 0;}
   .hist-footer{display:flex;gap:8px;justify-content:flex-end;}
 
+  /* ---------- tutorial overlay ---------- */
+  #tutorialOverlay{
+    position:fixed;inset:0;background:rgba(20,14,6,.72);
+    display:flex;align-items:center;justify-content:center;
+    z-index:45;padding:18px;
+  }
+  #tutorialOverlay.hidden{display:none;}
+  .tutorial-card{
+    background:linear-gradient(180deg,#fbf3dd,#ead9b2);
+    border:2px solid var(--ink);
+    box-shadow:0 0 0 5px var(--paper),0 0 0 7px var(--ink),0 22px 48px rgba(0,0,0,.55);
+    padding:28px 30px 22px;max-width:560px;width:100%;
+    max-height:88vh;overflow-y:auto;
+  }
+  .tut-h2{
+    font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;
+    color:var(--oxblood);text-transform:uppercase;letter-spacing:.06em;
+    margin:0 0 14px;text-align:center;
+  }
+  .tut-tab-row{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 16px;justify-content:center;}
+  .tut-tab-btn{
+    font-family:'Spectral',serif;font-size:13px;
+    background:var(--paper-2);border:1.5px solid var(--ink);color:var(--ink);
+    border-radius:3px;padding:6px 14px;cursor:pointer;
+    box-shadow:0 2px 0 rgba(0,0,0,.2);transition:background .15s,color .15s;
+  }
+  .tut-tab-btn.active{background:var(--oxblood);color:#f9eed6;border-color:var(--oxblood-dk);}
+  .tut-pane{display:none;}
+  .tut-pane.active{display:block;}
+  .tut-step{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;font-size:14px;line-height:1.5;}
+  .tut-num{
+    flex:none;width:26px;height:26px;border-radius:50%;
+    background:var(--oxblood);color:#f9eed6;
+    font-family:'Cormorant Garamond',serif;font-weight:700;font-size:15px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .tut-box{
+    background:rgba(255,255,255,.45);border:1.5px dashed var(--brass);
+    border-radius:3px;padding:10px 14px;font-style:italic;font-size:13px;
+    color:var(--ink-soft);margin-top:8px;
+  }
+  .bio-card{
+    background:rgba(255,255,255,.4);border:1.4px solid var(--ink);
+    border-radius:3px;padding:12px 14px;margin-bottom:10px;
+  }
+  .bio-name{
+    font-family:'Cormorant Garamond',serif;font-weight:700;font-size:17px;
+    color:var(--oxblood);margin-bottom:6px;letter-spacing:.04em;
+  }
+  .bio-row{font-size:13.5px;line-height:1.55;margin-bottom:3px;}
+  .bio-lbl{font-weight:600;color:var(--ink);}
+
   @media (max-width:560px){
     .frame{padding:18px 12px 22px;}
     .col{width:clamp(94px,27vw,128px);}
@@ -257,7 +309,7 @@
     <div class="results" id="results">
       <div class="result-card">
         <h2 id="resTitle">Resultado</h2>
-        <div class="score-big"><span id="resScore">0</span><span> / 14</span></div>
+        <div class="score-big"><span id="resScore">0</span><span id="resTotal"> / 14</span></div>
         <div class="result-meta" id="resMeta">Tempo: 0:00</div>
         <button class="btn-primary" id="playAgain">Jogar novamente</button>
         <br>
@@ -269,9 +321,11 @@
     <div id="startOverlay">
       <div class="start-card">
         <h2>Anatomia Humana</h2>
-        <p>Ligue cada termo ao ponto correto na figura.<br>Identifique todas as 14 estruturas do corpo humano.</p>
+        <p>Ligue cada termo ao ponto correto na figura.<br>Escolha o modo de jogo abaixo.</p>
         <div class="start-btns">
-          <button class="btn-primary" id="startBtn">&#9654; Iniciar</button>
+          <button class="btn-primary" id="startBtn">&#9654; Modo Normal &mdash; 14 estruturas</button>
+          <button class="btn-primary" id="startEasyBtn" style="background:var(--good);box-shadow:0 4px 0 #2a5c36;">&#11088; Modo F&#225;cil &mdash; 7 estruturas</button>
+          <button class="btn-ghost" id="tutorialBtn">&#128214; Como Jogar &amp; Aprender</button>
           <button class="btn-ghost" id="histBtnStart">&#128202; Comparar Resultados</button>
         </div>
       </div>
@@ -289,6 +343,135 @@
       </div>
     </div>
   </div>
+
+    <!-- tutorial overlay -->
+    <div id="tutorialOverlay" class="hidden">
+      <div class="tutorial-card">
+        <h2 class="tut-h2">&#128214; Como Jogar &amp; Aprender</h2>
+        <div class="tut-tab-row">
+          <button class="tut-tab-btn active" data-tut="play">Como Jogar</button>
+          <button class="tut-tab-btn" data-tut="bones">Esqueleto</button>
+          <button class="tut-tab-btn" data-tut="muscles">M&#250;sculos</button>
+        </div>
+
+        <!-- ===== COMO JOGAR ===== -->
+        <div id="tut-play" class="tut-pane active">
+          <div class="tut-step">
+            <span class="tut-num">1</span>
+            <div><strong>Escolha o modo de jogo</strong> &mdash; <em>Normal</em> com 14 estruturas ou <em>F&#225;cil</em> com 7 estruturas.</div>
+          </div>
+          <div class="tut-step">
+            <span class="tut-num">2</span>
+            <div><strong>Conecte os termos</strong> aos pontos da figura: arraste um termo at&#233; o ponto correto, <em>ou</em> toque no termo e em seguida toque no ponto.</div>
+          </div>
+          <div class="tut-step">
+            <span class="tut-num">3</span>
+            <div><strong>Toque numa linha</strong> j&#225; desenhada para apag&#225;-la e tentar novamente.</div>
+          </div>
+          <div class="tut-step">
+            <span class="tut-num">4</span>
+            <div><strong>Clique em &ldquo;Enviar respostas&rdquo;</strong> quando terminar. Linhas <span style="color:var(--good);font-weight:700;">verdes</span> s&#227;o acertos; <span style="color:var(--bad);font-weight:700;">vermelhas</span>, erros. As respostas corretas aparecem em tracejado verde.</div>
+          </div>
+          <div class="tut-box">
+            <strong>Dica:</strong> os pontos na figura est&#227;o posicionados exatamente sobre cada estrutura &mdash; observe a localiza&#231;&#227;o antes de conectar!
+          </div>
+        </div>
+
+        <!-- ===== ESQUELETO ===== -->
+        <div id="tut-bones" class="tut-pane">
+          <div class="bio-card">
+            <div class="bio-name">Caveira (Cr&#226;nio)</div>
+            <div class="bio-row"><span class="bio-lbl">O que &#233;:</span> Conjunto de 22 ossos que formam a caixa protetora da cabe&#231;a.</div>
+            <div class="bio-row"><span class="bio-lbl">Para que serve:</span> Protege o c&#233;rebro e abriga os &#243;rg&#227;os dos sentidos (olhos, ouvidos, nariz).</div>
+            <div class="bio-row"><span class="bio-lbl">Onde fica:</span> Topo do corpo, acima do pesco&#231;o.</div>
+          </div>
+          <div class="bio-card">
+            <div class="bio-name">Clav&#237;cula</div>
+            <div class="bio-row"><span class="bio-lbl">O que &#233;:</span> Osso longo e fino em formato de &ldquo;S&rdquo;.</div>
+            <div class="bio-row"><span class="bio-lbl">Para que serve:</span> Liga o esterno ao ombro e transmite as for&#231;as dos bra&#231;os para o esqueleto central.</div>
+            <div class="bio-row"><span class="bio-lbl">Onde fica:</span> Parte superior do t&#243;rax, na horizontal, entre o esterno e o ombro.</div>
+          </div>
+          <div class="bio-card">
+            <div class="bio-name">Costelas</div>
+            <div class="bio-row"><span class="bio-lbl">O que &#233;:</span> 12 pares de ossos curvos que formam a caixa tor&#225;cica.</div>
+            <div class="bio-row"><span class="bio-lbl">Para que serve:</span> Protege o cora&#231;&#227;o e os pulm&#245;es; auxilia na respira&#231;&#227;o ao expandir e contrair o t&#243;rax.</div>
+            <div class="bio-row"><span class="bio-lbl">Onde fica:</span> Nas laterais do t&#243;rax, articulando com a coluna nas costas.</div>
+          </div>
+          <div class="bio-card">
+            <div class="bio-name">Coluna Vertebral</div>
+            <div class="bio-row"><span class="bio-lbl">O que &#233;:</span> Pilar central formado por 33 v&#233;rtebras empilhadas.</div>
+            <div class="bio-row"><span class="bio-lbl">Para que serve:</span> Sustenta o peso do corpo, protege a medula espinhal e permite movimentos de flex&#227;o, extens&#227;o e rota&#231;&#227;o do tronco.</div>
+            <div class="bio-row"><span class="bio-lbl">Onde fica:</span> Percorre todo o dorso, da base do cr&#226;nio at&#233; o c&#243;ccix.</div>
+          </div>
+          <div class="bio-card">
+            <div class="bio-name">Ulna</div>
+            <div class="bio-row"><span class="bio-lbl">O que &#233;:</span> Um dos dois ossos do antebra&#231;o, junto com o r&#225;dio.</div>
+            <div class="bio-row"><span class="bio-lbl">Para que serve:</span> Forma a articula&#231;&#227;o do cotovelo e permite a rota&#231;&#227;o do antebra&#231;o (girar a palma para cima e para baixo).</div>
+            <div class="bio-row"><span class="bio-lbl">Onde fica:</span> Lado interno (lado do dedo m&#237;nimo) do antebra&#231;o, do cotovelo ao pulso.</div>
+          </div>
+          <div class="bio-card">
+            <div class="bio-name">F&#234;mur</div>
+            <div class="bio-row"><span class="bio-lbl">O que &#233;:</span> O osso mais longo e resistente do corpo humano.</div>
+            <div class="bio-row"><span class="bio-lbl">Para que serve:</span> Suporta o peso corporal; forma as articula&#231;&#245;es do quadril e do joelho.</div>
+            <div class="bio-row"><span class="bio-lbl">Onde fica:</span> Na coxa, entre o quadril e o joelho.</div>
+          </div>
+          <div class="bio-card">
+            <div class="bio-name">F&#237;bula</div>
+            <div class="bio-row"><span class="bio-lbl">O que &#233;:</span> Osso fino e longo da perna, paralelo &#224; t&#237;bia.</div>
+            <div class="bio-row"><span class="bio-lbl">Para que serve:</span> Estabiliza o tornozelo e serve de ancoragem para os m&#250;sculos da perna.</div>
+            <div class="bio-row"><span class="bio-lbl">Onde fica:</span> Lado externo da perna (lado do dedo m&#237;nimo do p&#233;), do joelho ao tornozelo.</div>
+          </div>
+        </div>
+
+        <!-- ===== MÚSCULOS ===== -->
+        <div id="tut-muscles" class="tut-pane">
+          <div class="bio-card">
+            <div class="bio-name">Peitoral</div>
+            <div class="bio-row"><span class="bio-lbl">O que &#233;:</span> M&#250;sculo grande em forma de leque, na frente do peito.</div>
+            <div class="bio-row"><span class="bio-lbl">Para que serve:</span> Move o bra&#231;o para frente e para dentro; muito usado em empur&#245;es, na natação e em flexões.</div>
+            <div class="bio-row"><span class="bio-lbl">Onde fica:</span> Frente do t&#243;rax, da clav&#237;cula e esterno at&#233; o &#250;mero (osso do bra&#231;o).</div>
+          </div>
+          <div class="bio-card">
+            <div class="bio-name">B&#237;ceps</div>
+            <div class="bio-row"><span class="bio-lbl">O que &#233;:</span> M&#250;sculo com duas cabe&#231;as (&ldquo;bi&rdquo; = dois) na parte frontal do bra&#231;o.</div>
+            <div class="bio-row"><span class="bio-lbl">Para que serve:</span> Dobra o cotovelo (flex&#227;o) e gira o antebra&#231;o com a palma para cima (supina&#231;&#227;o).</div>
+            <div class="bio-row"><span class="bio-lbl">Onde fica:</span> Face anterior (frente) do bra&#231;o, entre o ombro e o cotovelo.</div>
+          </div>
+          <div class="bio-card">
+            <div class="bio-name">Trap&#233;zio</div>
+            <div class="bio-row"><span class="bio-lbl">O que &#233;:</span> M&#250;sculo grande em forma de losango nas costas.</div>
+            <div class="bio-row"><span class="bio-lbl">Para que serve:</span> Move e estabiliza a esc&#225;pula (eleva&#231;&#227;o, retra&#231;&#227;o), inclina e gira a cabe&#231;a.</div>
+            <div class="bio-row"><span class="bio-lbl">Onde fica:</span> Da nuca at&#233; a metade das costas, cobrindo ombros e pesco&#231;o.</div>
+          </div>
+          <div class="bio-card">
+            <div class="bio-name">Reto Abdominal</div>
+            <div class="bio-row"><span class="bio-lbl">O que &#233;:</span> M&#250;sculo longo e segmentado do abd&#244;men, popularmente chamado de &ldquo;tanquinho&rdquo;.</div>
+            <div class="bio-row"><span class="bio-lbl">Para que serve:</span> Flexiona o tronco (senta), protege os &#243;rg&#227;os abdominais e auxilia na respira&#231;&#227;o.</div>
+            <div class="bio-row"><span class="bio-lbl">Onde fica:</span> Frente do abd&#244;men, do esterno at&#233; o osso p&#250;bico.</div>
+          </div>
+          <div class="bio-card">
+            <div class="bio-name">Quadr&#237;ceps</div>
+            <div class="bio-row"><span class="bio-lbl">O que &#233;:</span> Grupo de 4 m&#250;sculos que formam a parte frontal da coxa.</div>
+            <div class="bio-row"><span class="bio-lbl">Para que serve:</span> Estende o joelho (chute, subir degraus) e auxilia na flex&#227;o do quadril.</div>
+            <div class="bio-row"><span class="bio-lbl">Onde fica:</span> Parte anterior (frente) da coxa, do quadril ao joelho.</div>
+          </div>
+          <div class="bio-card">
+            <div class="bio-name">Gl&#250;teo</div>
+            <div class="bio-row"><span class="bio-lbl">O que &#233;:</span> Grupo de m&#250;sculos das n&#225;degas; o gl&#250;teo m&#225;ximo &#233; o maior m&#250;sculo do corpo humano.</div>
+            <div class="bio-row"><span class="bio-lbl">Para que serve:</span> Estende e gira a coxa; fundamental para caminhar, correr e subir escadas.</div>
+            <div class="bio-row"><span class="bio-lbl">Onde fica:</span> Regi&#227;o posterior (tr&#225;s) do quadril.</div>
+          </div>
+          <div class="bio-card">
+            <div class="bio-name">Panturrilhas &ndash; G&#234;meos</div>
+            <div class="bio-row"><span class="bio-lbl">O que &#233;:</span> M&#250;sculo gastrocn&#234;mio (g&#234;meos) na parte posterior da perna.</div>
+            <div class="bio-row"><span class="bio-lbl">Para que serve:</span> Flexiona o p&#233; (ficar na ponta dos p&#233;s) e propulsiona o corpo ao correr e caminhar.</div>
+            <div class="bio-row"><span class="bio-lbl">Onde fica:</span> Parte posterior (tr&#225;s) da perna, entre o joelho e o tornozelo.</div>
+          </div>
+        </div>
+
+        <button class="btn-ghost" id="closeTutorialBtn" style="margin-top:16px;width:100%;text-align:center;">&#8592; Voltar ao menu</button>
+      </div>
+    </div>
 
   <div class="controls">
     <button class="btn-primary" id="submitBtn">Enviar respostas</button>
@@ -336,6 +519,11 @@
     {id:'femur',       name:'F\u00eamur'},
     {id:'panturrilha', name:'Panturrilhas \u2013 G\u00eameos'}
   ];
+
+  /* easy mode: 7 of the 14 structures (front-facing, well-known) */
+  const EASY_IDS = ['caveira','peitoral','biceps','costelas','abdominal','quadriceps','fibula'];
+  let easyMode = false;
+  function activeLabels(){ return easyMode ? LABELS.filter(l => EASY_IDS.includes(l.id)) : LABELS; }
 
   /* state */
   let connections = {};
@@ -416,9 +604,10 @@
   function buildTags(){
     colLeft.innerHTML = '';
     colRight.innerHTML = '';
-    const order = shuffle(LABELS);
+    const order = shuffle(activeLabels());
+    const half = Math.ceil(order.length / 2);
     order.forEach((lab, i) => {
-      const side = i < 7 ? 'left' : 'right';
+      const side = i < half ? 'left' : 'right';
       const tag = document.createElement('div');
       tag.className = 'tag';
       tag.dataset.label = lab.id;
@@ -440,7 +629,8 @@
 
   function buildDots(){
     dotsLayer.innerHTML = '';
-    Object.keys(DOTS).forEach(id => {
+    activeLabels().forEach(lab => {
+      const id = lab.id;
       const p = DOTS[id];
       const dot = document.createElement('button');
       dot.type = 'button';
@@ -501,7 +691,7 @@
     });
 
     if(submitted){
-      LABELS.forEach(lab => {
+      activeLabels().forEach(lab => {
         if(connections[lab.id] !== lab.id){
           const a = center(nodeEl(lab.id));
           const b = center(dotEl(lab.id));
@@ -803,7 +993,7 @@
     submitBtn.disabled = true;
 
     let correct = 0;
-    LABELS.forEach(lab => {
+    activeLabels().forEach(lab => {
       const tag = board.querySelector('.tag[data-label="'+lab.id+'"]');
       const ok = connections[lab.id] === lab.id;
       if(ok){ correct++; tag.classList.add('solved-ok'); }
@@ -812,8 +1002,9 @@
 
     render();
 
-    const total = LABELS.length;
+    const total = activeLabels().length;
     document.getElementById('resScore').textContent = correct;
+    document.getElementById('resTotal').textContent = ' / ' + total;
     document.getElementById('resMeta').textContent =
       'Tempo: ' + fmt(seconds) + '  \u2022  ' + correct + ' de ' + total + ' corretas';
     const title = document.getElementById('resTitle');
@@ -843,11 +1034,34 @@
   submitBtn.addEventListener('click', () => { ac(); submit(); });
   resetBtn.addEventListener('click', () => { ac(); newGame(); });
   document.getElementById('playAgain').addEventListener('click', () => { ac(); results.classList.remove('show'); newGame(); });
-  document.getElementById('startBtn').addEventListener('click', () => { ac(); hideStartOverlay(); newGame(); setTimeout(render,120); setTimeout(render,500); });
+  document.getElementById('startBtn').addEventListener('click', () => { ac(); easyMode = false; hideStartOverlay(); newGame(); setTimeout(render,120); setTimeout(render,500); });
+  document.getElementById('startEasyBtn').addEventListener('click', () => { ac(); easyMode = true; hideStartOverlay(); newGame(); setTimeout(render,120); setTimeout(render,500); });
   document.getElementById('histBtnStart').addEventListener('click', () => { ac(); showHistory(); });
   document.getElementById('histBtnResult').addEventListener('click', () => { ac(); showHistory(); });
   document.getElementById('histClose').addEventListener('click', () => { ac(); closeHistory(); });
   document.getElementById('histClear').addEventListener('click', () => { ac(); localStorage.removeItem(HIST_KEY); renderHistory(); });
+
+  /* tutorial */
+  function showTutorial(){
+    document.getElementById('startOverlay').classList.add('hidden');
+    document.getElementById('tutorialOverlay').classList.remove('hidden');
+  }
+  function closeTutorial(){
+    document.getElementById('tutorialOverlay').classList.add('hidden');
+    document.getElementById('startOverlay').classList.remove('hidden');
+  }
+  document.querySelectorAll('.tut-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.tut;
+      document.querySelectorAll('.tut-tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tut-pane').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tut-' + target).classList.add('active');
+    });
+  });
+  document.getElementById('tutorialBtn').addEventListener('click', () => { ac(); showTutorial(); });
+  document.getElementById('closeTutorialBtn').addEventListener('click', () => { ac(); closeTutorial(); });
+
   soundBtn.addEventListener('click', () => {
     soundOn = !soundOn;
     soundBtn.innerHTML = soundOn ? '&#9835; Som: Ligado' : '&#9836; Som: Desligado';

@@ -474,74 +474,74 @@ function charSVG(happy){
 /* ================= PERGUNTAS ================= */
 const QUESTIONS = [
   {
-    pic:'toalha',
-    q:'O que pode acontecer se não nos secarmos direito?',
-    options:['A roupa fica mais colorida.','A pele pode ter coceira e fungos.','O cabelo cresce mais rápido.'],
-    answer:1,
-    good:'Que legal! Você se secou direitinho depois do banho, principalmente nas dobrinhas do corpo. Assim, evita fungos e se mantém saudável!'
-  },
-  {
-    pic:'maca',
-    q:'O que usamos para lavar as frutas?',
-    options:['Uma esponja suja.','Água limpa.','Um guardanapo seco.'],
-    answer:1,
-    good:'Isso mesmo! Lavar as frutas com água limpa tira a sujeira e os germes antes de comer.'
+    pic:'maos',
+    q:'Quantos segundos devemos esfregar as mãos ao lavá-las?',
+    options:['Pelo menos 20 segundos.','Apenas 2 segundos.','5 segundos é suficiente.'],
+    answer:0,
+    good:'Correto! Esfregar as mãos por pelo menos 20 segundos com sabão garante que todos os germes sejam eliminados de verdade.'
   },
   {
     pic:'escova',
-    q:'Quantas vezes devemos escovar os dentes por dia?',
-    options:['Pelo menos três vezes.','Só uma vez por semana.','Nunca precisa escovar.'],
-    answer:0,
-    good:'Muito bem! Escovar os dentes pela manhã, depois das refeições e antes de dormir deixa o sorriso saudável!'
-  },
-  {
-    pic:'maos',
-    q:'O que devemos fazer antes de comer?',
-    options:['Brincar na terra.','Lavar as mãos com água e sabão.','Assistir televisão.'],
+    q:'De quanto em quanto tempo devemos trocar a escova de dentes?',
+    options:['Uma vez por ano.','A cada 3 meses.','Somente quando quebrar.'],
     answer:1,
-    good:'Perfeito! Lavar as mãos antes de comer evita que os germes entrem no nosso corpo.'
-  },
-  {
-    pic:'sabonete',
-    q:'O que usamos para lavar o corpo no banho?',
-    options:['Areia e folhas.','Sabonete e água.','Apenas uma toalha.'],
-    answer:1,
-    good:'Show! O sabonete com água tira a sujeira e o suor, deixando o corpo limpinho e cheiroso.'
-  },
-  {
-    pic:'espirro',
-    q:'O que devemos fazer ao espirrar ou tossir?',
-    options:['Cobrir a boca e o nariz.','Espirrar na comida.','Não fazer nada.'],
-    answer:0,
-    good:'Boa! Cobrir a boca e o nariz com o braço ou um lenço evita espalhar germes para os amigos.'
-  },
-  {
-    pic:'tesoura',
-    q:'Por que devemos cortar as unhas?',
-    options:['Para ficarem bem grandes.','Para não acumular sujeira e germes.','Para arranhar os colegas.'],
-    answer:1,
-    good:'Exatamente! Unhas curtas e limpas não guardam sujeira nem germes embaixo delas.'
-  },
-  {
-    pic:'vaso',
-    q:'O que fazemos depois de usar o banheiro?',
-    options:['Saímos correndo.','Lavamos bem as mãos.','Comemos um lanche.'],
-    answer:1,
-    good:'Ótimo! Lavar as mãos depois do banheiro é uma das maneiras mais importantes de ficar saudável.'
-  },
-  {
-    pic:'shampoo',
-    q:'Com o que lavamos o cabelo?',
-    options:['Com shampoo e água.','Com refrigerante.','Com tinta colorida.'],
-    answer:0,
-    good:'Isso aí! O shampoo com água limpa o couro cabeludo e deixa o cabelo saudável.'
+    good:'Exato! Trocar a escova a cada 3 meses garante que as cerdas continuem limpando bem os dentes sem machucar a gengiva.'
   },
   {
     pic:'banho',
-    q:'Com que frequência devemos tomar banho?',
-    options:['Uma vez por mês.','Todos os dias.','Só no aniversário.'],
+    q:'Qual é a temperatura ideal para o banho?',
+    options:['Muito quente para matar germes.','Morna e confortável ao corpo.','Sempre gelada para refrescar.'],
     answer:1,
-    good:'Maravilha! Tomar banho todos os dias remove o suor e a sujeira e mantém o corpo cheiroso.'
+    good:'Isso! Um banho morno é o mais indicado. Água muito quente resseca a pele e pode causar irritações.'
+  },
+  {
+    pic:'sabonete',
+    q:'Em qual dessas situações NÃO é preciso lavar as mãos?',
+    options:['Antes de preparar a comida.','Depois de tossir ou espirrar.','Antes de assistir televisão.'],
+    answer:2,
+    good:'Muito bem! Lavar as mãos é essencial antes de comer, ao preparar alimentos e após tossir. Assistir TV não exige isso!'
+  },
+  {
+    pic:'tesoura',
+    q:'Qual hábito NÃO ajuda na higiene das unhas?',
+    options:['Mantê-las curtas e limpas.','Roer as unhas com os dentes.','Lavar as unhas ao lavar as mãos.'],
+    answer:1,
+    good:'Correto! Roer as unhas leva germes direto para a boca e ainda pode machucar os dedos e a gengiva.'
+  },
+  {
+    pic:'espirro',
+    q:'Após espirrar em um lenço de papel, o que fazer com ele?',
+    options:['Guardar no bolso para reusar.','Deixar sobre a mesa.','Jogar no lixo imediatamente.'],
+    answer:2,
+    good:'Perfeito! Jogar o lenço usado no lixo logo depois evita que os germes se espalhem pelo ambiente e contaminem outras pessoas.'
+  },
+  {
+    pic:'shampoo',
+    q:'Ao lavar o cabelo, onde o shampoo deve ser aplicado principalmente?',
+    options:['Apenas nas pontas do cabelo.','No couro cabeludo, onde nasce o cabelo.','No rosto junto com o sabonete.'],
+    answer:1,
+    good:'Ótimo! Massagear o shampoo no couro cabeludo remove a oleosidade e deixa os fios saudáveis da raiz às pontas.'
+  },
+  {
+    pic:'vaso',
+    q:'Por que é importante dar descarga após usar o vaso sanitário?',
+    options:['Para fazer barulho e avisar todos.','Para eliminar germes e manter o banheiro limpo.','Porque a água é colorida e bonita.'],
+    answer:1,
+    good:'Isso mesmo! Dar descarga elimina os dejetos e os germes, mantendo o banheiro higienizado e seguro para todos.'
+  },
+  {
+    pic:'toalha',
+    q:'Por que não devemos compartilhar toalha de banho?',
+    options:['Para não desbotá-la rapidamente.','Para não transmitir fungos ou bactérias de uma pessoa à outra.','Porque fica pesada quando molhada.'],
+    answer:1,
+    good:'Exatamente! Cada pessoa deve ter sua própria toalha para evitar a transmissão de fungos, bactérias e outras infecções de pele.'
+  },
+  {
+    pic:'maca',
+    q:'Além de lavar frutas, o que mais ajuda a comer com higiene?',
+    options:['Comer com as mãos sujas para fortalecer o corpo.','Lavar as mãos antes e manter a comida tampada.','Deixar a comida exposta ao sol para secar os germes.'],
+    answer:1,
+    good:'Muito bem! Lavar as mãos e manter os alimentos tampados evita contaminação por germes e protege toda a família de doenças.'
   }
 ];
 

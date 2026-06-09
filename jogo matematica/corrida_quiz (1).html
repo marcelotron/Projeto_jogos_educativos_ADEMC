@@ -420,6 +420,80 @@
 
   .hidden-soft{display:none !important}
 
+  /* ---------- Tutorial modal ---------- */
+  #tutorial-modal .card{
+    max-height:88vh;overflow-y:auto;width:min(620px,92vw);
+    text-align:left;
+    scrollbar-width:thin;scrollbar-color:#555 transparent;
+  }
+  #tutorial-modal .card::-webkit-scrollbar{width:6px}
+  #tutorial-modal .card::-webkit-scrollbar-thumb{background:#aaa;border-radius:3px}
+  #tutorial-modal .card h1{text-align:center}
+  #tutorial-modal .sub{text-align:center}
+
+  .tab-row{
+    display:flex;gap:6px;flex-wrap:wrap;
+    margin:10px 0 16px;justify-content:center;
+  }
+  .tab-btn{
+    font-family:"Bungee",sans-serif;font-size:12px;letter-spacing:.04em;
+    border:2px solid #000;border-radius:10px;
+    background:#fff;color:var(--ink);
+    padding:6px 11px;
+    box-shadow:0 3px 0 #000;
+    cursor:pointer;
+    transition:transform .1s, box-shadow .1s, background .15s;
+  }
+  .tab-btn:hover{transform:translateY(-1px)}
+  .tab-btn.active{background:var(--player);color:#fff;box-shadow:0 3px 0 #000}
+  .tab-btn:active{transform:translateY(2px);box-shadow:0 1px 0 #000}
+
+  .tab-pane{display:none}
+  .tab-pane.active{display:block}
+
+  .learn-box{
+    background:#fff7da;border:3px dashed #000;border-radius:14px;
+    padding:14px 16px;margin-bottom:12px;font-size:15px;line-height:1.6;
+  }
+  .learn-box h3{
+    font-family:"Bungee",sans-serif;font-size:17px;margin:0 0 10px;color:var(--ink);
+    display:flex;align-items:center;gap:8px;
+  }
+  .learn-box p{margin:0 0 8px}
+  .example-block{
+    background:#fff;border:2px solid #000;border-radius:10px;
+    padding:10px 14px;margin:8px 0;
+    font-family:"Share Tech Mono",monospace;font-size:15px;
+  }
+  .example-block .res{color:var(--right);font-weight:700}
+  .example-block .err{color:var(--wrong);font-weight:700}
+  .learn-tip{
+    background:var(--player);color:#fff;border-radius:8px;border:2px solid #000;
+    padding:8px 12px;margin-top:10px;font-size:14px;line-height:1.4;
+  }
+  .op-hl{color:var(--sky-3);font-weight:700}
+  .prime-list{
+    display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;
+  }
+  .prime-chip{
+    background:#16202a;color:var(--gold);font-family:"Share Tech Mono",monospace;
+    border:2px solid #000;border-radius:8px;padding:4px 10px;font-size:14px;font-weight:700;
+  }
+  .sq-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px;margin:8px 0;
+  }
+  .sq-card{
+    background:#fff;border:2px solid #000;border-radius:8px;padding:6px;
+    text-align:center;font-family:"Share Tech Mono",monospace;font-size:13px;
+  }
+  .sq-card b{display:block;color:var(--player);font-size:16px}
+
+  #btn-tutorial{
+    width:100%;margin:0 0 6px;
+    font-size:16px;padding:9px 16px;
+    background:#fff;color:var(--ink);
+  }
+
   /* ---------- History modal ---------- */
   #history-modal .card{
     max-height:85vh;overflow-y:auto;width:min(600px,92vw);
@@ -603,10 +677,10 @@
       <p class="sub">Escolha seu modo de jogo</p>
       <div class="modes">
         <button class="mode-btn" data-mode="basico" type="button" style="--accent:#19a36f">
-          <div class="mode-icon">➕</div>
+          <div class="mode-icon">🔢</div>
           <div class="mode-text">
             <div class="mode-title">Modo Básico</div>
-            <div class="mode-desc">Adição e subtração de 1 a 10, sem resultados negativos</div>
+            <div class="mode-desc">Verdadeiro ou falso: adição e subtração de 1 a 10</div>
           </div>
           <div class="mode-arrow">▶</div>
         </button>
@@ -627,6 +701,7 @@
           <div class="mode-arrow">▶</div>
         </button>
       </div>
+      <button class="btn" id="btn-tutorial" type="button">📚 Como Jogar &amp; Aprender</button>
       <button class="btn" id="btn-history" type="button">📊 Comparar Resultados</button>
       <p class="rules-mini">
         🏁 <b>Acerto:</b> +30 m e +3 pts &nbsp;·&nbsp; 💥 <b>Erro:</b> −10 m e −1 pt &nbsp;·&nbsp; 🤖 CPU avança a cada 7 s
@@ -643,6 +718,192 @@
       <div class="actions" style="margin-top:14px">
         <button class="btn secondary" id="btn-clear-history" type="button">Limpar</button>
         <button class="btn primary" id="btn-close-history" type="button">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tutorial / Learn modal -->
+  <div class="modal hidden" id="tutorial-modal">
+    <div class="card">
+      <h1 style="font-size:clamp(26px,5vw,40px)">📚 Como Jogar &amp; Aprender</h1>
+      <p class="sub">Escolha um tema abaixo</p>
+      <div class="tab-row" id="tab-row">
+        <button class="tab-btn active" data-tab="jogar">🎮 Como Jogar</button>
+        <button class="tab-btn" data-tab="adicao">➕ Adição</button>
+        <button class="tab-btn" data-tab="subtracao">➖ Subtração</button>
+        <button class="tab-btn" data-tab="multiplicacao">✖ Multiplicação</button>
+        <button class="tab-btn" data-tab="divisao">➗ Divisão</button>
+        <button class="tab-btn" data-tab="parimpar">🔢 Par &amp; Ímpar</button>
+        <button class="tab-btn" data-tab="primo">⭐ Primo</button>
+        <button class="tab-btn" data-tab="raiz">√ Raiz</button>
+      </div>
+
+      <!-- Como Jogar -->
+      <div class="tab-pane active" id="tab-jogar">
+        <div class="learn-box">
+          <h3>🏁 Objetivo</h3>
+          <p>Responda perguntas de matemática para fazer seu corredor chegar primeiro à linha de chegada. O adversário (CPU) avança sozinho a cada 7 segundos — não dá pra relaxar!</p>
+        </div>
+        <div class="learn-box">
+          <h3>⚡ Regras</h3>
+          <div class="example-block">✅ Acerto → avança <span class="res">+30 m</span> e ganha <span class="res">+3 pts</span></div>
+          <div class="example-block">❌ Erro → recua <span class="err">−10 m</span> e perde <span class="err">−1 pt</span></div>
+          <div class="example-block">🤖 CPU avança <span class="op-hl">30 m</span> automaticamente a cada <span class="op-hl">7 segundos</span></div>
+        </div>
+        <div class="learn-box">
+          <h3>🎯 Modos de Jogo</h3>
+          <div class="example-block"><b style="color:#19a36f">🔢 Modo Básico</b><br>Verdadeiro ou Falso: operações de <span class="op-hl">adição e subtração</span> (1 a 10). Bom para começar!</div>
+          <div class="example-block"><b style="color:#1f6feb">✖ Modo Avançado</b><br>Digite o resultado: soma, subtração, <span class="op-hl">multiplicação e divisão</span>. Mais desafiador!</div>
+          <div class="example-block"><b style="color:#9b5de5">🤔 Modo Desafio</b><br>Verdadeiro ou Falso: <span class="op-hl">par/ímpar, número primo e raiz quadrada</span>. Para experts!</div>
+        </div>
+        <div class="learn-box">
+          <h3>⌨️ Atalhos de Teclado</h3>
+          <div class="example-block">Nos modos Verdadeiro/Falso:<br><kbd style="background:#16202a;color:#fff;padding:2px 8px;border-radius:4px;border:1px solid #000;font-family:monospace">V</kbd> ou <kbd style="background:#16202a;color:#fff;padding:2px 8px;border-radius:4px;border:1px solid #000;font-family:monospace">←</kbd> → Verdadeiro &nbsp;|&nbsp; <kbd style="background:#16202a;color:#fff;padding:2px 8px;border-radius:4px;border:1px solid #000;font-family:monospace">F</kbd> ou <kbd style="background:#16202a;color:#fff;padding:2px 8px;border-radius:4px;border:1px solid #000;font-family:monospace">→</kbd> → Falso</div>
+          <div class="example-block">No modo Avançado: <kbd style="background:#16202a;color:#fff;padding:2px 8px;border-radius:4px;border:1px solid #000;font-family:monospace">Enter</kbd> confirma a resposta</div>
+        </div>
+      </div>
+
+      <!-- Adição -->
+      <div class="tab-pane" id="tab-adicao">
+        <div class="learn-box">
+          <h3>➕ O que é Adição?</h3>
+          <p>Adição é a operação de <span class="op-hl">juntar quantidades</span>. Usamos o sinal <span class="op-hl">+</span> para indicar a soma de dois ou mais números.</p>
+          <div class="example-block">3 + 5 = <span class="res">8</span><br><small>Temos 3 maçãs e ganhamos mais 5 → ficamos com 8</small></div>
+          <div class="example-block">12 + 7 = <span class="res">19</span></div>
+          <div class="example-block">25 + 8 = <span class="res">33</span></div>
+          <div class="learn-tip">💡 <b>Dica:</b> Comece pelo número maior e vá contando os do número menor. Ex: 7 + 4 → comece no 7 e conte mais 4: 8, 9, 10, <b>11</b></div>
+        </div>
+        <div class="learn-box">
+          <h3>🧠 Propriedades da Adição</h3>
+          <div class="example-block"><b>Comutativa:</b> a ordem não muda o resultado<br>3 + 5 = 5 + 3 = <span class="res">8</span></div>
+          <div class="example-block"><b>Elemento neutro:</b> somar com 0 não muda nada<br>7 + 0 = <span class="res">7</span></div>
+        </div>
+      </div>
+
+      <!-- Subtração -->
+      <div class="tab-pane" id="tab-subtracao">
+        <div class="learn-box">
+          <h3>➖ O que é Subtração?</h3>
+          <p>Subtração é a operação de <span class="op-hl">tirar uma quantidade de outra</span>. Usamos o sinal <span class="op-hl">−</span>. É o inverso da adição.</p>
+          <div class="example-block">10 − 4 = <span class="res">6</span><br><small>Tínhamos 10 e gastamos 4 → ficamos com 6</small></div>
+          <div class="example-block">15 − 8 = <span class="res">7</span></div>
+          <div class="example-block">20 − 13 = <span class="res">7</span></div>
+          <div class="learn-tip">💡 <b>Dica:</b> Pense na adição ao contrário! Se 6 + 4 = 10, então 10 − 4 = <b>6</b></div>
+        </div>
+        <div class="learn-box">
+          <h3>🧠 Lembre-se</h3>
+          <div class="example-block"><b>No jogo:</b> a subtração nunca gera resultado negativo nos modos básico e avançado.<br>O número maior sempre fica na frente: 9 − 3 (não 3 − 9)</div>
+          <div class="example-block"><b>Prova real:</b> resultado + subtraído = minuendo<br>10 − 4 = 6 &nbsp;→&nbsp; <span class="res">6</span> + 4 = 10 ✅</div>
+        </div>
+      </div>
+
+      <!-- Multiplicação -->
+      <div class="tab-pane" id="tab-multiplicacao">
+        <div class="learn-box">
+          <h3>✖ O que é Multiplicação?</h3>
+          <p>Multiplicação é uma <span class="op-hl">adição repetida</span>. Usamos o sinal <span class="op-hl">×</span>.</p>
+          <div class="example-block">3 × 4 = <span class="res">12</span><br><small>É como somar: 3 + 3 + 3 + 3 = 12</small></div>
+          <div class="example-block">6 × 7 = <span class="res">42</span></div>
+          <div class="example-block">5 × 9 = <span class="res">45</span></div>
+          <div class="learn-tip">💡 <b>Dica:</b> Memorize a tabuada do 2 ao 10! Qualquer número × 0 = 0 e qualquer número × 1 = ele mesmo.</div>
+        </div>
+        <div class="learn-box">
+          <h3>📋 Mini Tabuada Rápida</h3>
+          <div class="example-block">× 2: dobro do número &nbsp;&nbsp; (7 × 2 = <span class="res">14</span>)<br>× 5: termina em 0 ou 5 &nbsp;(6 × 5 = <span class="res">30</span>)<br>× 9: a soma dos dígitos = 9 (4 × 9 = <span class="res">36</span> → 3+6=9)<br>× 10: só colocar um zero (8 × 10 = <span class="res">80</span>)</div>
+        </div>
+      </div>
+
+      <!-- Divisão -->
+      <div class="tab-pane" id="tab-divisao">
+        <div class="learn-box">
+          <h3>➗ O que é Divisão?</h3>
+          <p>Divisão é <span class="op-hl">repartir em partes iguais</span>. Usamos o sinal <span class="op-hl">÷</span>. É o inverso da multiplicação.</p>
+          <div class="example-block">12 ÷ 4 = <span class="res">3</span><br><small>12 balas divididas igualmente entre 4 pessoas → 3 para cada</small></div>
+          <div class="example-block">20 ÷ 5 = <span class="res">4</span></div>
+          <div class="example-block">36 ÷ 6 = <span class="res">6</span></div>
+          <div class="learn-tip">💡 <b>Dica:</b> No jogo, todas as divisões são exatas (sem resto). Pense pela multiplicação: ? × 4 = 12 → <b>3</b></div>
+        </div>
+        <div class="learn-box">
+          <h3>🧠 Regras importantes</h3>
+          <div class="example-block"><b>Qualquer número ÷ 1 = ele mesmo:</b> 9 ÷ 1 = <span class="res">9</span></div>
+          <div class="example-block"><b>Qualquer número ÷ ele mesmo = 1:</b> 7 ÷ 7 = <span class="res">1</span></div>
+          <div class="example-block"><b>0 ÷ qualquer número = 0:</b> 0 ÷ 5 = <span class="res">0</span><br><b class="err">Nunca divida por zero!</b></div>
+        </div>
+      </div>
+
+      <!-- Par & Ímpar -->
+      <div class="tab-pane" id="tab-parimpar">
+        <div class="learn-box">
+          <h3>🔢 Números Pares</h3>
+          <p>Números pares são os que podem ser divididos por 2 <span class="op-hl">sem sobrar nada</span> (resto zero).</p>
+          <div class="example-block">Pares: 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20...</div>
+          <div class="example-block">8 ÷ 2 = <span class="res">4</span> → 8 é <span class="res">PAR</span> ✅<br>14 ÷ 2 = <span class="res">7</span> → 14 é <span class="res">PAR</span> ✅</div>
+          <div class="learn-tip">💡 Olhe o último dígito: se termina em <b>0, 2, 4, 6 ou 8</b> → é PAR!</div>
+        </div>
+        <div class="learn-box">
+          <h3>🔢 Números Ímpares</h3>
+          <p>Números ímpares são os que ao ser divididos por 2 <span class="op-hl">sobra 1</span> (não divide exato).</p>
+          <div class="example-block">Ímpares: 1, 3, 5, 7, 9, 11, 13, 15, 17, 19...</div>
+          <div class="example-block">13 ÷ 2 = 6 com <span class="err">resto 1</span> → 13 é <span class="err">ÍMPAR</span><br>7 ÷ 2 = 3 com <span class="err">resto 1</span> → 7 é <span class="err">ÍMPAR</span></div>
+          <div class="learn-tip">💡 Olhe o último dígito: se termina em <b>1, 3, 5, 7 ou 9</b> → é ÍMPAR!</div>
+        </div>
+      </div>
+
+      <!-- Primo -->
+      <div class="tab-pane" id="tab-primo">
+        <div class="learn-box">
+          <h3>⭐ O que é Número Primo?</h3>
+          <p>Um número primo é aquele que só tem <span class="op-hl">dois divisores</span>: o número <span class="op-hl">1</span> e ele <span class="op-hl">mesmo</span>. Não é divisível por mais nenhum número.</p>
+          <div class="example-block">7 é primo? 7 ÷ 1 = 7 ✅ &nbsp;|&nbsp; 7 ÷ 7 = 1 ✅<br>7 ÷ 2, 3, 4, 5, 6 → <span class="err">nenhum divide exato</span><br>→ <span class="res">7 é PRIMO!</span></div>
+          <div class="example-block">9 é primo? 9 ÷ 3 = <span class="res">3</span> ✅ → Divide por 3!<br>→ <span class="err">9 NÃO é primo</span> (tem 3 divisores: 1, 3 e 9)</div>
+          <div class="learn-tip">⚠️ <b>Atenção:</b> o número <b>1 NÃO é primo</b>! O menor número primo é o <b>2</b>.</div>
+        </div>
+        <div class="learn-box">
+          <h3>📋 Primos de 1 a 50</h3>
+          <div class="prime-list">
+            <span class="prime-chip">2</span><span class="prime-chip">3</span><span class="prime-chip">5</span>
+            <span class="prime-chip">7</span><span class="prime-chip">11</span><span class="prime-chip">13</span>
+            <span class="prime-chip">17</span><span class="prime-chip">19</span><span class="prime-chip">23</span>
+            <span class="prime-chip">29</span><span class="prime-chip">31</span><span class="prime-chip">37</span>
+            <span class="prime-chip">41</span><span class="prime-chip">43</span><span class="prime-chip">47</span>
+          </div>
+          <div class="learn-tip">💡 <b>Dica rápida:</b> Para testar se N é primo, tente dividir por 2, 3, 5, 7... Se nenhum dividir exato até √N, é primo!</div>
+        </div>
+      </div>
+
+      <!-- Raiz Quadrada -->
+      <div class="tab-pane" id="tab-raiz">
+        <div class="learn-box">
+          <h3>√ O que é Raiz Quadrada?</h3>
+          <p>A raiz quadrada de um número é o valor que, <span class="op-hl">multiplicado por ele mesmo</span>, dá aquele número.</p>
+          <div class="example-block">√9 = <span class="res">3</span> &nbsp;porque&nbsp; 3 × 3 = 9</div>
+          <div class="example-block">√16 = <span class="res">4</span> &nbsp;porque&nbsp; 4 × 4 = 16</div>
+          <div class="example-block">√25 = <span class="res">5</span> &nbsp;porque&nbsp; 5 × 5 = 25</div>
+          <div class="example-block">√100 = <span class="res">10</span> &nbsp;porque&nbsp; 10 × 10 = 100</div>
+          <div class="learn-tip">💡 <b>Dica:</b> Pense ao contrário — "qual número ao quadrado dá esse resultado?"</div>
+        </div>
+        <div class="learn-box">
+          <h3>📋 Quadrados Perfeitos</h3>
+          <p>São números cuja raiz quadrada é um número inteiro. Memorize estes:</p>
+          <div class="sq-grid">
+            <div class="sq-card"><b>√1</b>= 1<br><small>1×1</small></div>
+            <div class="sq-card"><b>√4</b>= 2<br><small>2×2</small></div>
+            <div class="sq-card"><b>√9</b>= 3<br><small>3×3</small></div>
+            <div class="sq-card"><b>√16</b>= 4<br><small>4×4</small></div>
+            <div class="sq-card"><b>√25</b>= 5<br><small>5×5</small></div>
+            <div class="sq-card"><b>√36</b>= 6<br><small>6×6</small></div>
+            <div class="sq-card"><b>√49</b>= 7<br><small>7×7</small></div>
+            <div class="sq-card"><b>√64</b>= 8<br><small>8×8</small></div>
+            <div class="sq-card"><b>√81</b>= 9<br><small>9×9</small></div>
+            <div class="sq-card"><b>√100</b>= 10<br><small>10×10</small></div>
+            <div class="sq-card"><b>√121</b>= 11<br><small>11×11</small></div>
+            <div class="sq-card"><b>√144</b>= 12<br><small>12×12</small></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions" style="margin-top:14px">
+        <button class="btn primary" id="btn-close-tutorial" type="button">Fechar</button>
       </div>
     </div>
   </div>
@@ -840,14 +1101,25 @@ const MODES = {
     color: "#19a36f",
     generate(){
       const op = randInt(1,2);
-      let a = randInt(1,15);
-      let b = randInt(1,15);
+      let a = randInt(1,10);
+      let b = randInt(1,10);
       if (op === 2 && b > a) { const t = a; a = b; b = t; } // subtração nunca negativa
       const sym = op === 1 ? "+" : "−";
+      const correct = op === 1 ? a + b : a - b;
+      const showCorrect = Math.random() < 0.5;
+      let shown;
+      if (showCorrect) {
+        shown = correct;
+      } else {
+        let delta = randInt(1, 4);
+        shown = correct + (Math.random() < 0.5 ? delta : -delta);
+        if (shown < 0) shown = correct + delta; // evitar negativo na tela
+        if (shown === correct) shown = correct + 1; // garantir diferente
+      }
       return {
-        type: "numeric",
-        display: `${a} <span class="op">${sym}</span> ${b} = ?`,
-        answer: op === 1 ? a + b : a - b,
+        type: "truefalse",
+        display: `${a} <span class="op">${sym}</span> ${b} = ${shown}?`,
+        answer: showCorrect,
       };
     },
   },
@@ -1369,6 +1641,30 @@ document.addEventListener("keydown", (e)=>{
     }
   }
 });
+
+// Tutorial
+function showTutorial(){
+  $("#start-modal").classList.add("hidden");
+  $("#tutorial-modal").classList.remove("hidden");
+}
+function closeTutorial(){
+  $("#tutorial-modal").classList.add("hidden");
+  $("#start-modal").classList.remove("hidden");
+}
+
+// Tab switching inside tutorial
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", ()=>{
+    const target = btn.dataset.tab;
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("tab-" + target).classList.add("active");
+  });
+});
+
+$("#btn-tutorial").addEventListener("click", showTutorial);
+$("#btn-close-tutorial").addEventListener("click", closeTutorial);
 
 // Posições iniciais
 placeRunner($("#player"), 0);

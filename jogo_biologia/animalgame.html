@@ -799,27 +799,38 @@ const ANIMALS = [
   { emoji: '🦊', name: 'Raposa',        tags: ['terrestre','carnivoro','mamifero','selvagem','predador','pelo'] },
   { emoji: '🐒', name: 'Macaco',        tags: ['terrestre','onivoro','mamifero','selvagem','pelo'] },
   { emoji: '🐸', name: 'Sapo',          tags: ['terrestre','aquatico','carnivoro','anfibio','selvagem','nada'] },
+  { emoji: '🦍', name: 'Gorila',        tags: ['terrestre','herbivoro','mamifero','selvagem','pelo','africa'] },
+  { emoji: '🦩', name: 'Flamingo',      tags: ['aquatico','ave','selvagem','africa','nada','voa'] },
+  { emoji: '🐡', name: 'Baiacu',        tags: ['marinho','aquatico','peixe','selvagem','nada'] },
+  { emoji: '🦇', name: 'Morcego',       tags: ['terrestre','carnivoro','mamifero','selvagem','pelo','voa'] },
 ];
 
 // =========================================================================
 // PHASES — each cycles a different category
 // =========================================================================
 const PHASES = [
-  { title: 'Animais Terrestres',  tag: 'terrestre' },
-  { title: 'Animais Marinhos',    tag: 'marinho' },
-  { title: 'Herbívoros',          tag: 'herbivoro' },
-  { title: 'Carnívoros',          tag: 'carnivoro' },
-  { title: 'Aves',                tag: 'ave' },
-  { title: 'Mamíferos',           tag: 'mamifero' },
-  { title: 'Répteis',             tag: 'reptil' },
-  { title: 'Insetos',             tag: 'inseto' },
-  { title: 'Animais de Fazenda',  tag: 'fazenda' },
-  { title: 'Animais Selvagens',   tag: 'selvagem' },
+  // habitat
+  { title: 'Animais Terrestres',   tag: 'terrestre' },
+  { title: 'Animais Marinhos',     tag: 'marinho'   },
+  { title: 'Animais Aquáticos',    tag: 'aquatico'  },
+  // alimentação
+  { title: 'Herbívoros',           tag: 'herbivoro' },
+  { title: 'Carnívoros',           tag: 'carnivoro' },
+  { title: 'Onívoros',             tag: 'onivoro'   },
+  // grupos taxonômicos
+  { title: 'Aves',                 tag: 'ave'       },
+  { title: 'Mamíferos',            tag: 'mamifero'  },
+  { title: 'Répteis',              tag: 'reptil'    },
+  { title: 'Insetos',              tag: 'inseto'    },
+  { title: 'Peixes',               tag: 'peixe'     },
+  // geografia
+  { title: 'Animais da África',    tag: 'africa'    },
+  // relação com humanos
+  { title: 'Animais de Fazenda',   tag: 'fazenda'   },
   { title: 'Animais de Estimação', tag: 'estimacao' },
-  { title: 'Predadores',          tag: 'predador' },
-  { title: 'Animais que Voam',    tag: 'voa' },
-  { title: 'Animais que Nadam',   tag: 'nada' },
-  { title: 'Animais com Pelo',    tag: 'pelo' },
+  // comportamento
+  { title: 'Animais que Voam',     tag: 'voa'       },
+  { title: 'Animais que Nadam',    tag: 'nada'      },
 ];
 
 // =========================================================================

@@ -11,7 +11,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            width: 100vw;
+            height: 100vh;
             background-color: #1a1a2e;
             font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
             overflow: hidden;
@@ -20,11 +21,12 @@
         #game-container {
             position: relative;
             width: 800px;
-            height: 600px;
+            height: 700px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
             border-radius: 10px;
             overflow: hidden;
             background: linear-gradient(to bottom, #16213e 0%, #0f3460 100%);
+            transform-origin: center center;
         }
 
         canvas {
@@ -294,6 +296,97 @@
             100% { opacity: 0.9; }
         }
 
+        /* --- Botão conceitos no menu --- */
+        .btn-concepts {
+            background: transparent !important;
+            border-color: rgba(52,152,219,0.5) !important;
+            color: #3498db !important;
+            font-size: 20px !important;
+        }
+        .btn-concepts:hover {
+            background: rgba(52,152,219,0.15) !important;
+            border-color: #3498db !important;
+        }
+
+        /* --- Tela de Conceitos --- */
+        #concepts-screen {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.93);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            pointer-events: auto;
+            z-index: 25;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s;
+            padding: 14px;
+            box-sizing: border-box;
+        }
+        #concepts-screen.visible { opacity: 1; visibility: visible; }
+        .concepts-box {
+            background: linear-gradient(135deg, #16213e, #0f3460);
+            border: 3px solid #3498db;
+            border-radius: 20px;
+            padding: 18px 22px;
+            width: 100%;
+            max-width: 700px;
+            max-height: 540px;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+        .concepts-box h2 {
+            color: #3498db;
+            font-size: 24px;
+            text-align: center;
+            margin: 0 0 12px 0;
+            flex-shrink: 0;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+        }
+        #concepts-content {
+            overflow-y: auto;
+            flex: 1;
+            scrollbar-width: thin;
+            scrollbar-color: #3498db transparent;
+            padding-right: 4px;
+        }
+        #concepts-content::-webkit-scrollbar { width: 6px; }
+        #concepts-content::-webkit-scrollbar-thumb { background: #3498db; border-radius: 3px; }
+        .concept-card {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-left: 4px solid;
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-bottom: 10px;
+            color: white;
+        }
+        .concept-card .concept-title {
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .concept-card .concept-desc {
+            font-size: 14px;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.5;
+        }
+        .concept-card .concept-example {
+            font-size: 13px;
+            color: rgba(255,255,255,0.55);
+            margin-top: 5px;
+            font-style: italic;
+        }
+        .concept-actions { display: flex; gap: 12px; justify-content: center; margin-top: 12px; flex-shrink: 0; }
+        .concept-actions button { font-size: 17px; padding: 10px 22px; }
+
         /* --- Botão histórico no menu --- */
         .btn-history {
             background: transparent !important;
@@ -406,7 +499,7 @@
 <body>
 
 <div id="game-container">
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <canvas id="gameCanvas" width="800" height="700"></canvas>
     
     <div id="ui-layer">
         <div id="score-display" class="hud">Pontos: <span id="score-val">0</span></div>
@@ -430,7 +523,69 @@
         <div class="start-buttons">
             <button class="btn-play" id="btn-play">🎮 JOGAR!</button>
             <button class="btn-instructions" id="btn-instructions">📖 Como Jogar?</button>
+            <button class="btn-concepts" id="btn-concepts">📚 Conceitos de Português</button>
             <button class="btn-history" id="btn-history">📊 Comparar Resultados</button>
+        </div>
+    </div>
+
+    <!-- TELA DE CONCEITOS -->
+    <div id="concepts-screen">
+        <div class="concepts-box">
+            <h2>📚 Conceitos Básicos de Português</h2>
+            <div id="concepts-content">
+
+                <div class="concept-card" style="border-left-color:#2980b9;">
+                    <div class="concept-title" style="color:#2980b9;">📦 Substantivo</div>
+                    <div class="concept-desc">É a palavra que dá nome a seres, coisas, lugares, sentimentos e ideias.</div>
+                    <div class="concept-example">Ex: <em>casa, cachorro, alegria, Brasil, escola</em></div>
+                </div>
+
+                <div class="concept-card" style="border-left-color:#e74c3c;">
+                    <div class="concept-title" style="color:#e74c3c;">⚡ Verbo</div>
+                    <div class="concept-desc">É a palavra que indica uma ação, estado ou fenômeno da natureza. O verbo muda de forma conforme o tempo (passado, presente, futuro) e a pessoa.</div>
+                    <div class="concept-example">Ex: <em>correr, sorrir, estar, chover, estudar</em></div>
+                </div>
+
+                <div class="concept-card" style="border-left-color:#27ae60;">
+                    <div class="concept-title" style="color:#27ae60;">🎨 Adjetivo</div>
+                    <div class="concept-desc">É a palavra que caracteriza ou qualifica um substantivo, indicando suas qualidades, defeitos ou estados.</div>
+                    <div class="concept-example">Ex: <em>bonito, rápido, azul, alegre, corajoso</em></div>
+                </div>
+
+                <div class="concept-card" style="border-left-color:#f39c12;">
+                    <div class="concept-title" style="color:#f39c12;">👤 Sujeito</div>
+                    <div class="concept-desc">É o ser sobre o qual se faz uma declaração na frase. Geralmente é quem pratica ou recebe a ação do verbo.</div>
+                    <div class="concept-example">Ex: <em><strong>O gato</strong> pulou o muro.</em> → O gato é o sujeito</div>
+                </div>
+
+                <div class="concept-card" style="border-left-color:#9b59b6;">
+                    <div class="concept-title" style="color:#9b59b6;">💬 Predicado</div>
+                    <div class="concept-desc">É tudo o que se diz sobre o sujeito. Toda frase que tem verbo tem predicado.</div>
+                    <div class="concept-example">Ex: <em>O gato <strong>pulou o muro.</strong></em> → "pulou o muro" é o predicado</div>
+                </div>
+
+                <div class="concept-card" style="border-left-color:#1abc9c;">
+                    <div class="concept-title" style="color:#1abc9c;">🔤 Artigo</div>
+                    <div class="concept-desc">É a palavra que acompanha o substantivo, indicando se é determinado ou indeterminado, e se é masculino ou feminino.</div>
+                    <div class="concept-example">Ex: <em>o, a, os, as (definidos) — um, uma, uns, umas (indefinidos)</em></div>
+                </div>
+
+                <div class="concept-card" style="border-left-color:#e67e22;">
+                    <div class="concept-title" style="color:#e67e22;">🔁 Pronome</div>
+                    <div class="concept-desc">É a palavra que substitui ou acompanha o substantivo. Evita a repetição de nomes na frase.</div>
+                    <div class="concept-example">Ex: <em>eu, tu, ele, ela, nós, vocês, eles — meu, teu, seu…</em></div>
+                </div>
+
+                <div class="concept-card" style="border-left-color:#e94560;">
+                    <div class="concept-title" style="color:#e94560;">🔗 Conjunção</div>
+                    <div class="concept-desc">É a palavra que liga orações ou termos de uma mesma oração, estabelecendo uma relação entre eles.</div>
+                    <div class="concept-example">Ex: <em>e, mas, ou, porque, porém, portanto, quando</em></div>
+                </div>
+
+            </div>
+            <div class="concept-actions">
+                <button id="btn-close-concepts">⬅ Voltar</button>
+            </div>
         </div>
     </div>
 
@@ -545,7 +700,7 @@
 
     const monster = {
         x: 400,
-        y: 500,
+        y: 590,
         state: 'normal',
         stateTimer: 0,
         mouthOpen: 0
@@ -878,6 +1033,14 @@
 
     btnInstructions.addEventListener('click', () => {
         instructionsScreen.classList.add('visible');
+    });
+
+    document.getElementById('btn-concepts').addEventListener('click', () => {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        document.getElementById('concepts-screen').classList.add('visible');
+    });
+    document.getElementById('btn-close-concepts').addEventListener('click', () => {
+        document.getElementById('concepts-screen').classList.remove('visible');
     });
 
     btnBack.addEventListener('click', () => {
@@ -1279,7 +1442,7 @@
         }
         
         ctx.fillStyle = 'rgba(255,255,255,0.05)';
-        ctx.fillRect(0, 550, 800, 50);
+        ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
     }
 
     function drawWords() {
@@ -1345,6 +1508,17 @@
     }
 
     // Game starts from menu, not auto-init
+
+    // --- Escala responsiva: ajusta o container para caber na janela ---
+    function scaleGame() {
+        const container = document.getElementById('game-container');
+        const scaleX = window.innerWidth / 800;
+        const scaleY = window.innerHeight / 700;
+        const scale = Math.min(scaleX, scaleY);
+        container.style.transform = `scale(${scale})`;
+    }
+    window.addEventListener('resize', scaleGame);
+    scaleGame();
 </script>
 </body>
 </html>
