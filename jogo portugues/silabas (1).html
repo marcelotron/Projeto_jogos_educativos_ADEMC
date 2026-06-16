@@ -690,6 +690,12 @@
     border: 2px solid rgba(241,196,15,0.28) !important;
     box-shadow: 0 3px 0 rgba(0,0,0,0.3);
   }
+  .mbtn-theme {
+    background: rgba(200,50,180,0.14);
+    color: #f0a0e8;
+    border: 2px solid rgba(200,50,180,0.32) !important;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.3);
+  }
 
   /* ----- How to play ----- */
   .how-steps { display: flex; flex-direction: column; gap: 10px; text-align: left; margin-bottom: 18px; }
@@ -773,6 +779,122 @@
   .cback-btn:hover  { background: rgba(255,255,255,0.18); }
   .cback-btn:active { transform: translateY(1px); }
 
+  /* ============ THEMES ============ */
+
+  /* ---- Noite Estrelada ---- */
+  .stage.theme-noite {
+    background: linear-gradient(180deg, #0f1b35 0%, #0f1b35 65%, #060e1c 65%, #030810 100%);
+  }
+  .stage.theme-noite::before {
+    background:
+      radial-gradient(circle at 10% 8%,  rgba(255,255,255,.9) 1px, transparent 1px),
+      radial-gradient(circle at 22% 4%,  rgba(255,255,255,.7) 1px, transparent 1px),
+      radial-gradient(circle at 38% 12%, rgba(255,255,255,.9) 1px, transparent 1px),
+      radial-gradient(circle at 52% 6%,  rgba(255,255,255,.6) 1px, transparent 1px),
+      radial-gradient(circle at 65% 15%, rgba(255,255,255,.8) 1px, transparent 1px),
+      radial-gradient(circle at 78% 5%,  rgba(255,255,255,.75) 1px, transparent 1px),
+      radial-gradient(circle at 88% 20%, rgba(255,255,255,.65) 1px, transparent 1px),
+      radial-gradient(circle at 30% 18%, rgba(255,255,255,.95) 2px, transparent 2px),
+      radial-gradient(circle at 48% 25%, rgba(255,255,255,.5) 1px, transparent 1px),
+      radial-gradient(circle at 72% 10%, rgba(255,255,255,.7) 1px, transparent 1px),
+      radial-gradient(circle at 15% 30%, rgba(255,200,150,.6) 2px, transparent 2px),
+      radial-gradient(circle at 92% 8%,  rgba(255,255,255,.8) 1px, transparent 1px),
+      radial-gradient(circle at 57% 3%,  rgba(255,255,255,.7) 1px, transparent 1px),
+      radial-gradient(circle at 43% 35%, rgba(200,220,255,.5) 1px, transparent 1px),
+      radial-gradient(ellipse at 80% 5%, rgba(200,180,80,.1) 0%, transparent 30%);
+  }
+  .stage.theme-noite .panel,
+  .stage.theme-noite .controls,
+  .stage.theme-noite .round-indicator { background: #0f1b35; box-shadow: 0 6px 12px rgba(0,0,0,.5); }
+  .stage.theme-noite .panel .label { color: #7090bb; }
+  .stage.theme-noite .panel .score-num { color: #a0c8ff; }
+  .stage.theme-noite .round-indicator { color: #7090bb; }
+  .stage.theme-noite .ctrl-btn { color: #7090bb; }
+  .stage.theme-noite .timer-bar { background: #0a1428; }
+  .stage.theme-noite .heart { color: #4466cc; }
+  .stage.theme-noite .frame { background: linear-gradient(135deg, #1e3a6e, #0f2050); box-shadow: inset 0 0 0 6px #0f1b35, 0 4px 8px rgba(0,0,0,.5); }
+  .stage.theme-noite .desk-top { background: linear-gradient(180deg, #1e3a6e, #0f2050); box-shadow: 0 4px 0 #081030; }
+  .stage.theme-noite .desk-leg { background: linear-gradient(180deg, #0f2050, #060d28); }
+  .stage.theme-noite .book { background: linear-gradient(135deg, #8833cc, #5511aa); }
+  .stage.theme-noite .desk.right .book { background: linear-gradient(135deg, #aa3333, #771111); }
+  .stage.theme-noite .board-wrap { background: linear-gradient(180deg, #1e3a6e, #0f2050); box-shadow: 0 12px 24px rgba(0,0,0,.6), inset 0 2px 0 rgba(100,150,255,.15), inset 0 -3px 0 rgba(0,0,0,.3); }
+  .stage.theme-noite .board-wrap::before { background: repeating-linear-gradient(180deg, transparent 0, transparent 22px, rgba(80,120,255,.04) 22px, rgba(80,120,255,.04) 23px); }
+  .stage.theme-noite .board { background: radial-gradient(ellipse at 30% 30%, rgba(80,120,255,.07), transparent 60%), radial-gradient(ellipse at 70% 80%, rgba(0,0,0,.2), transparent 70%), linear-gradient(135deg, #1a2a5e 0%, #0d1636 100%); }
+  .stage.theme-noite .ledge { background: linear-gradient(180deg, #1e3a6e, #0f2050); }
+  .stage.theme-noite .eraser { background: linear-gradient(180deg, #3a6aaa, #1a3a7a); }
+  .stage.theme-noite .chalk { background: rgba(200,220,255,.7); }
+
+  /* ---- Natureza ---- */
+  .stage.theme-natureza { background: linear-gradient(180deg, #87ceeb 0%, #b0e8ff 55%, #4caf50 55%, #2e7d32 100%); }
+  .stage.theme-natureza::before {
+    background:
+      radial-gradient(circle at 30% 14%, #fff 5%, rgba(255,255,255,.8) 6%, transparent 8%),
+      radial-gradient(circle at 35% 12%, #fff 3%, transparent 5%),
+      radial-gradient(circle at 28% 16%, #fff 2%, transparent 4%),
+      radial-gradient(circle at 65% 10%, #fff 4%, rgba(255,255,255,.9) 5%, transparent 7%),
+      radial-gradient(circle at 70%  8%, #fff 2%, transparent 4%),
+      radial-gradient(circle at 60% 12%, #fff 1.5%, transparent 3%),
+      radial-gradient(ellipse at 20% 25%, rgba(255,255,200,.55) 0%, transparent 40%),
+      radial-gradient(ellipse at 50% 60%, rgba(0,80,0,.05) 0%, transparent 50%);
+  }
+  .stage.theme-natureza .frame { background: linear-gradient(135deg, #66a82b, #3d6e1a); box-shadow: inset 0 0 0 6px #87ceeb, 0 4px 8px rgba(0,0,0,.2); }
+  .stage.theme-natureza .desk-top { background: linear-gradient(180deg, #a0522d, #7a3b1e); box-shadow: 0 4px 0 #5a2a12; }
+  .stage.theme-natureza .desk-leg { background: linear-gradient(180deg, #7a3b1e, #5a2a12); }
+  .stage.theme-natureza .book { background: linear-gradient(135deg, #e74c3c, #a93226); }
+  .stage.theme-natureza .desk.right .book { background: linear-gradient(135deg, #27ae60, #1a7a44); }
+  .stage.theme-natureza .board-wrap { background: linear-gradient(180deg, #7a4a1e, #5a3010); box-shadow: 0 12px 24px rgba(0,0,0,.3), inset 0 2px 0 rgba(255,255,255,.22), inset 0 -3px 0 rgba(0,0,0,.2); }
+  .stage.theme-natureza .board-wrap::before { background: repeating-linear-gradient(180deg, transparent 0, transparent 22px, rgba(0,0,0,.04) 22px, rgba(0,0,0,.04) 23px); }
+  .stage.theme-natureza .board { background: radial-gradient(ellipse at 30% 30%, rgba(255,255,255,.06), transparent 60%), radial-gradient(ellipse at 70% 80%, rgba(0,0,0,.12), transparent 70%), linear-gradient(135deg, #1a5c1a 0%, #0d3810 100%); }
+  .stage.theme-natureza .ledge { background: linear-gradient(180deg, #7a4a1e, #5a3010); }
+  .stage.theme-natureza .eraser { background: linear-gradient(180deg, #c0a060, #9a7a40); }
+  .stage.theme-natureza .chalk { background: #fffde7; }
+
+  /* ---- Espaço ---- */
+  .stage.theme-espaco { background: linear-gradient(180deg, #06001a 0%, #0c0028 60%, #0a001a 60%, #04000e 100%); }
+  .stage.theme-espaco::before {
+    background:
+      radial-gradient(circle at  5%  3%, rgba(255,255,255,.9) 1px, transparent 1px),
+      radial-gradient(circle at 12% 15%, rgba(255,255,255,.7) 1px, transparent 1px),
+      radial-gradient(circle at 20%  7%, rgba(255,200,255,.8) 1px, transparent 1px),
+      radial-gradient(circle at 28%  2%, rgba(255,255,255,.6) 1px, transparent 1px),
+      radial-gradient(circle at 35% 20%, rgba(200,200,255,.9) 1px, transparent 1px),
+      radial-gradient(circle at 42%  8%, rgba(255,255,255,.7) 1px, transparent 1px),
+      radial-gradient(circle at 50% 16%, rgba(255,200,150,.6) 1px, transparent 1px),
+      radial-gradient(circle at 58%  4%, rgba(255,255,255,.8) 1px, transparent 1px),
+      radial-gradient(circle at 65% 25%, rgba(200,255,255,.7) 1px, transparent 1px),
+      radial-gradient(circle at 72% 10%, rgba(255,255,255,.9) 1px, transparent 1px),
+      radial-gradient(circle at 80%  6%, rgba(255,255,255,1) 2px, transparent 2px),
+      radial-gradient(circle at 88% 18%, rgba(255,200,255,.7) 1px, transparent 1px),
+      radial-gradient(circle at 94% 12%, rgba(255,255,255,.8) 1px, transparent 1px),
+      radial-gradient(circle at 18% 32%, rgba(255,255,255,.5) 1px, transparent 1px),
+      radial-gradient(circle at 45% 40%, rgba(200,200,255,.4) 1px, transparent 1px),
+      radial-gradient(circle at 60% 35%, rgba(255,255,200,.7) 2px, transparent 2px),
+      radial-gradient(ellipse at 40% 20%, rgba(80,0,160,.25) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 30%, rgba(0,80,160,.2) 0%, transparent 45%);
+  }
+  .stage.theme-espaco .panel,
+  .stage.theme-espaco .controls,
+  .stage.theme-espaco .round-indicator { background: #0c0028; box-shadow: 0 6px 12px rgba(0,0,0,.6); }
+  .stage.theme-espaco .panel .label { color: #7060aa; }
+  .stage.theme-espaco .panel .score-num { color: #c0a0ff; }
+  .stage.theme-espaco .round-indicator { color: #7060aa; }
+  .stage.theme-espaco .ctrl-btn { color: #7060aa; }
+  .stage.theme-espaco .timer-bar { background: #06001a; }
+  .stage.theme-espaco .heart { color: #8844cc; }
+  .stage.theme-espaco .frame { background: linear-gradient(135deg, #334, #112); box-shadow: inset 0 0 0 6px rgba(100,100,200,.3), 0 4px 8px rgba(0,0,0,.6), 0 0 12px rgba(100,50,200,.2); }
+  .stage.theme-espaco .desk-top { background: linear-gradient(180deg, #223, #112); box-shadow: 0 4px 0 #001; }
+  .stage.theme-espaco .desk-leg { background: linear-gradient(180deg, #112, #001); }
+  .stage.theme-espaco .book { background: linear-gradient(135deg, #2266ee, #1144cc); }
+  .stage.theme-espaco .desk.right .book { background: linear-gradient(135deg, #ee2266, #cc1144); }
+  .stage.theme-espaco .board-wrap { background: linear-gradient(180deg, #1a1a3a, #0d0d24); box-shadow: 0 12px 24px rgba(0,0,0,.7), inset 0 2px 0 rgba(100,150,255,.2), inset 0 -3px 0 rgba(0,0,0,.4), 0 0 30px rgba(50,100,255,.08); }
+  .stage.theme-espaco .board-wrap::before { background: repeating-linear-gradient(180deg, transparent 0, transparent 22px, rgba(50,100,255,.03) 22px, rgba(50,100,255,.03) 23px); }
+  .stage.theme-espaco .board { background: radial-gradient(ellipse at 30% 30%, rgba(50,150,255,.08), transparent 60%), radial-gradient(ellipse at 70% 80%, rgba(100,0,200,.1), transparent 70%), linear-gradient(135deg, #001a3a 0%, #000c22 100%); }
+  .stage.theme-espaco .ledge { background: linear-gradient(180deg, #1a1a3a, #0d0d24); }
+  .stage.theme-espaco .eraser { background: linear-gradient(180deg, #335, #223); }
+  .stage.theme-espaco .chalk { background: rgba(150,200,255,.7); }
+  .stage.theme-espaco .letter { color: #d0e8ff; }
+  .stage.theme-espaco .word-cell.correct .letter { color: #90ffb0; }
+
   /* responsive */
   @media (max-width: 720px) {
     .panel { width: 88px; padding: 10px 8px; top: 24%; }
@@ -831,6 +953,9 @@
     </button>
     <button class="ctrl-btn" id="btnMusic" title="Música">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+    </button>
+    <button class="ctrl-btn" id="btnTheme" title="Mudar Cenário" style="grid-column:span 3">
+      <svg viewBox="0 0 24 24" fill="currentColor" style="width:20px;height:20px"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
     </button>
   </div>
 
@@ -896,6 +1021,10 @@
         <button class="mbtn mbtn-hist" id="btnMenuHist">
           <span class="mbtn-icon">📊</span>
           <span class="mbtn-label">Comparar Resultados</span>
+        </button>
+        <button class="mbtn mbtn-theme" id="btnMenuTheme">
+          <span class="mbtn-icon">🎨</span>
+          <span class="mbtn-label">Cenário: 🏫 Sala de Aula</span>
         </button>
       </div>
     </div>
@@ -1127,6 +1256,28 @@ const WORDS = [
   // 4 sílabas
   { w: "Amarelo",   b: [0, 2, 4] },   // a-ma-re-lo
   { w: "Tartaruga", b: [2, 4, 6] },   // tar-ta-ru-ga
+
+  // ── Palavras novas ──────────────────────────────────────────
+  // 2 sílabas
+  { w: "Água",    b: [0] },            // á-gua
+  { w: "Vaca",    b: [1] },            // va-ca
+  { w: "Arco",    b: [1] },            // ar-co
+  { w: "Blusa",   b: [2] },            // blu-sa (cluster bl)
+  { w: "Onça",    b: [1] },            // on-ça
+  { w: "Fogo",    b: [1] },            // fo-go
+  { w: "Lápis",   b: [1] },            // lá-pis
+
+  // 3 sílabas
+  { w: "Cebola",   b: [1, 3] },        // ce-bo-la
+  { w: "Criança",  b: [2, 4] },        // cri-an-ça
+  { w: "Ônibus",   b: [0, 2] },        // ô-ni-bus
+  { w: "Macaco",   b: [1, 3] },        // ma-ca-co
+  { w: "Cachorro", b: [1, 5] },        // ca-chor-ro (ch dígrafo, rr separa)
+
+  // 4 sílabas
+  { w: "Elefante",   b: [0, 2, 5] },   // e-le-fan-te
+  { w: "Macarrão",   b: [1, 4] },      // ma-car-rão (rr separa)
+  { w: "Passarinho", b: [2, 4, 6] },   // pas-sa-ri-nho (ss separa, nh dígrafo)
 ];
 
 /* OBS sobre "Carro": em PT-BR o dígrafo "rr" SEPARA na divisão
@@ -1662,6 +1813,26 @@ document.getElementById('btnMenuHist').addEventListener('click', () => {
   hideMenu();
   showHistory();
 });
+
+/* =============================================================
+   TEMAS DE FUNDO
+   ============================================================= */
+const THEMES      = ['', 'theme-noite', 'theme-natureza', 'theme-espaco'];
+const THEME_NAMES = ['🏫 Sala de Aula', '🌙 Noite Estrelada', '🌿 Natureza', '🚀 Espaço'];
+let themeIdx = 0;
+
+function cycleTheme() {
+  themeIdx = (themeIdx + 1) % THEMES.length;
+  const stage = document.querySelector('.stage');
+  THEMES.forEach(t => { if (t) stage.classList.remove(t); });
+  if (THEMES[themeIdx]) stage.classList.add(THEMES[themeIdx]);
+  const lbl = document.querySelector('#btnMenuTheme .mbtn-label');
+  if (lbl) lbl.textContent = 'Cenário: ' + THEME_NAMES[themeIdx];
+  showToast(THEME_NAMES[themeIdx], '');
+}
+
+document.getElementById('btnMenuTheme').addEventListener('click', cycleTheme);
+document.getElementById('btnTheme').addEventListener('click', () => { cycleTheme(); });
 
 /* =============================================================
    INÍCIO

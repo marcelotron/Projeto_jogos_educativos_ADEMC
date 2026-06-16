@@ -688,7 +688,7 @@
           <div class="mode-icon">✖</div>
           <div class="mode-text">
             <div class="mode-title">Modo Avançado</div>
-            <div class="mode-desc">Soma, subtração, multiplicação e divisão</div>
+            <div class="mode-desc">Verdadeiro ou falso: soma, subtração, multiplicação e divisão</div>
           </div>
           <div class="mode-arrow">▶</div>
         </button>
@@ -753,13 +753,12 @@
         <div class="learn-box">
           <h3>🎯 Modos de Jogo</h3>
           <div class="example-block"><b style="color:#19a36f">🔢 Modo Básico</b><br>Verdadeiro ou Falso: operações de <span class="op-hl">adição e subtração</span> (1 a 10). Bom para começar!</div>
-          <div class="example-block"><b style="color:#1f6feb">✖ Modo Avançado</b><br>Digite o resultado: soma, subtração, <span class="op-hl">multiplicação e divisão</span>. Mais desafiador!</div>
+          <div class="example-block"><b style="color:#1f6feb">✖ Modo Avançado</b><br>Verdadeiro ou Falso: <span class="op-hl">soma, subtração, multiplicação e divisão</span> com números maiores. Mais desafiador!</div>
           <div class="example-block"><b style="color:#9b5de5">🤔 Modo Desafio</b><br>Verdadeiro ou Falso: <span class="op-hl">par/ímpar, número primo e raiz quadrada</span>. Para experts!</div>
         </div>
         <div class="learn-box">
           <h3>⌨️ Atalhos de Teclado</h3>
-          <div class="example-block">Nos modos Verdadeiro/Falso:<br><kbd style="background:#16202a;color:#fff;padding:2px 8px;border-radius:4px;border:1px solid #000;font-family:monospace">V</kbd> ou <kbd style="background:#16202a;color:#fff;padding:2px 8px;border-radius:4px;border:1px solid #000;font-family:monospace">←</kbd> → Verdadeiro &nbsp;|&nbsp; <kbd style="background:#16202a;color:#fff;padding:2px 8px;border-radius:4px;border:1px solid #000;font-family:monospace">F</kbd> ou <kbd style="background:#16202a;color:#fff;padding:2px 8px;border-radius:4px;border:1px solid #000;font-family:monospace">→</kbd> → Falso</div>
-          <div class="example-block">No modo Avançado: <kbd style="background:#16202a;color:#fff;padding:2px 8px;border-radius:4px;border:1px solid #000;font-family:monospace">Enter</kbd> confirma a resposta</div>
+          <div class="example-block">Em todos os modos:<br><kbd style="background:#16202a;color:#fff;padding:2px 8px;border-radius:4px;border:1px solid #000;font-family:monospace">V</kbd> ou <kbd style="background:#16202a;color:#fff;padding:2px 8px;border-radius:4px;border:1px solid #000;font-family:monospace">←</kbd> → Verdadeiro &nbsp;|&nbsp; <kbd style="background:#16202a;color:#fff;padding:2px 8px;border-radius:4px;border:1px solid #000;font-family:monospace">F</kbd> ou <kbd style="background:#16202a;color:#fff;padding:2px 8px;border-radius:4px;border:1px solid #000;font-family:monospace">→</kbd> → Falso</div>
         </div>
       </div>
 
@@ -1129,27 +1128,38 @@ const MODES = {
     color: "#1f6feb",
     generate(){
       const op = randInt(1,4); // 1=+, 2=-, 3=×, 4=÷
-      let a, b, sym, ans;
+      let a, b, sym, correct;
       if(op === 1){
         a = randInt(2,20); b = randInt(2,20);
-        sym = "+"; ans = a + b;
+        sym = "+"; correct = a + b;
       } else if(op === 2){
         a = randInt(2,20); b = randInt(2,20);
-        sym = "−"; ans = a - b;
+        if(b > a){ const t = a; a = b; b = t; } // subtração nunca negativa
+        sym = "−"; correct = a - b;
       } else if(op === 3){
         a = randInt(2,10); b = randInt(2,10);
-        sym = "×"; ans = a * b;
+        sym = "×"; correct = a * b;
       } else {
         // ÷ exata: escolhe quociente e divisor, calcula dividendo
-        b   = randInt(2,10);
-        ans = randInt(2,10);
-        a   = b * ans;
+        b = randInt(2,10);
+        correct = randInt(2,10);
+        a = b * correct;
         sym = "÷";
       }
+      const showCorrect = Math.random() < 0.5;
+      let shown;
+      if(showCorrect){
+        shown = correct;
+      } else {
+        let delta = randInt(1, 5);
+        shown = correct + (Math.random() < 0.5 ? delta : -delta);
+        if(shown <= 0) shown = correct + delta;
+        if(shown === correct) shown = correct + 1;
+      }
       return {
-        type: "numeric",
-        display: `${a} <span class="op">${sym}</span> ${b} = ?`,
-        answer: ans,
+        type: "truefalse",
+        display: `${a} <span class="op">${sym}</span> ${b} = ${shown}?`,
+        answer: showCorrect,
       };
     },
   },
