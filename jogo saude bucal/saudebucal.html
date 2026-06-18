@@ -544,7 +544,7 @@
   <div class="screen" id="screen-brush">
     <div class="canvas-instructions">
       <div class="icon-circle">🪥</div>
-      <div>Arraste a escova de um lado pro outro nos dentes pra tirar todo a placa!</div>
+      <div>Passe a escova sobre cada dente algumas vezes pra remover a placa!</div>
     </div>
     <canvas id="brushCanvas" width="680" height="500"></canvas>
     <div class="progress-row">
@@ -563,7 +563,7 @@
   <div class="screen" id="screen-floss">
     <div class="canvas-instructions">
       <div class="icon-circle">🧵</div>
-      <div>Arraste o fio pra cima e pra baixo entre os dentes pra tirar os restos de comida!</div>
+      <div>Coloque o fio entre os dentes e mova pra cima e pra baixo pra limpar!</div>
     </div>
     <canvas id="flossCanvas" width="680" height="500"></canvas>
     <div class="progress-row">
@@ -695,22 +695,22 @@ function sfxCheer() {
 const QUESTIONS = [
   { img: "imagens/escovar.png",  fallback: "🪥", q: "Devemos escovar os dentes pelo menos 2 vezes ao dia.", a: true,
     why: "Isso mesmo! O ideal é escovar de manhã, depois das refeições e antes de dormir." },
-  { img: "imagens/doces.png",    fallback: "🍬", q: "Comer doces o tempo todo não faz mal nenhum aos dentes.", a: false,
-    why: "Cuidado! O açúcar alimenta as bactérias que causam cárie. Tudo bem comer doce, mas com moderação e escovando depois." },
-  { img: "imagens/fio.png",      fallback: "🧵", q: "O fio dental serve só para tirar comida presa, não é tão importante.", a: false,
-    why: "Na verdade, o fio dental remove a placa entre os dentes onde a escova não chega. Use todos os dias!" },
+  { img: "imagens/fluor.png",    fallback: "🧴", q: "O creme dental com flúor ajuda a fortalecer e proteger os dentes.", a: true,
+    why: "Sim! O flúor fortalece o esmalte dos dentes e ajuda a prevenir cáries. Sempre use pasta com flúor!" },
+  { img: "imagens/forca.png",    fallback: "💪", q: "Escovar os dentes com muita força limpa melhor do que escovar com suavidade.", a: false,
+    why: "Pelo contrário! Escovar com força pode machucar a gengiva e desgastar o esmalte. Use movimentos suaves e circulares." },
   { img: "imagens/bacteria.png", fallback: "🦠", q: "Cárie é causada por bactérias que vivem na nossa boca.", a: true,
     why: "Exato! As bactérias transformam restos de açúcar em ácido, que ataca o esmalte dos dentes." },
-  { img: "imagens/leite.png",    fallback: "🦷", q: "Crianças não precisam escovar os dentes de leite porque eles caem mesmo.", a: false,
-    why: "Errado! Os dentes de leite guardam o lugar dos dentes permanentes. Cuidar deles é super importante." },
+  { img: "imagens/dente6.png",   fallback: "🦷", q: "Os primeiros dentes permanentes costumam aparecer por volta dos 6 anos de idade.", a: true,
+    why: "Verdade! Por volta dos 6 anos surgem os primeiros molares permanentes. Por isso cuidar dos dentes de leite desde bebê é muito importante!" },
   { img: "imagens/dentista.png", fallback: "🏥", q: "É bom visitar o dentista a cada 6 meses, mesmo sem dor.", a: true,
     why: "Verdade! O dentista detecta problemas cedo, antes de virarem dor ou cárie grande." },
-  { img: "imagens/escova.png",   fallback: "♻️", q: "Devemos trocar a escova de dente quando ela estiver muito velha, depois de uns 3 meses.", a: true,
-    why: "Isso! Cerdas tortas não limpam direito. Troque a escova a cada 3 meses ou depois de uma gripe forte." },
+  { img: "imagens/enxaguante.png", fallback: "🫧", q: "O enxaguante bucal substitui completamente a escovação dos dentes.", a: false,
+    why: "Não! O enxaguante é um complemento, não substitui a escovação. Escove, passe o fio e use o enxaguante para uma limpeza completa." },
   { img: "imagens/agua.png",     fallback: "💧", q: "Beber bastante água ajuda a manter a boca saudável.", a: true,
     why: "Sim! A água ajuda a lavar restos de comida e mantém a saliva, que protege os dentes naturalmente." },
-  { img: "imagens/refri.png",    fallback: "🥤", q: "Refrigerantes não fazem mal aos dentes se tomarmos todo dia.", a: false,
-    why: "Refrigerante tem muito açúcar e ácido, que enfraquecem o esmalte. Beba com moderação e prefira água!" },
+  { img: "imagens/habitos.png",  fallback: "🙅", q: "Usar os dentes pra morder unhas ou abrir embalagens pode danificá-los.", a: true,
+    why: "Exato! Os dentes são feitos para mastigar comida. Morder objetos duros pode causar rachaduras e desgaste. Cuide bem deles!" },
   { img: "imagens/lingua.png",   fallback: "😛", q: "A língua também precisa ser escovada ou raspada.", a: true,
     why: "Verdade! A língua acumula bactérias que causam mau hálito. Limpe ela na hora de escovar os dentes." }
 ];
@@ -845,7 +845,7 @@ const TEETH = [
   { x: 535, y: 280, w: 75, h: 100, row: 'bot' }
 ];
 
-let brushCanvas, brushCtx, brushPlaqueCanvas, brushPlaqueCtx;
+let brushCanvas, brushCtx;
 let brushState = {
   pointer: { x: -100, y: -100 },
   pressed: false,
@@ -862,13 +862,16 @@ function goToBrush() {
 function initBrushGame() {
   brushCanvas = document.getElementById('brushCanvas');
   brushCtx = brushCanvas.getContext('2d');
-  // Off-screen plaque canvas
-  brushPlaqueCanvas = document.createElement('canvas');
-  brushPlaqueCanvas.width = brushCanvas.width;
-  brushPlaqueCanvas.height = brushCanvas.height;
-  brushPlaqueCtx = brushPlaqueCanvas.getContext('2d');
 
-  drawPlaqueLayer();
+  // Each tooth tracks its own cleanliness (0=dirty, 1=clean) and fixed spot positions
+  TEETH.forEach(t => {
+    t.clean = 0;
+    t.spots = Array.from({length: 8}, () => ({
+      x: t.x + 6 + Math.random() * (t.w - 12),
+      y: t.y + 6 + Math.random() * (t.h - 12),
+      r: 4 + Math.random() * 5
+    }));
+  });
 
   brushState = {
     pointer: { x: -100, y: -100 },
@@ -883,23 +886,6 @@ function initBrushGame() {
 
   attachBrushEvents();
   requestAnimationFrame(brushLoop);
-}
-
-function drawPlaqueLayer() {
-  brushPlaqueCtx.clearRect(0, 0, brushPlaqueCanvas.width, brushPlaqueCanvas.height);
-  TEETH.forEach(t => {
-    // Draw plaque texture inside tooth shape
-    drawToothShape(brushPlaqueCtx, t, '#B8954A');
-    // Add darker spots
-    brushPlaqueCtx.fillStyle = 'rgba(110, 85, 30, 0.6)';
-    for (let i = 0; i < 8; i++) {
-      const px = t.x + Math.random() * t.w;
-      const py = t.y + Math.random() * t.h;
-      brushPlaqueCtx.beginPath();
-      brushPlaqueCtx.arc(px, py, 4 + Math.random()*5, 0, Math.PI*2);
-      brushPlaqueCtx.fill();
-    }
-  });
 }
 
 function drawToothShape(ctx, t, fill) {
@@ -950,18 +936,15 @@ function attachBrushEvents() {
       const dy = p.y - brushState.lastY;
       const d = Math.hypot(dx, dy);
       brushState.velocity = d;
-      // Erase plaque along the path
       if (d > 1) {
-        brushPlaqueCtx.globalCompositeOperation = 'destination-out';
-        brushPlaqueCtx.lineWidth = 38;
-        brushPlaqueCtx.lineCap = 'round';
-        brushPlaqueCtx.beginPath();
-        brushPlaqueCtx.moveTo(brushState.lastX, brushState.lastY);
-        brushPlaqueCtx.lineTo(p.x, p.y);
-        brushPlaqueCtx.stroke();
-        brushPlaqueCtx.globalCompositeOperation = 'source-over';
+        // Accumulate cleanliness for any tooth the brush passes over
+        TEETH.forEach(t => {
+          if (p.x >= t.x - 20 && p.x <= t.x + t.w + 20 &&
+              p.y >= t.y - 20 && p.y <= t.y + t.h + 20) {
+            t.clean = Math.min(1, t.clean + Math.min(d, 25) * 0.006);
+          }
+        });
       }
-      // brush sound throttled
       const now = performance.now();
       if (d > 4 && now - brushAudioTimer > 90) {
         brushAudioTimer = now;
@@ -1021,8 +1004,20 @@ function brushLoop() {
     ctx.fillRect(t.x + 8, t.y + 12, 8, t.h * 0.3);
   });
 
-  // Draw plaque overlay
-  ctx.drawImage(brushPlaqueCanvas, 0, 0);
+  // Draw per-tooth plaque overlay that fades as each tooth gets clean
+  TEETH.forEach(t => {
+    const alpha = 1 - t.clean;
+    if (alpha <= 0) return;
+    ctx.globalAlpha = alpha;
+    drawToothShape(ctx, t, '#B8954A');
+    ctx.fillStyle = 'rgba(110, 85, 30, 0.7)';
+    t.spots.forEach(s => {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+  });
 
   // Draw brush at pointer
   drawBrush(ctx, brushState.pointer.x, brushState.pointer.y, brushState.pressed);
@@ -1066,30 +1061,15 @@ function drawBrush(ctx, x, y, pressed) {
 
 let brushCleanCheck = 0;
 function updateBrushCleanliness() {
-  // Throttle
   brushCleanCheck++;
   if (brushCleanCheck % 8 !== 0) return;
 
-  // Sample remaining plaque on tooth regions
-  const data = brushPlaqueCtx.getImageData(0, 0, brushPlaqueCanvas.width, brushPlaqueCanvas.height).data;
-  let totalArea = 0, cleanArea = 0;
-  TEETH.forEach(t => {
-    // sample grid
-    const step = 6;
-    for (let yy = t.y; yy < t.y + t.h; yy += step) {
-      for (let xx = t.x; xx < t.x + t.w; xx += step) {
-        totalArea++;
-        const idx = (Math.floor(yy) * brushPlaqueCanvas.width + Math.floor(xx)) * 4;
-        if (data[idx + 3] < 30) cleanArea++;
-      }
-    }
-  });
-  const pct = totalArea ? (cleanArea / totalArea) : 0;
+  const pct = TEETH.reduce((s, t) => s + t.clean, 0) / TEETH.length;
   brushState.cleanliness = pct;
   const pctRound = Math.round(pct * 100);
   document.getElementById('brushBar').style.width = pctRound + '%';
   document.getElementById('brushPct').textContent = pctRound + '%';
-  if (pct >= 0.92 && !brushState.celebrated) {
+  if (pct >= 0.85 && !brushState.celebrated) {
     brushState.celebrated = true;
     sfxCheer();
     showToast('Dentes brilhando! ✨', 'sun');
@@ -1107,12 +1087,11 @@ const GAPS = [
 ];
 
 let flossCanvas, flossCtx;
+let flossAudioTimer = 0;
 let flossState = {
   pointer: { x: -100, y: -100 },
   pressed: false,
   lastY: 0,
-  upDownChanges: 0,
-  lastDir: 0, // -1 up, 1 down
   activeGap: -1,
   doneCount: 0
 };
@@ -1131,7 +1110,6 @@ function initFlossGame() {
     pointer: { x: -100, y: -100 },
     pressed: false,
     lastY: 0,
-    lastDir: 0,
     activeGap: -1,
     doneCount: 0
   };
@@ -1156,7 +1134,7 @@ function attachFlossEvents() {
     flossState.activeGap = -1;
     GAPS.forEach((g, i) => {
       if (g.done >= 1) return;
-      if (p.x >= g.x - g.w/2 - 6 && p.x <= g.x + g.w/2 + 6 && p.y > 130 && p.y < 350) {
+      if (p.x >= g.x - g.w/2 - 30 && p.x <= g.x + g.w/2 + 30 && p.y > 100 && p.y < 420) {
         flossState.activeGap = i;
       }
     });
@@ -1166,14 +1144,13 @@ function attachFlossEvents() {
     const p = getCanvasCoords(c, e);
     flossState.pointer = p;
     if (flossState.pressed && flossState.activeGap >= 0) {
-      const dy = p.y - flossState.lastY;
-      const dir = dy > 1 ? 1 : (dy < -1 ? -1 : 0);
-      // detect direction change
-      if (dir !== 0 && flossState.lastDir !== 0 && dir !== flossState.lastDir) {
-        // up-down motion detected
+      const dy = Math.abs(p.y - flossState.lastY);
+      if (dy > 0.5) {
         const g = GAPS[flossState.activeGap];
-        g.done = Math.min(1, g.done + 0.18);
-        sfxFloss();
+        // ~85px de movimento vertical total limpa o espaço
+        g.done = Math.min(1, g.done + dy * 0.012);
+        const now = performance.now();
+        if (now - flossAudioTimer > 120) { flossAudioTimer = now; sfxFloss(); }
         if (g.done >= 1 && !g.cheered) {
           g.cheered = true;
           flossState.doneCount++;
@@ -1181,13 +1158,11 @@ function attachFlossEvents() {
           spawnFlossSparkle(g.x, g.y);
         }
       }
-      if (dir !== 0) flossState.lastDir = dir;
-      // also need to be in gap zone
-      const g = GAPS[flossState.activeGap];
-      if (Math.abs(p.x - g.x) > g.w/2 + 12) {
-        flossState.activeGap = -1; // exited gap
-      }
       flossState.lastY = p.y;
+      const g = GAPS[flossState.activeGap];
+      if (Math.abs(p.x - g.x) > g.w/2 + 40) {
+        flossState.activeGap = -1;
+      }
     }
   };
   const onUp = () => {

@@ -683,7 +683,7 @@
     let timeLeft = 60;
     let acertos = 0;
     let erros = 0;
-    const MAX_SCORE = 200;
+    const MAX_SCORE = 300;
     let nextBonusMilestone = 50;
     let finalRushTriggered = false;
     let gameState = 'MENU';
@@ -897,8 +897,8 @@
                         spawnParticles(w.x + w.width / 2, w.y - 40, "+10s ⏱", "#3498db");
                         updateHUD();
                     }
-                    // sprint final aos 180 pontos
-                    if (score >= 180 && !finalRushTriggered) {
+                    // sprint final aos 280 pontos
+                    if (score >= 280 && !finalRushTriggered) {
                         finalRushTriggered = true;
                         baseSpeed += 1.8;
                         spawnIntervalMs = Math.max(400, spawnIntervalMs - 600);

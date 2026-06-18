@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿ <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -220,6 +220,7 @@
   .d-eq{color:var(--ink-soft);font-size:12px;}
   .hist-empty{text-align:center;font-style:italic;color:var(--ink-soft);padding:24px 0;}
   .hist-footer{display:flex;gap:8px;justify-content:flex-end;}
+
 
   /* ---------- tutorial overlay ---------- */
   #tutorialOverlay{
@@ -522,8 +523,12 @@
 
   /* easy mode: 7 of the 14 structures (front-facing, well-known) */
   const EASY_IDS = ['caveira','peitoral','biceps','costelas','abdominal','quadriceps','fibula'];
+
   let easyMode = false;
-  function activeLabels(){ return easyMode ? LABELS.filter(l => EASY_IDS.includes(l.id)) : LABELS; }
+  function activeLabels(){
+    return easyMode ? LABELS.filter(l => EASY_IDS.includes(l.id)) : LABELS;
+  }
+  function activeDots(){ return DOTS; }
 
   /* state */
   let connections = {};
@@ -631,7 +636,7 @@
     dotsLayer.innerHTML = '';
     activeLabels().forEach(lab => {
       const id = lab.id;
-      const p = DOTS[id];
+      const p = activeDots()[id];
       const dot = document.createElement('button');
       dot.type = 'button';
       dot.className = 'dot';
@@ -876,7 +881,7 @@
         const dotId = connections[id];
         if(dotId){
           const dEl = dotEl(dotId);
-          const side = DOTS[dotId].xp < 50 ? 'L' : 'R';
+          const side = activeDots()[dotId].xp < 50 ? 'L' : 'R';
           const y = dEl ? pctY(dEl.getBoundingClientRect()) : DOTS[dotId].yp;
           (side === 'L' ? leftItems : rightItems).push({ id:id, y:y });
         } else {
@@ -1024,6 +1029,7 @@
     timerEl.textContent = '0:00';
     submitBtn.disabled = false;
     results.classList.remove('show');
+    figureImg.style.display = '';
     buildTags();
     buildDots();
     render();

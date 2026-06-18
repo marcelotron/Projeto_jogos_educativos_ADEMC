@@ -13,565 +13,397 @@
   --wood-mid: #8B4513;
   --wood-light: #B8763C;
   --wood-highlight: #D9A066;
-  --leaf-dark: #2D5016;
-  --leaf-mid: #4A7C2A;
-  --leaf-light: #7CB342;
-  --grass-dark: #558B2F;
-  --grass-light: #8BC34A;
-  --sky-top: #87CEEB;
-  --sky-bot: #BFE4F0;
   --gold: #FFD43B;
   --gold-dark: #F59E0B;
   --paper: #FFF8E7;
   --paper-shadow: #E8DCC0;
   --success: #4ADE80;
   --error: #EF4444;
-  --water: #5DADE2;
+  --scene-title: #FFD43B;
+  --scene-box-border: var(--wood-dark);
+  --scene-box-bg: linear-gradient(135deg, var(--wood-light) 0%, var(--wood-mid) 50%, var(--wood-light) 100%);
+  --scene-inner-bg: radial-gradient(ellipse at top, var(--paper) 0%, var(--paper-shadow) 100%);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html, body {
-  width: 100%;
-  height: 100%;
+  width: 100%; height: 100%;
   overflow: hidden;
   background: #0F1419;
   font-family: 'Fredoka', system-ui, sans-serif;
   touch-action: none;
-  -webkit-user-select: none;
-  user-select: none;
+  -webkit-user-select: none; user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
-
-body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+body { display: flex; align-items: center; justify-content: center; }
 
 #game {
   position: relative;
-  width: 100vw;
-  height: 100vh;
+  width: 100vw; height: 100vh;
   max-width: min(100vw, calc(100vh * 16 / 9));
   max-height: min(100vh, calc(100vw * 9 / 16));
   overflow: hidden;
-  box-shadow: 0 0 40px rgba(0,0,0,0.5);
-  background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bot) 60%);
+  box-shadow: 0 0 60px rgba(0,0,0,0.7);
 }
 
-/* ====== Background scene ====== */
+/* ====== Scene theming ====== */
+#game[data-scene="floresta"] { --scene-title: #FFD43B; --scene-box-border: #3A6010; --scene-box-bg: linear-gradient(135deg, #6A8C38 0%, #4A6A20 50%, #5A7C2C 100%); --scene-inner-bg: radial-gradient(ellipse at top, #F0FFE0 0%, #D8EFC0 100%); }
+#game[data-scene="oceano"]   { --scene-title: #7DDFFF; --scene-box-border: #0A4A7C; --scene-box-bg: linear-gradient(135deg, #1A6BAA 0%, #0A4A7C 50%, #1A6BAA 100%); --scene-inner-bg: radial-gradient(ellipse at top, #D0F4FF 0%, #A0DCEE 100%); }
+#game[data-scene="ceu"]      { --scene-title: #FFFAAA; --scene-box-border: #2A5090; --scene-box-bg: linear-gradient(135deg, #5A90D8 0%, #2A60B0 50%, #4A80C8 100%); --scene-inner-bg: radial-gradient(ellipse at top, #E8F4FF 0%, #C8DCFF 100%); }
+#game[data-scene="savana"]   { --scene-title: #FFB830; --scene-box-border: #7A3010; --scene-box-bg: linear-gradient(135deg, #C86020 0%, #8A3A10 50%, #B05018 100%); --scene-inner-bg: radial-gradient(ellipse at top, #FFF0D0 0%, #F0D8A0 100%); }
+#game[data-scene="fazenda"]  { --scene-title: #CCFF66; --scene-box-border: #2A5A10; --scene-box-bg: linear-gradient(135deg, #4A8C20 0%, #2A6010 50%, #3A7818 100%); --scene-inner-bg: radial-gradient(ellipse at top, #F0FFE8 0%, #D8F0C0 100%); }
+#game[data-scene="selva"]    { --scene-title: #88FFCC; --scene-box-border: #0A3A1A; --scene-box-bg: linear-gradient(135deg, #1A5A30 0%, #0A3A1A 50%, #1A4A28 100%); --scene-inner-bg: radial-gradient(ellipse at top, #D0FFE8 0%, #A0DCBC 100%); }
+
+/* ====== Background SVG ====== */
 .bg-svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
   pointer-events: none;
+  transition: opacity 0.3s ease;
 }
+.bg-svg.fade-out { opacity: 0; }
 
-.cloud {
-  animation: drift 60s linear infinite;
-}
+/* ====== Scene animations ====== */
+.cloud { animation: drift 60s linear infinite; }
 .cloud-2 { animation-duration: 90s; animation-delay: -30s; }
 .cloud-3 { animation-duration: 75s; animation-delay: -45s; }
-
 @keyframes drift {
-  from { transform: translateX(-200px); }
-  to { transform: translateX(2000px); }
+  from { transform: translateX(-220px); }
+  to   { transform: translateX(1800px); }
+}
+
+.bubble {
+  animation: bubble-rise 5s ease-in infinite;
+  transform-origin: center bottom;
+}
+.bubble:nth-child(2) { animation-delay: -1.6s; }
+.bubble:nth-child(3) { animation-delay: -3.2s; }
+.bubble:nth-child(4) { animation-delay: -0.8s; }
+.bubble:nth-child(5) { animation-delay: -4.0s; }
+@keyframes bubble-rise {
+  0%   { transform: translate(0, 0) scale(1); opacity: 0.7; }
+  80%  { opacity: 0.4; }
+  100% { transform: translate(var(--bx,8px), -260px) scale(0.4); opacity: 0; }
+}
+
+.seaweed { animation: sway 3.5s ease-in-out infinite; transform-origin: bottom center; }
+.seaweed:nth-child(odd) { animation-direction: alternate-reverse; }
+@keyframes sway {
+  0%, 100% { transform: rotate(-8deg) scaleX(1); }
+  50%       { transform: rotate(8deg) scaleX(0.96); }
+}
+
+.firefly { animation: flicker 2s ease-in-out infinite; }
+.firefly:nth-child(2) { animation-delay: -0.7s; animation-duration: 2.8s; }
+.firefly:nth-child(3) { animation-delay: -1.4s; animation-duration: 1.6s; }
+.firefly:nth-child(4) { animation-delay: -2.1s; animation-duration: 3.2s; }
+.firefly:nth-child(5) { animation-delay: -0.3s; animation-duration: 2.4s; }
+@keyframes flicker {
+  0%, 100% { opacity: 0.1; r: 3; }
+  40%, 60% { opacity: 0.95; r: 5; }
+}
+
+.grass-tip { animation: grass-wave 2.5s ease-in-out infinite; transform-origin: bottom center; }
+.grass-tip:nth-child(odd) { animation-direction: alternate-reverse; animation-duration: 3.2s; }
+@keyframes grass-wave {
+  0%, 100% { transform: rotate(-6deg); }
+  50%       { transform: rotate(6deg); }
 }
 
 /* ====== HUD ====== */
 #hud {
-  position: absolute;
-  top: 2.5%;
-  left: 50%;
+  position: absolute; top: 2.5%; left: 50%;
   transform: translateX(-50%);
-  display: flex;
-  gap: 14px;
-  z-index: 100;
+  display: flex; gap: 14px; z-index: 100;
 }
-
 .counter {
   background: linear-gradient(180deg, var(--wood-light) 0%, var(--wood-mid) 100%);
-  border: 3px solid var(--wood-dark);
-  border-radius: 14px;
+  border: 3px solid var(--wood-dark); border-radius: 14px;
   padding: 4px 16px 4px 12px;
-  color: white;
-  font-family: 'Lilita One', cursive;
+  color: white; font-family: 'Lilita One', cursive;
   font-size: clamp(20px, 2.6vw, 30px);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 4px 0 var(--wood-dark), 0 6px 12px rgba(0,0,0,0.3);
+  display: flex; align-items: center; gap: 8px;
+  box-shadow: 0 4px 0 var(--wood-dark), 0 6px 16px rgba(0,0,0,0.4);
   letter-spacing: 1px;
 }
-
-.counter .icon {
-  font-size: 1.2em;
-  filter: drop-shadow(1px 1px 0 rgba(0,0,0,0.4));
-}
-
+.counter .icon { font-size: 1.2em; filter: drop-shadow(1px 1px 0 rgba(0,0,0,0.4)); }
 .counter.correct .icon { color: var(--success); }
-.counter.wrong .icon { color: var(--error); }
+.counter.wrong   .icon { color: var(--error); }
 
 #soundToggle {
-  position: absolute;
-  top: 2.5%;
-  right: 2%;
-  width: clamp(48px, 5.5vw, 70px);
-  height: clamp(48px, 5.5vw, 70px);
+  position: absolute; top: 2.5%; right: 2%;
+  width: clamp(48px, 5.5vw, 70px); height: clamp(48px, 5.5vw, 70px);
   background: radial-gradient(circle at 30% 30%, var(--wood-highlight) 0%, var(--wood-mid) 70%, var(--wood-dark) 100%);
-  border-radius: 50%;
-  border: 3px solid var(--wood-dark);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: clamp(22px, 2.8vw, 32px);
-  cursor: pointer;
-  z-index: 100;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3), inset 0 -3px 0 rgba(0,0,0,0.2);
+  border-radius: 50%; border: 3px solid var(--wood-dark);
+  display: flex; align-items: center; justify-content: center;
+  font-size: clamp(22px, 2.8vw, 32px); cursor: pointer; z-index: 100;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4), inset 0 -3px 0 rgba(0,0,0,0.2);
   transition: transform 0.15s;
 }
 #soundToggle:active { transform: scale(0.92); }
-#soundToggle.muted { filter: grayscale(0.7) brightness(0.7); }
+#soundToggle.muted  { filter: grayscale(0.7) brightness(0.7); }
 #soundToggle.muted::after {
   content: '';
-  position: absolute;
-  inset: 18%;
+  position: absolute; inset: 18%;
   border-top: 4px solid var(--error);
-  transform: rotate(-45deg);
-  transform-origin: center;
+  transform: rotate(-45deg); transform-origin: center;
 }
 
-/* ====== Box (drop zone) ====== */
+/* ====== Drop Box ====== */
 #box {
-  position: absolute;
-  left: 2.5%;
-  top: 16%;
-  width: 38%;
-  height: 76%;
-  background:
-    repeating-linear-gradient(90deg, transparent 0 20px, rgba(0,0,0,0.06) 20px 21px),
-    linear-gradient(135deg, var(--wood-light) 0%, var(--wood-mid) 50%, var(--wood-light) 100%);
-  border-radius: 18px;
-  padding: clamp(6px, 1vw, 12px);
-  box-shadow:
-    0 8px 24px rgba(0,0,0,0.4),
-    inset 0 -5px 0 var(--wood-dark),
-    inset 0 3px 0 rgba(255,255,255,0.15);
-  border: 4px solid var(--wood-dark);
-  z-index: 5;
-  display: flex;
-  flex-direction: column;
+  position: absolute; left: 2.5%; top: 16%; width: 38%; height: 76%;
+  background: var(--scene-box-bg);
+  border-radius: 18px; padding: clamp(6px,1vw,12px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.5), inset 0 -5px 0 rgba(0,0,0,0.25), inset 0 3px 0 rgba(255,255,255,0.2);
+  border: 4px solid var(--scene-box-border);
+  z-index: 5; display: flex; flex-direction: column;
+  transition: border-color 0.5s ease, background 0.5s ease;
 }
-
-/* wood "nails" in corners */
-#box::before, #box::after {
-  content: '';
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background: radial-gradient(circle, #3a2410 30%, #6b3d1f 70%);
-  border-radius: 50%;
-  box-shadow: inset 0 -1px 1px rgba(0,0,0,0.5);
-}
-#box::before { top: 8px; left: 8px; }
-#box::after  { top: 8px; right: 8px; }
+/* nails in all 4 corners */
+#box::before { content: ''; position: absolute; top: 8px; left: 8px; width: 12px; height: 12px; background: radial-gradient(circle, #2A1808 30%, #6b3d1f 70%); border-radius: 50%; box-shadow: inset 0 -1px 2px rgba(0,0,0,0.5), 0 1px 2px rgba(255,255,255,0.15); }
+#box::after  { content: ''; position: absolute; top: 8px; right: 8px; width: 12px; height: 12px; background: radial-gradient(circle, #2A1808 30%, #6b3d1f 70%); border-radius: 50%; box-shadow: inset 0 -1px 2px rgba(0,0,0,0.5), 0 1px 2px rgba(255,255,255,0.15); }
+.box-nail-bl { position: absolute; bottom: 8px; left: 8px; width: 12px; height: 12px; background: radial-gradient(circle, #2A1808 30%, #6b3d1f 70%); border-radius: 50%; box-shadow: inset 0 -1px 2px rgba(0,0,0,0.5), 0 1px 2px rgba(255,255,255,0.15); pointer-events: none; z-index: 2; }
+.box-nail-br { position: absolute; bottom: 8px; right: 8px; width: 12px; height: 12px; background: radial-gradient(circle, #2A1808 30%, #6b3d1f 70%); border-radius: 50%; box-shadow: inset 0 -1px 2px rgba(0,0,0,0.5), 0 1px 2px rgba(255,255,255,0.15); pointer-events: none; z-index: 2; }
 
 #categoryTitle {
   font-family: 'Lilita One', cursive;
   text-align: center;
-  font-size: clamp(20px, 3.2vw, 38px);
-  color: var(--gold);
-  text-shadow:
-    3px 3px 0 var(--wood-dark),
-    -1px -1px 0 var(--wood-dark),
-     1px -1px 0 var(--wood-dark),
-    -1px  1px 0 var(--wood-dark),
-     2px  4px 0 rgba(0,0,0,0.25);
+  font-size: clamp(18px, 3vw, 36px);
+  color: var(--scene-title);
+  text-shadow: 3px 3px 0 rgba(0,0,0,0.5), -1px -1px 0 rgba(0,0,0,0.3), 0 0 20px rgba(255,255,255,0.2);
   padding: 4px 8px 10px;
-  letter-spacing: 1.5px;
-  line-height: 1.1;
+  letter-spacing: 1.5px; line-height: 1.1;
+  transition: color 0.5s ease;
 }
 
 #boxContents {
   flex: 1;
-  background:
-    radial-gradient(ellipse at top, var(--paper) 0%, var(--paper-shadow) 100%);
+  background: var(--scene-inner-bg);
   border-radius: 12px;
-  display: flex;
-  flex-wrap: wrap;
-  align-content: center;
-  justify-content: center;
-  gap: clamp(4px, 0.8vw, 10px);
-  padding: clamp(8px, 1.2vw, 16px);
+  display: flex; flex-wrap: wrap;
+  align-content: center; justify-content: center;
+  gap: clamp(4px,0.8vw,10px); padding: clamp(8px,1.2vw,16px);
   overflow: hidden;
-  position: relative;
-  box-shadow: inset 0 3px 8px rgba(0,0,0,0.15);
+  box-shadow: inset 0 3px 10px rgba(0,0,0,0.2);
+  transition: background 0.5s ease;
 }
 
 .placed-animal {
-  font-size: clamp(34px, 4.5vw, 56px);
-  line-height: 1;
-  filter: drop-shadow(2px 3px 2px rgba(0,0,0,0.25));
+  font-size: clamp(32px,4.2vw,52px); line-height: 1;
+  filter: drop-shadow(2px 3px 3px rgba(0,0,0,0.3));
   animation: pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-
 @keyframes pop {
-  0% { transform: scale(0) rotate(-15deg); opacity: 0; }
-  60% { transform: scale(1.25) rotate(8deg); opacity: 1; }
+  0%   { transform: scale(0) rotate(-20deg); opacity: 0; }
+  60%  { transform: scale(1.28) rotate(10deg); opacity: 1; }
   100% { transform: scale(1) rotate(0); }
 }
 
 /* ====== Action buttons ====== */
 #actionButtons {
-  position: absolute;
-  right: 2.5%;
-  top: 22%;
-  display: flex;
-  flex-direction: column;
-  gap: clamp(10px, 1.6vw, 20px);
-  z-index: 100;
-  align-items: stretch;
+  position: absolute; right: 2.5%; top: 22%;
+  display: flex; flex-direction: column;
+  gap: clamp(10px,1.6vw,20px); z-index: 100; align-items: stretch;
 }
 
 .btn {
   background: linear-gradient(180deg, #9CCC65 0%, #689F38 100%);
-  border: 4px solid #33691E;
-  border-radius: 18px;
-  padding: clamp(6px, 1vw, 12px) clamp(16px, 2.4vw, 32px);
+  border: 4px solid #33691E; border-radius: 18px;
+  padding: clamp(6px,1vw,12px) clamp(16px,2.4vw,32px);
   font-family: 'Lilita One', cursive;
-  font-size: clamp(18px, 2.4vw, 30px);
-  color: white;
-  cursor: pointer;
-  letter-spacing: 2.5px;
-  box-shadow:
-    0 5px 0 #33691E,
-    0 7px 12px rgba(0,0,0,0.3),
-    inset 0 -3px 0 rgba(0,0,0,0.15),
-    inset 0 2px 0 rgba(255,255,255,0.3);
+  font-size: clamp(18px,2.4vw,30px);
+  color: white; cursor: pointer; letter-spacing: 2.5px;
+  box-shadow: 0 5px 0 #33691E, 0 7px 16px rgba(0,0,0,0.35), inset 0 -3px 0 rgba(0,0,0,0.15), inset 0 2px 0 rgba(255,255,255,0.3);
   transition: transform 0.1s, box-shadow 0.1s, filter 0.2s;
-  text-shadow: 2px 2px 0 rgba(0,0,0,0.25);
-  min-width: clamp(110px, 14vw, 170px);
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+  min-width: clamp(110px,14vw,170px);
 }
-
 .btn:active:not(:disabled) {
   transform: translateY(4px);
-  box-shadow: 0 1px 0 #33691E, 0 2px 4px rgba(0,0,0,0.3), inset 0 -1px 0 rgba(0,0,0,0.15);
+  box-shadow: 0 1px 0 #33691E, 0 2px 6px rgba(0,0,0,0.3), inset 0 -1px 0 rgba(0,0,0,0.15);
 }
-
-.btn:disabled {
-  filter: grayscale(0.6) brightness(0.85);
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.btn.next-ready {
-  animation: readyPulse 1.1s ease-in-out infinite;
-}
-
+.btn:disabled { filter: grayscale(0.6) brightness(0.8); opacity: 0.5; cursor: not-allowed; }
+.btn.next-ready { animation: readyPulse 1.1s ease-in-out infinite; }
 @keyframes readyPulse {
-  0%, 100% { transform: scale(1); box-shadow: 0 5px 0 #33691E, 0 7px 12px rgba(0,0,0,0.3), inset 0 -3px 0 rgba(0,0,0,0.15), inset 0 2px 0 rgba(255,255,255,0.3); }
-  50% { transform: scale(1.06); box-shadow: 0 5px 0 #33691E, 0 10px 24px rgba(255, 212, 59, 0.6), inset 0 -3px 0 rgba(0,0,0,0.15), inset 0 2px 0 rgba(255,255,255,0.3); }
+  0%, 100% { transform: scale(1); box-shadow: 0 5px 0 #33691E, 0 7px 16px rgba(0,0,0,0.35), inset 0 -3px 0 rgba(0,0,0,0.15), inset 0 2px 0 rgba(255,255,255,0.3); }
+  50%       { transform: scale(1.07); box-shadow: 0 5px 0 #33691E, 0 12px 28px rgba(255,212,59,0.65), inset 0 -3px 0 rgba(0,0,0,0.15), inset 0 2px 0 rgba(255,255,255,0.3); }
 }
 
 #doneBtn {
   background: linear-gradient(180deg, var(--wood-highlight) 0%, var(--wood-mid) 100%);
   border-color: var(--wood-dark);
-  box-shadow:
-    0 5px 0 var(--wood-dark),
-    0 7px 12px rgba(0,0,0,0.3),
-    inset 0 -3px 0 rgba(0,0,0,0.2),
-    inset 0 2px 0 rgba(255,255,255,0.25);
+  box-shadow: 0 5px 0 var(--wood-dark), 0 7px 16px rgba(0,0,0,0.35), inset 0 -3px 0 rgba(0,0,0,0.2), inset 0 2px 0 rgba(255,255,255,0.25);
 }
-#doneBtn:active:not(:disabled) {
-  box-shadow: 0 1px 0 var(--wood-dark), 0 2px 4px rgba(0,0,0,0.3);
-}
+#doneBtn:active:not(:disabled) { box-shadow: 0 1px 0 var(--wood-dark), 0 2px 6px rgba(0,0,0,0.3); }
 
 /* ====== Progress ====== */
 #progress {
-  position: absolute;
-  bottom: 3%;
-  right: 2.5%;
+  position: absolute; bottom: 3%; right: 2.5%;
   background: linear-gradient(180deg, var(--wood-light) 0%, var(--wood-mid) 100%);
-  border: 3px solid var(--wood-dark);
-  border-radius: 14px;
-  padding: 4px 16px;
-  color: white;
-  font-family: 'Lilita One', cursive;
-  font-size: clamp(18px, 2.4vw, 28px);
-  z-index: 100;
-  box-shadow: 0 4px 0 var(--wood-dark), 0 6px 12px rgba(0,0,0,0.3);
+  border: 3px solid var(--wood-dark); border-radius: 14px;
+  padding: 4px 16px; color: white;
+  font-family: 'Lilita One', cursive; font-size: clamp(18px,2.4vw,28px);
+  z-index: 100; box-shadow: 0 4px 0 var(--wood-dark), 0 6px 14px rgba(0,0,0,0.35);
   letter-spacing: 1px;
 }
 
 /* ====== Animals ====== */
 .animal {
   position: absolute;
-  font-size: clamp(48px, 7vw, 92px);
-  cursor: grab;
-  z-index: 10;
-  filter: drop-shadow(3px 5px 3px rgba(0,0,0,0.35));
-  line-height: 1;
-  user-select: none;
-  -webkit-user-drag: none;
+  font-size: clamp(48px,7vw,90px);
+  cursor: grab; z-index: 10;
+  filter: drop-shadow(3px 5px 4px rgba(0,0,0,0.4));
+  line-height: 1; user-select: none; -webkit-user-drag: none;
   transition: transform 0.2s, filter 0.2s;
   animation: idle 3s ease-in-out infinite;
   will-change: transform;
 }
-
-@keyframes idle {
-  0%, 100% { transform: translateY(0) rotate(0); }
-  50% { transform: translateY(-4px) rotate(1deg); }
+.animal::before {
+  content: '';
+  position: absolute; inset: -10%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%);
+  pointer-events: none;
+  transition: opacity 0.2s;
+  opacity: 0;
 }
-
-.animal:hover { transform: scale(1.08); }
+.animal:hover::before { opacity: 1; }
+@keyframes idle {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%       { transform: translateY(-5px) rotate(1.5deg); }
+}
+.animal:hover { transform: scale(1.1); filter: drop-shadow(4px 6px 6px rgba(0,0,0,0.5)); }
 .animal:active { cursor: grabbing; }
-
 .animal.dragging {
-  z-index: 1000;
-  animation: none;
-  transform: scale(1.15) rotate(-6deg);
-  filter: drop-shadow(5px 10px 8px rgba(0,0,0,0.5));
+  z-index: 1000; animation: none;
+  transform: scale(1.18) rotate(-7deg);
+  filter: drop-shadow(6px 12px 10px rgba(0,0,0,0.55));
   transition: none;
 }
-
-.animal.shake {
-  animation: shake 0.5s;
-}
-
+.animal.shake { animation: shake 0.5s; }
 @keyframes shake {
   0%, 100% { transform: translateX(0) rotate(0); }
-  15% { transform: translateX(-14px) rotate(-12deg); }
-  30% { transform: translateX(14px) rotate(12deg); }
-  45% { transform: translateX(-12px) rotate(-9deg); }
-  60% { transform: translateX(10px) rotate(8deg); }
-  75% { transform: translateX(-6px) rotate(-4deg); }
+  15%  { transform: translateX(-16px) rotate(-14deg); }
+  30%  { transform: translateX(16px) rotate(14deg); }
+  45%  { transform: translateX(-12px) rotate(-9deg); }
+  60%  { transform: translateX(10px) rotate(8deg); }
+  75%  { transform: translateX(-5px) rotate(-3deg); }
 }
-
 .animal.placed { pointer-events: none; opacity: 0; }
-.animal.returning { transition: left 0.35s cubic-bezier(0.34, 1.3, 0.64, 1), top 0.35s cubic-bezier(0.34, 1.3, 0.64, 1); }
+.animal.returning { transition: left 0.38s cubic-bezier(0.34, 1.3, 0.64, 1), top 0.38s cubic-bezier(0.34, 1.3, 0.64, 1); }
 
 /* ====== Sparkles ====== */
 .sparkle {
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  pointer-events: none;
-  z-index: 999;
-  font-size: 22px;
+  position: absolute; pointer-events: none; z-index: 999;
+  font-size: clamp(18px,2.5vw,26px);
   animation: sparkleOut 0.9s ease-out forwards;
 }
-
 @keyframes sparkleOut {
-  0% { transform: translate(0,0) scale(0) rotate(0); opacity: 1; }
-  50% { opacity: 1; }
-  100% { transform: translate(var(--dx), var(--dy)) scale(1.2) rotate(360deg); opacity: 0; }
+  0%   { transform: translate(0,0) scale(0) rotate(0); opacity: 1; }
+  50%  { opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(1.3) rotate(360deg); opacity: 0; }
 }
 
 /* ====== Overlays ====== */
 .overlay {
-  position: absolute;
-  inset: 0;
+  position: absolute; inset: 0;
   background: rgba(0,0,0,0.65);
-  backdrop-filter: blur(3px);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 500;
-  animation: fadeIn 0.3s;
+  backdrop-filter: blur(4px);
+  display: none; align-items: center; justify-content: center;
+  z-index: 500; animation: fadeIn 0.3s;
 }
-
 .overlay.show { display: flex; }
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 .phase-card, .final-card, .start-card {
-  background:
-    radial-gradient(ellipse at top left, var(--gold) 0%, var(--gold-dark) 100%);
-  padding: clamp(20px, 4vw, 50px) clamp(30px, 6vw, 80px);
-  border-radius: 28px;
-  border: 6px solid var(--wood-dark);
+  background: radial-gradient(ellipse at top left, #FFE566 0%, #F59E0B 100%);
+  padding: clamp(20px,4vw,50px) clamp(30px,6vw,80px);
+  border-radius: 28px; border: 6px solid var(--wood-dark);
   text-align: center;
-  box-shadow:
-    0 14px 40px rgba(0,0,0,0.6),
-    inset 0 -6px 0 rgba(0,0,0,0.18),
-    inset 0 3px 0 rgba(255,255,255,0.35);
+  box-shadow: 0 16px 50px rgba(0,0,0,0.7), inset 0 -6px 0 rgba(0,0,0,0.18), inset 0 3px 0 rgba(255,255,255,0.4);
   animation: bounceIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-  max-width: 80%;
+  max-width: 82%;
 }
-
 @keyframes bounceIn {
-  0% { transform: scale(0.2) rotate(-180deg); opacity: 0; }
-  60% { transform: scale(1.08) rotate(10deg); opacity: 1; }
+  0%   { transform: scale(0.2) rotate(-180deg); opacity: 0; }
+  60%  { transform: scale(1.1) rotate(8deg); opacity: 1; }
   100% { transform: scale(1) rotate(0); }
 }
-
 .phase-card h2, .final-card h1, .start-card h1 {
-  font-family: 'Lilita One', cursive;
-  color: var(--wood-dark);
-  text-shadow: 3px 3px 0 #FFF, 5px 5px 0 rgba(0,0,0,0.15);
-  letter-spacing: 2px;
-  line-height: 1.1;
+  font-family: 'Lilita One', cursive; color: var(--wood-dark);
+  text-shadow: 3px 3px 0 #FFF8CC, 5px 5px 0 rgba(0,0,0,0.15);
+  letter-spacing: 2px; line-height: 1.1;
 }
-
-.phase-card h2 { font-size: clamp(28px, 4.5vw, 48px); margin-bottom: 8px; }
-.final-card h1, .start-card h1 { font-size: clamp(32px, 5.5vw, 60px); margin-bottom: 16px; }
-
+.phase-card h2 { font-size: clamp(26px,4.2vw,46px); margin-bottom: 6px; }
+.final-card h1, .start-card h1 { font-size: clamp(30px,5vw,58px); margin-bottom: 14px; }
 .phase-card p, .final-card p, .start-card p {
-  font-family: 'Fredoka', sans-serif;
-  font-weight: 600;
-  font-size: clamp(16px, 2.4vw, 24px);
-  color: var(--wood-dark);
-  margin: 6px 0;
+  font-family: 'Fredoka', sans-serif; font-weight: 600;
+  font-size: clamp(15px,2.2vw,23px); color: var(--wood-dark); margin: 6px 0;
 }
+.phase-scene-icon { font-size: clamp(36px,5.5vw,60px); margin: 4px 0; }
+.stars { font-size: clamp(38px,6vw,68px); margin: 12px 0; letter-spacing: 4px; }
 
-.stars { font-size: clamp(40px, 6.5vw, 70px); margin: 12px 0; letter-spacing: 4px; }
-
-#playAgainBtn, #startBtn { margin-top: clamp(14px, 2.5vw, 24px); }
+#playAgainBtn, #startBtn { margin-top: clamp(14px,2.5vw,24px); }
 
 /* ====== Portrait warning ====== */
 #rotateMsg {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: #0F1419;
-  color: white;
-  z-index: 9999;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  text-align: center;
-  padding: 20px;
-  font-family: 'Fredoka', sans-serif;
+  display: none; position: fixed; inset: 0; background: #0F1419;
+  color: white; z-index: 9999;
+  align-items: center; justify-content: center; flex-direction: column;
+  text-align: center; padding: 20px; font-family: 'Fredoka', sans-serif;
 }
 #rotateMsg .icon { font-size: 60px; animation: rotate90 2s ease-in-out infinite; }
 #rotateMsg p { font-size: 20px; margin-top: 16px; max-width: 280px; }
-
-@keyframes rotate90 {
-  0%, 40% { transform: rotate(0); }
-  60%, 100% { transform: rotate(90deg); }
-}
-
-@media (orientation: portrait) and (max-width: 700px) {
-  #rotateMsg { display: flex; }
-}
+@keyframes rotate90 { 0%, 40% { transform: rotate(0); } 60%, 100% { transform: rotate(90deg); } }
+@media (orientation: portrait) and (max-width: 700px) { #rotateMsg { display: flex; } }
 
 /* ====== History overlay ====== */
 .history-card {
-  background: radial-gradient(ellipse at top left, var(--gold) 0%, var(--gold-dark) 100%);
+  background: radial-gradient(ellipse at top left, #FFE566 0%, #F59E0B 100%);
   padding: clamp(16px,3vw,32px) clamp(20px,4vw,48px) clamp(14px,2.5vw,24px);
-  border-radius: 28px;
-  border: 6px solid var(--wood-dark);
-  text-align: center;
-  box-shadow: 0 14px 40px rgba(0,0,0,0.6), inset 0 -6px 0 rgba(0,0,0,0.18), inset 0 3px 0 rgba(255,255,255,0.35);
-  max-width: 88%;
-  width: 700px;
-  max-height: 80vh;
-  display: flex;
-  flex-direction: column;
+  border-radius: 28px; border: 6px solid var(--wood-dark); text-align: center;
+  box-shadow: 0 16px 50px rgba(0,0,0,0.7), inset 0 -6px 0 rgba(0,0,0,0.18), inset 0 3px 0 rgba(255,255,255,0.4);
+  max-width: 88%; width: 700px; max-height: 80vh;
+  display: flex; flex-direction: column;
   animation: bounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .history-card h1 {
-  font-family: 'Lilita One', cursive;
-  color: var(--wood-dark);
-  text-shadow: 3px 3px 0 #FFF, 5px 5px 0 rgba(0,0,0,0.15);
-  letter-spacing: 2px;
-  font-size: clamp(26px, 4vw, 46px);
-  margin-bottom: 2px;
+  font-family: 'Lilita One', cursive; color: var(--wood-dark);
+  text-shadow: 3px 3px 0 #FFF8CC, 5px 5px 0 rgba(0,0,0,0.15);
+  letter-spacing: 2px; font-size: clamp(24px,3.8vw,44px); margin-bottom: 2px;
 }
 .history-card .hist-sub {
-  font-family: 'Fredoka', sans-serif;
-  font-weight: 600;
-  font-size: clamp(13px, 1.8vw, 18px);
-  color: var(--wood-dark);
-  margin: 0 0 10px;
+  font-family: 'Fredoka', sans-serif; font-weight: 600;
+  font-size: clamp(13px,1.8vw,18px); color: var(--wood-dark); margin: 0 0 10px;
 }
-#historyContent {
-  overflow-y: auto;
-  flex: 1;
-  padding: 2px 4px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--wood-dark) var(--gold-dark);
-}
+#historyContent { overflow-y: auto; flex: 1; padding: 2px 4px; scrollbar-width: thin; scrollbar-color: var(--wood-dark) #F59E0B; }
 #historyContent::-webkit-scrollbar { width: 6px; }
 #historyContent::-webkit-scrollbar-thumb { background: var(--wood-dark); border-radius: 3px; }
 .hist-entry {
   background: linear-gradient(180deg, var(--wood-light) 0%, var(--wood-mid) 100%);
-  border: 3px solid var(--wood-dark);
-  border-radius: 14px;
-  padding: 7px 12px;
-  margin-bottom: 7px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  border: 3px solid var(--wood-dark); border-radius: 14px;
+  padding: 7px 12px; margin-bottom: 7px;
+  display: flex; align-items: center; gap: 10px;
 }
-.hist-stars { font-size: clamp(16px, 2.2vw, 24px); flex-shrink: 0; letter-spacing: 1px; }
-.hist-date {
-  font-family: 'Fredoka', sans-serif;
-  font-size: clamp(11px, 1.3vw, 14px);
-  color: rgba(255,255,255,0.85);
-  flex-shrink: 0;
-  min-width: 58px;
-  text-align: left;
-}
+.hist-stars { font-size: clamp(16px,2.2vw,24px); flex-shrink: 0; letter-spacing: 1px; }
+.hist-date { font-family: 'Fredoka', sans-serif; font-size: clamp(11px,1.3vw,14px); color: rgba(255,255,255,0.85); flex-shrink: 0; min-width: 58px; text-align: left; }
 .hist-stats-row { display: flex; gap: 5px; flex: 1; justify-content: flex-end; }
-.hist-stat-col {
-  background: radial-gradient(ellipse at top, var(--paper) 0%, var(--paper-shadow) 100%);
-  border: 2px solid var(--wood-dark);
-  border-radius: 10px;
-  padding: 4px 7px;
-  text-align: center;
-  min-width: 50px;
-}
-.hist-stat-val {
-  font-family: 'Lilita One', cursive;
-  font-size: clamp(14px, 1.8vw, 19px);
-  color: var(--wood-dark);
-  display: block;
-  line-height: 1;
-}
-.hist-stat-delta {
-  font-family: 'Fredoka', sans-serif;
-  font-weight: 700;
-  font-size: clamp(10px, 1.3vw, 13px);
-  display: block;
-  min-height: 13px;
-  line-height: 1;
-}
-.hist-stat-lbl {
-  font-family: 'Fredoka', sans-serif;
-  font-size: clamp(9px, 1.1vw, 11px);
-  color: var(--wood-dark);
-  opacity: 0.65;
-  text-transform: uppercase;
-  letter-spacing: .05em;
-  display: block;
-  margin-top: 1px;
-}
+.hist-stat-col { background: radial-gradient(ellipse at top, var(--paper) 0%, var(--paper-shadow) 100%); border: 2px solid var(--wood-dark); border-radius: 10px; padding: 4px 7px; text-align: center; min-width: 50px; }
+.hist-stat-val { font-family: 'Lilita One', cursive; font-size: clamp(14px,1.8vw,19px); color: var(--wood-dark); display: block; line-height: 1; }
+.hist-stat-delta { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: clamp(10px,1.3vw,13px); display: block; min-height: 13px; line-height: 1; }
+.hist-stat-lbl { font-family: 'Fredoka', sans-serif; font-size: clamp(9px,1.1vw,11px); color: var(--wood-dark); opacity: 0.65; text-transform: uppercase; letter-spacing: .05em; display: block; margin-top: 1px; }
 .d-up   { color: #1a7a28; }
 .d-down { color: var(--error); }
 .d-same { color: var(--wood-mid); }
-.hist-empty {
-  font-family: 'Fredoka', sans-serif;
-  font-weight: 600;
-  color: var(--wood-dark);
-  font-size: clamp(14px, 2vw, 20px);
-  padding: 28px 0;
-  line-height: 1.9;
-}
+.hist-empty { font-family: 'Fredoka', sans-serif; font-weight: 600; color: var(--wood-dark); font-size: clamp(14px,2vw,20px); padding: 28px 0; line-height: 1.9; }
 .hist-actions { display: flex; gap: 12px; justify-content: center; margin-top: 12px; flex-shrink: 0; }
 .btn-wood {
   background: linear-gradient(180deg, var(--wood-highlight) 0%, var(--wood-mid) 100%) !important;
   border-color: var(--wood-dark) !important;
-  box-shadow: 0 5px 0 var(--wood-dark), 0 7px 12px rgba(0,0,0,0.3), inset 0 -3px 0 rgba(0,0,0,0.2), inset 0 2px 0 rgba(255,255,255,0.25) !important;
+  box-shadow: 0 5px 0 var(--wood-dark), 0 7px 16px rgba(0,0,0,0.35), inset 0 -3px 0 rgba(0,0,0,0.2), inset 0 2px 0 rgba(255,255,255,0.25) !important;
 }
-.btn-wood:active:not(:disabled) {
-  box-shadow: 0 1px 0 var(--wood-dark), 0 2px 4px rgba(0,0,0,0.3) !important;
-}
+.btn-wood:active:not(:disabled) { box-shadow: 0 1px 0 var(--wood-dark), 0 2px 6px rgba(0,0,0,0.3) !important; }
 </style>
 </head>
 <body>
@@ -581,110 +413,7 @@ body {
 </div>
 
 <div id="game">
-  <svg class="bg-svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
-    <defs>
-      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#87CEEB"/>
-        <stop offset="100%" stop-color="#BFE4F0"/>
-      </linearGradient>
-      <linearGradient id="grass" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#8BC34A"/>
-        <stop offset="60%" stop-color="#7CB342"/>
-        <stop offset="100%" stop-color="#558B2F"/>
-      </linearGradient>
-      <linearGradient id="trunk" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%" stop-color="#4A2511"/>
-        <stop offset="50%" stop-color="#8B4513"/>
-        <stop offset="100%" stop-color="#4A2511"/>
-      </linearGradient>
-      <radialGradient id="leafy">
-        <stop offset="0%" stop-color="#7CB342"/>
-        <stop offset="70%" stop-color="#4A7C2A"/>
-        <stop offset="100%" stop-color="#2D5016"/>
-      </radialGradient>
-      <radialGradient id="pond">
-        <stop offset="0%" stop-color="#A8D8E8"/>
-        <stop offset="100%" stop-color="#5DADE2"/>
-      </radialGradient>
-    </defs>
-
-    <!-- Sky and grass -->
-    <rect width="1600" height="560" fill="url(#sky)"/>
-    <rect y="560" width="1600" height="340" fill="url(#grass)"/>
-
-    <!-- Distant mountains -->
-    <path d="M0,560 L150,440 L300,500 L450,420 L600,490 L800,430 L1000,500 L1200,440 L1400,490 L1600,450 L1600,560 Z" fill="#A8D5DC" opacity="0.6"/>
-
-    <!-- Clouds -->
-    <g class="cloud" fill="white" opacity="0.9">
-      <ellipse cx="200" cy="140" rx="65" ry="28"/>
-      <ellipse cx="245" cy="120" rx="48" ry="24"/>
-      <ellipse cx="160" cy="125" rx="40" ry="20"/>
-    </g>
-    <g class="cloud cloud-2" fill="white" opacity="0.85">
-      <ellipse cx="780" cy="90" rx="75" ry="30"/>
-      <ellipse cx="830" cy="75" rx="55" ry="26"/>
-      <ellipse cx="735" cy="78" rx="45" ry="22"/>
-    </g>
-    <g class="cloud cloud-3" fill="white" opacity="0.8">
-      <ellipse cx="1280" cy="170" rx="60" ry="24"/>
-      <ellipse cx="1320" cy="155" rx="48" ry="22"/>
-    </g>
-
-    <!-- Pond -->
-    <ellipse cx="1300" cy="780" rx="200" ry="55" fill="url(#pond)" opacity="0.85"/>
-    <ellipse cx="1300" cy="775" rx="180" ry="42" fill="#A8D8E8" opacity="0.5"/>
-    <path d="M1180,770 Q1200,765 1220,770" stroke="white" stroke-width="2" fill="none" opacity="0.6"/>
-    <path d="M1320,790 Q1340,785 1360,790" stroke="white" stroke-width="2" fill="none" opacity="0.6"/>
-
-    <!-- Reeds by pond -->
-    <g stroke="#33691E" stroke-width="3" fill="none" stroke-linecap="round">
-      <line x1="1130" y1="780" x2="1128" y2="730"/>
-      <line x1="1140" y1="780" x2="1142" y2="720"/>
-      <line x1="1150" y1="780" x2="1148" y2="735"/>
-      <line x1="1470" y1="785" x2="1472" y2="725"/>
-      <line x1="1480" y1="785" x2="1478" y2="735"/>
-    </g>
-
-    <!-- Big tree right -->
-    <rect x="1480" y="380" width="70" height="520" fill="url(#trunk)"/>
-    <ellipse cx="1515" cy="360" rx="140" ry="170" fill="url(#leafy)"/>
-    <ellipse cx="1470" cy="320" rx="110" ry="130" fill="#4A7C2A"/>
-    <ellipse cx="1560" cy="340" rx="100" ry="120" fill="#5C8F36"/>
-
-    <!-- Big tree left -->
-    <rect x="20" y="340" width="60" height="560" fill="url(#trunk)"/>
-    <ellipse cx="50" cy="310" rx="120" ry="150" fill="url(#leafy)"/>
-    <ellipse cx="100" cy="280" rx="85" ry="100" fill="#5C8F36"/>
-
-    <!-- Background hills/bushes -->
-    <ellipse cx="700" cy="600" rx="80" ry="40" fill="#558B2F" opacity="0.8"/>
-    <ellipse cx="900" cy="610" rx="100" ry="45" fill="#4A7C2A" opacity="0.7"/>
-    <ellipse cx="500" cy="605" rx="70" ry="35" fill="#558B2F" opacity="0.75"/>
-
-    <!-- Grass tufts -->
-    <g fill="#33691E">
-      <path d="M0,860 Q40,830 80,860 L80,900 L0,900 Z"/>
-      <path d="M280,870 Q320,840 360,870 L360,900 L280,900 Z"/>
-      <path d="M520,865 Q560,835 600,865 L600,900 L520,900 Z"/>
-      <path d="M820,870 Q860,840 900,870 L900,900 L820,900 Z"/>
-      <path d="M1080,865 Q1120,835 1160,865 L1160,900 L1080,900 Z"/>
-    </g>
-    <g fill="#558B2F">
-      <path d="M150,875 Q180,855 210,875 L210,900 L150,900 Z"/>
-      <path d="M420,878 Q450,858 480,878 L480,900 L420,900 Z"/>
-      <path d="M700,876 Q730,856 760,876 L760,900 L700,900 Z"/>
-      <path d="M960,878 Q990,858 1020,878 L1020,900 L960,900 Z"/>
-    </g>
-
-    <!-- Little flowers -->
-    <g>
-      <circle cx="380" cy="855" r="4" fill="#FF6B9D"/>
-      <circle cx="650" cy="860" r="4" fill="#FFEB3B"/>
-      <circle cx="940" cy="855" r="4" fill="#FF6B9D"/>
-      <circle cx="1080" cy="862" r="4" fill="#FFEB3B"/>
-    </g>
-  </svg>
+  <svg class="bg-svg" id="bgSvg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice"></svg>
 
   <div id="hud">
     <div class="counter correct"><span class="icon">✓</span><span id="correctCount">0</span></div>
@@ -694,6 +423,8 @@ body {
   <div id="soundToggle" title="Som">🎵</div>
 
   <div id="box">
+    <div class="box-nail-bl"></div>
+    <div class="box-nail-br"></div>
     <h2 id="categoryTitle">Animais Terrestres</h2>
     <div id="boxContents"></div>
   </div>
@@ -703,7 +434,7 @@ body {
     <button class="btn" id="nextBtn" disabled>PRÓXIMO</button>
   </div>
 
-  <div id="progress">1/15</div>
+  <div id="progress">1/16</div>
 
   <div id="animalsArea"></div>
 
@@ -730,6 +461,7 @@ body {
 
   <div class="overlay" id="phaseTransition">
     <div class="phase-card">
+      <div class="phase-scene-icon" id="phaseCardIcon"></div>
       <h2 id="phaseCardTitle"></h2>
       <p id="phaseCardSubtitle"></p>
     </div>
@@ -750,6 +482,497 @@ body {
 'use strict';
 
 // =========================================================================
+// SCENES — SVG backgrounds per biome
+// =========================================================================
+const SCENES = {
+
+floresta: `
+<defs>
+<linearGradient id="s-sky" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0%" stop-color="#0D3B72"/><stop offset="50%" stop-color="#4A8DC8"/><stop offset="100%" stop-color="#A8D8F0"/>
+</linearGradient>
+<linearGradient id="s-gnd" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0%" stop-color="#5C9B2A"/><stop offset="100%" stop-color="#2A5012"/>
+</linearGradient>
+<radialGradient id="s-sun" cx="80%" cy="20%" r="18%">
+  <stop offset="0%" stop-color="#FFFBE0"/><stop offset="35%" stop-color="#FFE566" stop-opacity="0.9"/><stop offset="75%" stop-color="#FFAA20" stop-opacity="0.3"/><stop offset="100%" stop-color="#FF8010" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="s-leaf1"><stop offset="0%" stop-color="#7CC838"/><stop offset="70%" stop-color="#4A8820"/><stop offset="100%" stop-color="#2A5810"/></radialGradient>
+<radialGradient id="s-leaf2"><stop offset="0%" stop-color="#5CB030"/><stop offset="100%" stop-color="#2A5818"/></radialGradient>
+</defs>
+<rect width="1600" height="570" fill="url(#s-sky)"/>
+<rect y="530" width="1600" height="370" fill="url(#s-gnd)"/>
+<circle cx="1300" cy="170" r="130" fill="url(#s-sun)"/>
+<circle cx="1300" cy="170" r="56" fill="#FFF8B0"/>
+<g stroke="#FFE880" stroke-width="2.5" stroke-linecap="round" opacity="0.55">
+  <line x1="1300" y1="88" x2="1300" y2="56"/><line x1="1358" y1="112" x2="1382" y2="88"/><line x1="1382" y1="170" x2="1410" y2="170"/>
+  <line x1="1358" y1="228" x2="1382" y2="252"/><line x1="1242" y1="112" x2="1218" y2="88"/><line x1="1218" y1="170" x2="1190" y2="170"/>
+  <line x1="1242" y1="228" x2="1218" y2="252"/>
+</g>
+<path d="M0,535 L130,430 L260,480 L400,395 L540,455 L700,385 L860,448 L1020,395 L1180,455 L1350,405 L1520,445 L1600,420 L1600,535 Z" fill="#7AACBE" opacity="0.32"/>
+<path d="M0,540 L200,458 L340,508 L500,440 L660,498 L820,442 L980,502 L1140,450 L1300,505 L1460,460 L1600,488 L1600,540 Z" fill="#3A7050" opacity="0.48"/>
+<g opacity="0.65" fill="#2A5818">
+  <ellipse cx="210" cy="505" rx="55" ry="72"/><rect x="203" y="505" width="14" height="65" fill="#3A2010"/>
+  <ellipse cx="420" cy="498" rx="62" ry="80"/><rect x="413" y="498" width="14" height="70" fill="#3A2010"/>
+  <ellipse cx="1060" cy="500" rx="58" ry="76"/><rect x="1053" y="500" width="14" height="66" fill="#3A2010"/>
+  <ellipse cx="1260" cy="494" rx="68" ry="84"/><rect x="1253" y="494" width="14" height="70" fill="#3A2010"/>
+</g>
+<g class="cloud" fill="white" opacity="0.92">
+  <ellipse cx="260" cy="118" rx="82" ry="33"/><ellipse cx="314" cy="98" rx="58" ry="28"/><ellipse cx="208" cy="106" rx="52" ry="24"/>
+</g>
+<g class="cloud cloud-2" fill="white" opacity="0.84">
+  <ellipse cx="800" cy="78" rx="92" ry="35"/><ellipse cx="858" cy="60" rx="66" ry="28"/><ellipse cx="746" cy="68" rx="56" ry="26"/>
+</g>
+<g class="cloud cloud-3" fill="white" opacity="0.75">
+  <ellipse cx="1360" cy="150" rx="72" ry="28"/><ellipse cx="1410" cy="136" rx="50" ry="22"/>
+</g>
+<g fill="none" stroke="#1A3050" stroke-width="3" stroke-linecap="round" opacity="0.4">
+  <path d="M490,205 Q500,198 510,205"/><path d="M516,200 Q526,193 536,200"/>
+  <path d="M840,148 Q850,141 860,148"/><path d="M866,143 Q876,136 886,143"/>
+  <path d="M470,218 Q480,211 490,218"/>
+</g>
+<rect x="22" y="335" width="54" height="225" fill="#5A3010" rx="4"/><rect x="32" y="335" width="18" height="225" fill="#7A4820" rx="2"/>
+<ellipse cx="50" cy="312" rx="132" ry="158" fill="url(#s-leaf1)"/>
+<ellipse cx="0" cy="272" rx="102" ry="118" fill="#4A8020"/>
+<ellipse cx="108" cy="290" rx="92" ry="112" fill="#5CA830"/>
+<ellipse cx="52" cy="248" rx="76" ry="92" fill="#6DC838"/>
+<rect x="1498" y="308" width="58" height="252" fill="#5A3010" rx="4"/><rect x="1508" y="308" width="20" height="252" fill="#7A4820" rx="2"/>
+<ellipse cx="1528" cy="282" rx="148" ry="168" fill="url(#s-leaf1)"/>
+<ellipse cx="1578" cy="248" rx="112" ry="128" fill="#4A8020"/>
+<ellipse cx="1470" cy="262" rx="102" ry="120" fill="#5CA830"/>
+<ellipse cx="1538" cy="228" rx="86" ry="102" fill="#6DC838"/>
+<rect x="630" y="448" width="28" height="118" fill="#5A3010" rx="3"/>
+<ellipse cx="644" cy="428" rx="78" ry="92" fill="#4A8020"/>
+<ellipse cx="620" cy="404" rx="56" ry="68" fill="url(#s-leaf2)"/>
+<rect x="930" y="442" width="30" height="112" fill="#5A3010" rx="3"/>
+<ellipse cx="945" cy="418" rx="82" ry="98" fill="url(#s-leaf1)"/>
+<ellipse cx="968" cy="398" rx="62" ry="74" fill="#5CA830"/>
+<ellipse cx="312" cy="548" rx="88" ry="36" fill="#3A7820" opacity="0.88"/>
+<ellipse cx="720" cy="555" rx="112" ry="40" fill="#4A8A28" opacity="0.82"/>
+<ellipse cx="1360" cy="550" rx="100" ry="38" fill="#3A7820" opacity="0.88"/>
+<g fill="#2A5A14">
+  <path d="M0,878 Q50,848 100,878 L100,900 L0,900 Z"/><path d="M210,876 Q260,846 310,876 L310,900 L210,900 Z"/>
+  <path d="M460,878 Q510,848 560,878 L560,900 L460,900 Z"/><path d="M700,876 Q750,846 800,876 L800,900 L700,900 Z"/>
+  <path d="M920,878 Q970,848 1020,878 L1020,900 L920,900 Z"/><path d="M1160,876 Q1210,846 1260,876 L1260,900 L1160,900 Z"/>
+  <path d="M1400,878 Q1450,848 1500,878 L1500,900 L1400,900 Z"/>
+</g>
+<g fill="#3A7020">
+  <path d="M120,882 Q155,860 190,882 L190,900 L120,900 Z"/><path d="M360,880 Q395,858 430,880 L430,900 L360,900 Z"/>
+  <path d="M600,878 Q635,856 670,878 L670,900 L600,900 Z"/><path d="M840,880 Q875,858 910,880 L910,900 L840,900 Z"/>
+  <path d="M1060,878 Q1095,856 1130,878 L1130,900 L1060,900 Z"/>
+</g>
+<g>
+  <circle cx="348" cy="868" r="5" fill="#FF6B9D"/><circle cx="348" cy="868" r="2" fill="#FFE0F0"/>
+  <circle cx="628" cy="864" r="5" fill="#FFDD44"/><circle cx="628" cy="864" r="2" fill="#FFFACC"/>
+  <circle cx="878" cy="870" r="4" fill="#FF6B9D"/>
+  <circle cx="1118" cy="866" r="5" fill="#BB88FF"/><circle cx="1118" cy="866" r="2" fill="#EEDDFF"/>
+  <circle cx="1458" cy="870" r="4" fill="#FFDD44"/>
+</g>
+`,
+
+oceano: `
+<defs>
+<linearGradient id="o-sky" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0%" stop-color="#0A2A60"/><stop offset="60%" stop-color="#2878C8"/><stop offset="100%" stop-color="#58B8E8"/>
+</linearGradient>
+<linearGradient id="o-sea" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0%" stop-color="#1A78B8"/><stop offset="40%" stop-color="#0A4A8A"/><stop offset="100%" stop-color="#051828"/>
+</linearGradient>
+<linearGradient id="o-sand" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0%" stop-color="#D8A840"/><stop offset="100%" stop-color="#A87820"/>
+</linearGradient>
+<radialGradient id="o-sun" cx="20%" cy="18%" r="14%">
+  <stop offset="0%" stop-color="#FFF8B0"/><stop offset="40%" stop-color="#FFE566" stop-opacity="0.8"/><stop offset="100%" stop-color="#FF9900" stop-opacity="0"/>
+</radialGradient>
+</defs>
+<rect width="1600" height="480" fill="url(#o-sky)"/>
+<rect y="440" width="1600" height="460" fill="url(#o-sea)"/>
+<path d="M0,460 Q200,440 400,460 Q600,480 800,456 Q1000,432 1200,456 Q1400,480 1600,456 L1600,900 L0,900 Z" fill="#1A78B8" opacity="0.6"/>
+<path d="M0,448 Q100,436 200,448 Q300,460 400,446 Q500,432 600,448 Q700,464 800,446 Q900,428 1000,446 Q1100,464 1200,448 Q1300,432 1400,448 Q1500,464 1600,448" fill="none" stroke="white" stroke-width="3" opacity="0.4"/>
+<path d="M0,452 Q80,444 160,452 Q240,460 320,450 Q400,440 480,452 Q560,464 640,450 Q720,436 800,452" fill="none" stroke="white" stroke-width="1.5" opacity="0.3"/>
+<circle cx="250" cy="180" r="110" fill="url(#o-sun)"/>
+<circle cx="250" cy="180" r="52" fill="#FFF6A0"/>
+<path d="M80,452 Q250,460 420,452" fill="none" stroke="#FFE580" stroke-width="6" opacity="0.35"/>
+<g class="cloud" fill="white" opacity="0.88">
+  <ellipse cx="500" cy="120" rx="88" ry="34"/><ellipse cx="556" cy="100" rx="62" ry="28"/><ellipse cx="448" cy="108" rx="54" ry="24"/>
+</g>
+<g class="cloud cloud-2" fill="white" opacity="0.78">
+  <ellipse cx="1100" cy="88" rx="95" ry="36"/><ellipse cx="1158" cy="68" rx="66" ry="29"/><ellipse cx="1046" cy="76" rx="58" ry="26"/>
+</g>
+<g class="cloud cloud-3" fill="white" opacity="0.68">
+  <ellipse cx="800" cy="160" rx="70" ry="26"/><ellipse cx="848" cy="146" rx="48" ry="22"/>
+</g>
+<rect y="838" width="1600" height="62" fill="url(#o-sand)"/>
+<path d="M0,840 Q200,834 400,840 Q600,846 800,840 Q1000,834 1200,840 Q1400,846 1600,840" fill="none" stroke="#E8C050" stroke-width="2" opacity="0.5"/>
+<g fill="#E8C060" opacity="0.7">
+  <ellipse cx="280" cy="852" rx="18" ry="8"/><ellipse cx="580" cy="848" rx="14" ry="6"/><ellipse cx="880" cy="853" rx="16" ry="7"/><ellipse cx="1200" cy="850" rx="18" ry="8"/>
+</g>
+<g fill="#FF7060" opacity="0.75">
+  <path d="M420,860 L430,840 Q432,830 440,840 L450,860 Q442,856 436,860 Q430,864 424,860 Z"/>
+  <path d="M1080,858 L1090,838 Q1092,828 1100,838 L1110,858 Q1102,854 1096,858 Q1090,862 1084,858 Z"/>
+</g>
+<path d="M180,810 Q190,780 200,810 Q208,830 195,820 Q182,810 180,810 Z" fill="#FF7844" opacity="0.7"/>
+<path d="M750,800 Q760,770 770,800 Q778,820 765,810 Q752,800 750,800 Z" fill="#FF7844" opacity="0.65"/>
+<path d="M1300,808 Q1310,778 1320,808 Q1328,828 1315,818 Q1302,808 1300,808 Z" fill="#FF6644" opacity="0.7"/>
+<g class="seaweed" fill="#1A8A40" opacity="0.8">
+  <path d="M560,840 Q568,800 560,765 Q552,730 560,700 Q568,668 562,648" fill="none" stroke="#1A8A40" stroke-width="8" stroke-linecap="round"/>
+</g>
+<g class="seaweed" fill="#148030" opacity="0.75">
+  <path d="M820,840 Q828,795 820,758 Q812,720 820,690" fill="none" stroke="#148030" stroke-width="7" stroke-linecap="round"/>
+</g>
+<g class="seaweed" fill="#1A9A48" opacity="0.78">
+  <path d="M1180,840 Q1190,800 1182,762 Q1174,724 1180,695" fill="none" stroke="#1A9A48" stroke-width="8" stroke-linecap="round"/>
+</g>
+<g fill="#3090CC" opacity="0.45">
+  <ellipse cx="680" cy="700" rx="55" ry="18"/><path d="M655,700 Q680,688 705,700" fill="none" stroke="#50B0E8" stroke-width="3"/><ellipse cx="720" cy="700" rx="12" ry="8" fill="#50B0E8" opacity="0.5"/>
+  <ellipse cx="1050" cy="650" rx="65" ry="20"/><path d="M1022,650 Q1050,636 1078,650" fill="none" stroke="#50B0E8" stroke-width="3"/><ellipse cx="1092" cy="650" rx="13" ry="9" fill="#50B0E8" opacity="0.5"/>
+  <ellipse cx="380" cy="740" rx="48" ry="16"/><path d="M358,740 Q380,730 402,740" fill="none" stroke="#50B0E8" stroke-width="2.5"/>
+</g>
+<g fill="white" opacity="0.6">
+  <circle class="bubble" cx="460" cy="790" r="6" style="--bx:5px"/>
+  <circle class="bubble" cx="700" cy="810" r="4" style="--bx:-6px"/>
+  <circle class="bubble" cx="960" cy="800" r="5" style="--bx:8px"/>
+  <circle class="bubble" cx="1150" cy="790" r="4" style="--bx:-4px"/>
+  <circle class="bubble" cx="1380" cy="805" r="6" style="--bx:6px"/>
+</g>
+<g opacity="0.35" fill="white">
+  <circle cx="430" cy="790" r="3.5"/><circle cx="436" cy="782" r="2.5"/><circle cx="425" cy="778" r="2"/>
+  <circle cx="1000" cy="780" r="3"/><circle cx="1006" cy="772" r="2"/><circle cx="995" cy="768" r="1.5"/>
+</g>
+`,
+
+ceu: `
+<defs>
+<linearGradient id="c-sky" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0%" stop-color="#0A1F5A"/><stop offset="30%" stop-color="#1A4AAA"/><stop offset="65%" stop-color="#4A90D8"/><stop offset="100%" stop-color="#A8D8F8"/>
+</linearGradient>
+<radialGradient id="c-sun" cx="55%" cy="14%" r="16%">
+  <stop offset="0%" stop-color="#FFFCE0"/><stop offset="30%" stop-color="#FFE566" stop-opacity="0.95"/><stop offset="65%" stop-color="#FFB830" stop-opacity="0.4"/><stop offset="100%" stop-color="#FF8010" stop-opacity="0"/>
+</radialGradient>
+<linearGradient id="c-mtn" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0%" stop-color="#7AA8C8"/><stop offset="100%" stop-color="#5888A8"/>
+</linearGradient>
+</defs>
+<rect width="1600" height="900" fill="url(#c-sky)"/>
+<circle cx="880" cy="128" r="150" fill="url(#c-sun)"/>
+<circle cx="880" cy="128" r="68" fill="#FFFDE0"/>
+<g stroke="#FFE880" stroke-width="3" stroke-linecap="round" opacity="0.5">
+  <line x1="880" y1="34" x2="880" y2="5"/>
+  <line x1="954" y1="54" x2="980" y2="28"/><line x1="996" y1="128" x2="1026" y2="128"/>
+  <line x1="954" y1="202" x2="980" y2="228"/><line x1="806" y1="54" x2="780" y2="28"/>
+  <line x1="764" y1="128" x2="734" y2="128"/><line x1="806" y1="202" x2="780" y2="228"/>
+  <line x1="932" y1="42" x2="948" y2="16"/><line x1="828" y1="42" x2="812" y2="16"/>
+</g>
+<path d="M0,900 L0,800 L180,760 L300,790 L420,740 L560,770 L680,720 L820,758 L940,718 L1060,752 L1180,715 L1300,748 L1420,710 L1540,745 L1600,728 L1600,900 Z" fill="url(#c-mtn)" opacity="0.55"/>
+<path d="M0,900 L0,840 L240,808 L360,830 L500,806 L640,828 L760,804 L900,826 L1020,806 L1160,824 L1280,806 L1400,820 L1520,808 L1600,816 L1600,900 Z" fill="#A0C8E0" opacity="0.38"/>
+<g class="cloud" fill="white" opacity="0.96">
+  <ellipse cx="180" cy="280" rx="108" ry="46"/><ellipse cx="256" cy="250" rx="82" ry="38"/><ellipse cx="110" cy="258" rx="70" ry="34"/>
+  <ellipse cx="230" cy="300" rx="55" ry="25"/>
+</g>
+<g class="cloud cloud-2" fill="white" opacity="0.93">
+  <ellipse cx="880" cy="220" rx="130" ry="52"/><ellipse cx="976" cy="188" rx="95" ry="44"/><ellipse cx="790" cy="196" rx="80" ry="38"/>
+  <ellipse cx="950" cy="245" rx="65" ry="28"/>
+</g>
+<g class="cloud cloud-3" fill="white" opacity="0.88">
+  <ellipse cx="1400" cy="310" rx="115" ry="46"/><ellipse cx="1480" cy="278" rx="85" ry="38"/><ellipse cx="1325" cy="290" rx="72" ry="33"/>
+</g>
+<g fill="white" opacity="0.82">
+  <ellipse cx="560" cy="175" rx="90" ry="36"/><ellipse cx="626" cy="156" rx="65" ry="30"/><ellipse cx="500" cy="162" rx="56" ry="26"/>
+</g>
+<g fill="white" opacity="0.72">
+  <ellipse cx="1180" cy="148" rx="80" ry="30"/><ellipse cx="1240" cy="132" rx="58" ry="25"/><ellipse cx="1128" cy="138" rx="50" ry="22"/>
+</g>
+<g fill="none" stroke="#0A2050" stroke-width="3" stroke-linecap="round" opacity="0.38">
+  <path d="M380,400 Q392,392 404,400"/><path d="M410,395 Q422,387 434,395"/><path d="M416,408 Q428,400 440,408"/>
+  <path d="M680,350 Q692,342 704,350"/><path d="M710,345 Q722,337 734,345"/>
+  <path d="M1140,380 Q1152,372 1164,380"/><path d="M1170,375 Q1182,367 1194,375"/><path d="M1148,392 Q1160,384 1172,392"/>
+  <path d="M1400,445 Q1412,437 1424,445"/><path d="M1430,440 Q1442,432 1454,440"/>
+</g>
+`,
+
+savana: `
+<defs>
+<linearGradient id="sv-sky" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0%" stop-color="#1A0A3A"/><stop offset="35%" stop-color="#7A1A4A"/><stop offset="65%" stop-color="#C84820"/><stop offset="85%" stop-color="#E87C30"/><stop offset="100%" stop-color="#F0A840"/>
+</linearGradient>
+<linearGradient id="sv-gnd" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0%" stop-color="#3A2008"/><stop offset="100%" stop-color="#1A0A04"/>
+</linearGradient>
+<radialGradient id="sv-sun" cx="50%" cy="100%" r="32%">
+  <stop offset="0%" stop-color="#FFE080" stop-opacity="0.9"/><stop offset="50%" stop-color="#FF8020" stop-opacity="0.4"/><stop offset="100%" stop-color="#FF4000" stop-opacity="0"/>
+</radialGradient>
+</defs>
+<rect width="1600" height="900" fill="url(#sv-sky)"/>
+<ellipse cx="800" cy="610" rx="320" ry="200" fill="url(#sv-sun)"/>
+<ellipse cx="800" cy="618" rx="90" ry="70" fill="#FFC840" opacity="0.9"/>
+<path d="M0,620 L1600,620 L1600,900 L0,900 Z" fill="url(#sv-gnd)"/>
+<path d="M0,616 Q400,608 800,616 Q1200,624 1600,616" fill="none" stroke="#E8A030" stroke-width="4" opacity="0.6"/>
+<g fill="#1A0A04">
+  <path d="M220,620 L236,480 L242,480 L258,620 Z"/>
+  <path d="M162,480 Q238,438 314,480 Q280,494 238,490 Q196,494 162,480 Z"/>
+  <path d="M190,460 Q238,428 286,460 Q262,472 238,468 Q214,472 190,460 Z"/>
+  <path d="M210,446 Q238,430 266,446 Q250,456 238,452 Q226,456 210,446 Z"/>
+</g>
+<g fill="#1A0A04">
+  <path d="M580,620 L594,510 L600,510 L614,620 Z"/>
+  <path d="M528,510 Q597,466 666,510 Q636,526 597,522 Q558,526 528,510 Z"/>
+  <path d="M554,488 Q597,454 640,488 Q618,500 597,497 Q576,500 554,488 Z"/>
+</g>
+<g fill="#1A0A04">
+  <path d="M1180,620 L1196,505 L1203,505 L1219,620 Z"/>
+  <path d="M1124,505 Q1199,460 1274,505 Q1242,520 1199,516 Q1156,520 1124,505 Z"/>
+  <path d="M1150,482 Q1199,446 1248,482 Q1226,496 1199,492 Q1172,496 1150,482 Z"/>
+  <path d="M1168,466 Q1199,444 1230,466 Q1216,476 1199,472 Q1182,476 1168,466 Z"/>
+</g>
+<g fill="#2A1008">
+  <path d="M980,620 L989,545 L994,545 L1003,620 Z"/>
+  <path d="M950,545 Q991,520 1032,545 Q1012,556 991,553 Q970,556 950,545 Z"/>
+  <path d="M962,530 Q991,510 1020,530 Q1006,540 991,537 Q976,540 962,530 Z"/>
+</g>
+<g class="grass-tip" fill="#3A2008">
+  <path d="M0,622 Q6,602 12,622"/><path d="M20,622 Q27,600 34,622"/><path d="M44,622 Q52,598 60,622"/>
+  <path d="M320,622 Q327,600 334,622"/><path d="M344,622 Q352,598 360,622"/>
+  <path d="M660,622 Q668,600 676,622"/><path d="M686,622 Q694,599 702,622"/>
+  <path d="M820,622 Q828,600 836,622"/><path d="M846,622 Q854,598 862,622"/>
+  <path d="M1060,622 Q1068,600 1076,622"/><path d="M1086,622 Q1094,598 1102,622"/>
+  <path d="M1380,622 Q1388,600 1396,622"/><path d="M1408,622 Q1416,598 1424,622"/>
+  <path d="M1550,622 Q1558,600 1566,622"/><path d="M1576,622 Q1584,598 1592,622"/>
+</g>
+<g class="grass-tip" fill="#2A1206">
+  <path d="M80,622 Q87,604 94,622"/><path d="M380,622 Q388,602 396,622"/>
+  <path d="M500,622 Q508,602 516,622"/><path d="M740,622 Q748,602 756,622"/>
+  <path d="M940,622 Q948,602 956,622"/><path d="M1240,622 Q1248,602 1256,622"/>
+  <path d="M1470,622 Q1478,602 1486,622"/>
+</g>
+<g fill="white" opacity="0.55">
+  <circle cx="120" cy="80" r="2.5"/><circle cx="260" cy="55" r="2"/><circle cx="420" cy="100" r="2.5"/>
+  <circle cx="610" cy="60" r="2"/><circle cx="780" cy="40" r="3"/><circle cx="1050" cy="70" r="2"/>
+  <circle cx="1280" cy="48" r="2.5"/><circle cx="1450" cy="88" r="2"/>
+  <circle cx="200" cy="130" r="1.5"/><circle cx="950" cy="110" r="1.5"/>
+</g>
+<ellipse cx="800" cy="618" rx="22" ry="16" fill="#FF8820" opacity="0.7"/>
+<path d="M500,618 Q650,614 800,618 Q950,622 1100,618" fill="none" stroke="#FFA030" stroke-width="3" opacity="0.4"/>
+`,
+
+fazenda: `
+<defs>
+<linearGradient id="f-sky" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0%" stop-color="#1A6AC8"/><stop offset="55%" stop-color="#4A98E8"/><stop offset="100%" stop-color="#A0D0F8"/>
+</linearGradient>
+<linearGradient id="f-hill1" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0%" stop-color="#5AAF28"/><stop offset="100%" stop-color="#3A7818"/>
+</linearGradient>
+<linearGradient id="f-hill2" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0%" stop-color="#6AC030"/><stop offset="100%" stop-color="#4A8A20"/>
+</linearGradient>
+<linearGradient id="f-gnd" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0%" stop-color="#5AAF28"/><stop offset="100%" stop-color="#2A6010"/>
+</linearGradient>
+<radialGradient id="f-sun" cx="88%" cy="14%" r="12%">
+  <stop offset="0%" stop-color="#FFF8C8"/><stop offset="35%" stop-color="#FFE566" stop-opacity="0.85"/><stop offset="100%" stop-color="#FFAA20" stop-opacity="0"/>
+</radialGradient>
+</defs>
+<rect width="1600" height="560" fill="url(#f-sky)"/>
+<rect y="520" width="1600" height="380" fill="url(#f-gnd)"/>
+<circle cx="1420" cy="128" r="100" fill="url(#f-sun)"/>
+<circle cx="1420" cy="128" r="46" fill="#FFF8B0"/>
+<path d="M0,560 Q200,510 400,540 Q560,565 700,520 Q840,475 1000,520 Q1160,565 1300,520 Q1440,475 1600,510 L1600,560 L0,560 Z" fill="url(#f-hill1)" opacity="0.8"/>
+<path d="M0,556 Q300,524 500,544 Q700,564 900,524 Q1100,484 1300,524 Q1480,560 1600,540 L1600,556 L0,556 Z" fill="url(#f-hill2)" opacity="0.6"/>
+<path d="M0,900 L0,840 Q200,815 400,832 Q600,849 800,825 Q1000,801 1200,828 Q1400,855 1600,838 L1600,900 Z" fill="#2A6010" opacity="0.7"/>
+<g class="cloud" fill="white" opacity="0.95">
+  <ellipse cx="220" cy="140" rx="92" ry="38"/><ellipse cx="280" cy="118" rx="66" ry="30"/><ellipse cx="162" cy="126" rx="56" ry="26"/>
+</g>
+<g class="cloud cloud-2" fill="white" opacity="0.88">
+  <ellipse cx="720" cy="100" rx="80" ry="32"/><ellipse cx="772" cy="82" rx="58" ry="26"/><ellipse cx="668" cy="88" rx="50" ry="23"/>
+</g>
+<g class="cloud cloud-3" fill="white" opacity="0.82">
+  <ellipse cx="1100" cy="158" rx="70" ry="28"/><ellipse cx="1150" cy="142" rx="50" ry="22"/>
+</g>
+<rect x="1060" y="440" width="200" height="170" fill="#B82020" rx="4"/>
+<path d="M1040,450 L1160,360 L1280,450 Z" fill="#8A1818"/>
+<rect x="1140" y="520" width="60" height="90" fill="#5A1010" rx="4"/>
+<rect x="1068" y="458" width="55" height="40" fill="#FFEE88" opacity="0.9" rx="3"/>
+<rect x="1197" y="458" width="55" height="40" fill="#FFEE88" opacity="0.9" rx="3"/>
+<line x1="1060" y1="610" x2="1260" y2="610" stroke="#5A1010" stroke-width="3"/>
+<g stroke="#8B5020" stroke-width="6" stroke-linecap="round">
+  <line x1="1320" y1="580" x2="1320" y2="660"/><line x1="1360" y1="580" x2="1360" y2="660"/>
+  <line x1="1400" y1="580" x2="1400" y2="660"/><line x1="1440" y1="580" x2="1440" y2="660"/>
+  <line x1="1480" y1="580" x2="1480" y2="660"/>
+  <line x1="1315" y1="606" x2="1485" y2="606"/><line x1="1315" y1="634" x2="1485" y2="634"/>
+</g>
+<g stroke="#8B5020" stroke-width="5" stroke-linecap="round">
+  <line x1="120" y1="590" x2="120" y2="668"/><line x1="160" y1="590" x2="160" y2="668"/>
+  <line x1="200" y1="590" x2="200" y2="668"/><line x1="240" y1="590" x2="240" y2="668"/>
+  <line x1="280" y1="590" x2="280" y2="668"/>
+  <line x1="115" y1="616" x2="285" y2="616"/><line x1="115" y1="644" x2="285" y2="644"/>
+</g>
+<g>
+  <line x1="540" y1="640" x2="540" y2="700" stroke="#2A6010" stroke-width="4"/>
+  <circle cx="540" cy="620" r="22" fill="#FFD700"/>
+  <circle cx="540" cy="620" r="10" fill="#FF8800"/>
+  <line x1="600" y1="650" x2="600" y2="710" stroke="#2A6010" stroke-width="4"/>
+  <circle cx="600" cy="630" r="22" fill="#FFD700"/>
+  <circle cx="600" cy="630" r="10" fill="#FF8800"/>
+  <line x1="660" y1="642" x2="660" y2="700" stroke="#2A6010" stroke-width="4"/>
+  <circle cx="660" cy="622" r="22" fill="#FFD700"/>
+  <circle cx="660" cy="622" r="10" fill="#FF8800"/>
+  <line x1="720" y1="648" x2="720" y2="708" stroke="#2A6010" stroke-width="4"/>
+  <circle cx="720" cy="628" r="22" fill="#FFD700"/>
+  <circle cx="720" cy="628" r="10" fill="#FF8800"/>
+  <line x1="780" y1="640" x2="780" y2="700" stroke="#2A6010" stroke-width="4"/>
+  <circle cx="780" cy="620" r="22" fill="#FFD700"/>
+  <circle cx="780" cy="620" r="10" fill="#FF8800"/>
+</g>
+<rect x="900" y="680" width="80" height="50" rx="6" fill="#D8A840"/>
+<path d="M894,682 Q940,668 986,682" fill="none" stroke="#C09030" stroke-width="3"/>
+<rect x="920" y="730" width="40" height="8" fill="#A07020" rx="2"/>
+<path d="M390,620 L360,720 L420,720 Z" fill="#D8A840" opacity="0.8"/>
+<path d="M420,620 L390,720 L450,720 Z" fill="#C89030" opacity="0.75"/>
+<g fill="#2A5A14">
+  <path d="M0,876 Q50,848 100,876 L100,900 L0,900 Z"/>
+  <path d="M300,878 Q350,850 400,878 L400,900 L300,900 Z"/>
+  <path d="M820,876 Q870,848 920,876 L920,900 L820,900 Z"/>
+</g>
+`,
+
+selva: `
+<defs>
+<linearGradient id="j-sky" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0%" stop-color="#041A0C"/><stop offset="40%" stop-color="#0A3018"/><stop offset="100%" stop-color="#143C20"/>
+</linearGradient>
+<linearGradient id="j-water" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0%" stop-color="#0A2818"/><stop offset="100%" stop-color="#020E08"/>
+</linearGradient>
+<radialGradient id="j-ff" cx="50%" cy="50%" r="50%">
+  <stop offset="0%" stop-color="#CCFF88"/><stop offset="100%" stop-color="#88FF44" stop-opacity="0"/>
+</radialGradient>
+</defs>
+<rect width="1600" height="900" fill="url(#j-sky)"/>
+<rect y="700" width="1600" height="200" fill="url(#j-water)"/>
+<path d="M0,700 Q400,688 800,700 Q1200,712 1600,700" fill="none" stroke="#1A5830" stroke-width="3" opacity="0.6"/>
+<g fill="#0A2A14" opacity="0.92">
+  <ellipse cx="0" cy="80" rx="220" ry="200"/>
+  <ellipse cx="200" cy="40" rx="260" ry="230"/>
+  <ellipse cx="480" cy="60" rx="230" ry="210"/>
+  <ellipse cx="720" cy="30" rx="250" ry="220"/>
+  <ellipse cx="960" cy="50" rx="240" ry="215"/>
+  <ellipse cx="1200" cy="35" rx="255" ry="225"/>
+  <ellipse cx="1440" cy="55" rx="235" ry="210"/>
+  <ellipse cx="1600" cy="80" rx="220" ry="200"/>
+</g>
+<g fill="#0D3520" opacity="0.85">
+  <ellipse cx="100" cy="200" rx="190" ry="180"/>
+  <ellipse cx="350" cy="180" rx="220" ry="195"/>
+  <ellipse cx="600" cy="160" rx="200" ry="185"/>
+  <ellipse cx="850" cy="170" rx="215" ry="190"/>
+  <ellipse cx="1100" cy="155" rx="210" ry="188"/>
+  <ellipse cx="1350" cy="175" rx="200" ry="182"/>
+  <ellipse cx="1550" cy="192" rx="180" ry="175"/>
+</g>
+<g fill="#0A3818" opacity="0.6">
+  <ellipse cx="50" cy="340" rx="160" ry="150"/>
+  <ellipse cx="280" cy="320" rx="185" ry="168"/>
+  <ellipse cx="520" cy="310" rx="175" ry="160"/>
+  <ellipse cx="780" cy="330" rx="180" ry="165"/>
+  <ellipse cx="1020" cy="318" rx="172" ry="158"/>
+  <ellipse cx="1260" cy="328" rx="178" ry="162"/>
+  <ellipse cx="1500" cy="342" rx="160" ry="152"/>
+</g>
+<g stroke="#0A2010" stroke-width="28" stroke-linecap="round" opacity="0.95">
+  <line x1="80" y1="900" x2="88" y2="480"/>
+  <line x1="340" y1="900" x2="330" y2="500"/>
+  <line x1="640" y1="900" x2="648" y2="460"/>
+  <line x1="960" y1="900" x2="952" y2="475"/>
+  <line x1="1280" y1="900" x2="1288" y2="490"/>
+  <line x1="1540" y1="900" x2="1532" y2="470"/>
+</g>
+<g fill="#144020" opacity="0.88">
+  <path d="M20,700 Q80,630 140,700 Q110,720 80,715 Q50,720 20,700 Z"/>
+  <path d="M160,680 Q220,610 280,680 Q250,700 220,695 Q190,700 160,680 Z"/>
+  <path d="M420,690 Q490,618 560,690 Q530,712 490,707 Q450,712 420,690 Z"/>
+  <path d="M700,680 Q770,608 840,680 Q810,702 770,697 Q730,702 700,680 Z"/>
+  <path d="M980,688 Q1050,616 1120,688 Q1090,710 1050,705 Q1010,710 980,688 Z"/>
+  <path d="M1260,682 Q1330,610 1400,682 Q1370,704 1330,699 Q1290,704 1260,682 Z"/>
+  <path d="M1480,690 Q1540,620 1600,690 Q1572,712 1540,707 Q1508,712 1480,690 Z"/>
+</g>
+<g stroke="#0A4020" stroke-width="3" stroke-linecap="round" opacity="0.7">
+  <path d="M180,400 Q200,480 175,560 Q150,640 165,700" fill="none"/>
+  <path d="M500,380 Q525,470 505,555 Q485,640 495,700" fill="none"/>
+  <path d="M820,395 Q848,475 825,558 Q802,641 812,700" fill="none"/>
+  <path d="M1140,388 Q1165,468 1148,552 Q1131,636 1140,700" fill="none"/>
+  <path d="M1460,390 Q1488,472 1465,556 Q1442,640 1448,700" fill="none"/>
+</g>
+<g fill="#0A5028" opacity="0.7">
+  <ellipse cx="200" cy="710" rx="48" ry="12"/><ellipse cx="520" cy="720" rx="40" ry="10"/>
+  <ellipse cx="850" cy="714" rx="44" ry="11"/><ellipse cx="1160" cy="718" rx="42" ry="10"/>
+  <ellipse cx="1450" cy="712" rx="46" ry="11"/>
+</g>
+<g fill="#0A3818" opacity="0.55">
+  <ellipse cx="310" cy="722" rx="30" ry="8"/><ellipse cx="660" cy="726" rx="26" ry="7"/>
+  <ellipse cx="1000" cy="720" rx="28" ry="8"/><ellipse cx="1330" cy="724" rx="28" ry="7"/>
+</g>
+<g>
+  <circle class="firefly" cx="240" cy="500" r="4" fill="#CCFF88" filter="url(#j-ff)"/>
+  <circle class="firefly" cx="550" cy="420" r="3.5" fill="#AAFFA0"/>
+  <circle class="firefly" cx="780" cy="540" r="4" fill="#CCFF88"/>
+  <circle class="firefly" cx="1020" cy="460" r="3.5" fill="#AAFFA0"/>
+  <circle class="firefly" cx="1300" cy="510" r="4" fill="#CCFF88"/>
+  <circle class="firefly" cx="440" cy="580" r="3" fill="#AAFFA0"/>
+  <circle cx="240" cy="500" r="10" fill="#88FF44" opacity="0.12"/>
+  <circle cx="780" cy="540" r="10" fill="#88FF44" opacity="0.10"/>
+  <circle cx="1300" cy="510" r="10" fill="#88FF44" opacity="0.12"/>
+</g>
+<g fill="#1A4828" opacity="0.65">
+  <path d="M0,820 Q30,780 60,820 Q30,838 0,832 Z"/>
+  <path d="M120,812 Q158,768 196,812 Q166,830 146,828 Q126,830 120,812 Z"/>
+  <path d="M380,818 Q420,774 460,818 Q432,836 420,834 Q408,836 380,818 Z"/>
+  <path d="M680,820 Q718,776 756,820 Q728,838 718,836 Q708,838 680,820 Z"/>
+  <path d="M980,816 Q1020,772 1060,816 Q1032,834 1020,832 Q1008,834 980,816 Z"/>
+  <path d="M1280,820 Q1318,776 1356,820 Q1328,838 1318,836 Q1308,838 1280,820 Z"/>
+  <path d="M1560,818 Q1580,778 1600,818 L1600,840 L1560,840 Z"/>
+</g>
+`
+
+};
+
+const PHASE_SCENES = {
+  terrestre: 'floresta',
+  marinho:   'oceano',
+  aquatico:  'oceano',
+  herbivoro: 'savana',
+  carnivoro: 'floresta',
+  onivoro:   'floresta',
+  ave:       'ceu',
+  mamifero:  'floresta',
+  reptil:    'selva',
+  inseto:    'selva',
+  peixe:     'oceano',
+  africa:    'savana',
+  fazenda:   'fazenda',
+  estimacao: 'fazenda',
+  voa:       'ceu',
+  nada:      'oceano',
+};
+
+const SCENE_ICONS = {
+  floresta: '🌳',
+  oceano:   '🌊',
+  ceu:      '☁️',
+  savana:   '🌅',
+  fazenda:  '🌻',
+  selva:    '🌿',
+};
+
+const SCENE_SPARKLES = {
+  floresta: ['✨','🌟','💫','⭐'],
+  oceano:   ['💧','🫧','✨','⭐'],
+  ceu:      ['⭐','✨','💫','🌟'],
+  savana:   ['🌟','✨','⭐','💫'],
+  fazenda:  ['⭐','🌻','✨','💫'],
+  selva:    ['✨','💫','⭐','🌿'],
+};
+
+// =========================================================================
 // DATA — Animals with their category tags
 // =========================================================================
 const ANIMALS = [
@@ -768,7 +991,7 @@ const ANIMALS = [
   { emoji: '🦆', name: 'Pato',         tags: ['terrestre','onivoro','ave','fazenda','nada','voa'] },
   { emoji: '🦅', name: 'Águia',        tags: ['terrestre','carnivoro','ave','selvagem','predador','voa'] },
   { emoji: '🦉', name: 'Coruja',       tags: ['terrestre','carnivoro','ave','selvagem','predador','voa'] },
-  { emoji: '🦜', name: 'Papagaio',     tags: ['terrestre','onivoro','ave','selvagem','voa'] },
+  { emoji: '🦜', name: 'Papagaio',     tags: ['terrestre','herbivoro','ave','selvagem','voa'] },
   { emoji: '🐧', name: 'Pinguim',      tags: ['aquatico','carnivoro','ave','selvagem','nada'] },
   { emoji: '🦢', name: 'Cisne',        tags: ['aquatico','onivoro','ave','selvagem','nada','voa'] },
   { emoji: '🐬', name: 'Golfinho',     tags: ['marinho','aquatico','carnivoro','mamifero','selvagem','nada','predador'] },
@@ -786,7 +1009,7 @@ const ANIMALS = [
   { emoji: '🐝', name: 'Abelha',        tags: ['inseto','selvagem','voa'] },
   { emoji: '🐜', name: 'Formiga',       tags: ['inseto','selvagem'] },
   { emoji: '🦋', name: 'Borboleta',     tags: ['inseto','selvagem','voa'] },
-  { emoji: '🐞', name: 'Joaninha',      tags: ['inseto','selvagem','voa'] },
+  { emoji: '🐞', name: 'Joaninha',      tags: ['inseto','terrestre','selvagem','voa'] },
   { emoji: '🕷️', name: 'Aranha',        tags: ['terrestre','aracnideo','selvagem','predador','carnivoro'] },
   { emoji: '🐕', name: 'Cachorro',      tags: ['terrestre','onivoro','mamifero','estimacao','domestico','pelo'] },
   { emoji: '🐈', name: 'Gato',          tags: ['terrestre','carnivoro','mamifero','estimacao','domestico','pelo','predador'] },
@@ -805,32 +1028,20 @@ const ANIMALS = [
   { emoji: '🦇', name: 'Morcego',       tags: ['terrestre','carnivoro','mamifero','selvagem','pelo','voa'] },
 ];
 
-// =========================================================================
-// PHASES — each cycles a different category
-// =========================================================================
 const PHASES = [
-  // habitat
   { title: 'Animais Terrestres',   tag: 'terrestre' },
   { title: 'Animais Marinhos',     tag: 'marinho'   },
-  { title: 'Animais Aquáticos',    tag: 'aquatico'  },
-  // alimentação
   { title: 'Herbívoros',           tag: 'herbivoro' },
   { title: 'Carnívoros',           tag: 'carnivoro' },
   { title: 'Onívoros',             tag: 'onivoro'   },
-  // grupos taxonômicos
   { title: 'Aves',                 tag: 'ave'       },
   { title: 'Mamíferos',            tag: 'mamifero'  },
   { title: 'Répteis',              tag: 'reptil'    },
   { title: 'Insetos',              tag: 'inseto'    },
   { title: 'Peixes',               tag: 'peixe'     },
-  // geografia
-  { title: 'Animais da África',    tag: 'africa'    },
-  // relação com humanos
   { title: 'Animais de Fazenda',   tag: 'fazenda'   },
   { title: 'Animais de Estimação', tag: 'estimacao' },
-  // comportamento
   { title: 'Animais que Voam',     tag: 'voa'       },
-  { title: 'Animais que Nadam',    tag: 'nada'      },
 ];
 
 // =========================================================================
@@ -841,10 +1052,11 @@ const state = {
   correctCount: 0,
   wrongCount: 0,
   remainingCorrect: 0,
+  currentScene: 'floresta',
 };
 
 // =========================================================================
-// AUDIO — Web Audio API, no external files
+// AUDIO
 // =========================================================================
 let audioCtx = null;
 let soundEnabled = true;
@@ -861,8 +1073,7 @@ function getCtx() {
 function tone(freq, dur, type = 'sine', vol = 0.2, delay = 0) {
   if (!soundEnabled) return;
   setTimeout(() => {
-    const ctx = getCtx();
-    if (!ctx) return;
+    const ctx = getCtx(); if (!ctx) return;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = type;
@@ -871,15 +1082,13 @@ function tone(freq, dur, type = 'sine', vol = 0.2, delay = 0) {
     gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + 0.01);
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
     osc.connect(gain).connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + dur + 0.02);
+    osc.start(); osc.stop(ctx.currentTime + dur + 0.02);
   }, delay);
 }
 
 function slide(fStart, fEnd, dur, type = 'sine', vol = 0.18) {
   if (!soundEnabled) return;
-  const ctx = getCtx();
-  if (!ctx) return;
+  const ctx = getCtx(); if (!ctx) return;
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
   osc.type = type;
@@ -888,27 +1097,16 @@ function slide(fStart, fEnd, dur, type = 'sine', vol = 0.18) {
   gain.gain.setValueAtTime(vol, ctx.currentTime);
   gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
   osc.connect(gain).connect(ctx.destination);
-  osc.start();
-  osc.stop(ctx.currentTime + dur + 0.02);
+  osc.start(); osc.stop(ctx.currentTime + dur + 0.02);
 }
 
 const sfx = {
-  correct: () => {
-    tone(523, 0.1, 'triangle', 0.2);
-    tone(659, 0.1, 'triangle', 0.2, 80);
-    tone(784, 0.18, 'triangle', 0.22, 160);
-  },
-  wrong: () => slide(280, 110, 0.4, 'sawtooth', 0.16),
-  pickup: () => tone(700, 0.05, 'sine', 0.08),
-  drop: () => tone(280, 0.07, 'triangle', 0.1),
-  complete: () => {
-    [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, 0.16, 'triangle', 0.22, i * 80));
-  },
-  newPhase: () => {
-    tone(392, 0.12, 'triangle', 0.18);
-    tone(523, 0.12, 'triangle', 0.18, 100);
-    tone(659, 0.18, 'triangle', 0.2, 200);
-  },
+  correct: () => { tone(523,0.1,'triangle',0.2); tone(659,0.1,'triangle',0.2,80); tone(784,0.18,'triangle',0.22,160); },
+  wrong:   () => slide(280, 110, 0.4, 'sawtooth', 0.16),
+  pickup:  () => tone(700, 0.05, 'sine', 0.08),
+  drop:    () => tone(280, 0.07, 'triangle', 0.1),
+  complete: () => { [523,659,784,1047,1319].forEach((f,i) => tone(f,0.16,'triangle',0.22,i*80)); },
+  newPhase: () => { tone(392,0.12,'triangle',0.18); tone(523,0.12,'triangle',0.18,100); tone(659,0.18,'triangle',0.2,200); },
   hoverBox: () => tone(880, 0.04, 'sine', 0.06),
 };
 
@@ -917,8 +1115,17 @@ const sfx = {
 // =========================================================================
 const $ = id => document.getElementById(id);
 const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
-
 function getGameRect() { return $('game').getBoundingClientRect(); }
+
+// =========================================================================
+// SCENE MANAGEMENT
+// =========================================================================
+function setScene(tag) {
+  const sceneName = PHASE_SCENES[tag] || 'floresta';
+  state.currentScene = sceneName;
+  $('bgSvg').innerHTML = SCENES[sceneName];
+  $('game').setAttribute('data-scene', sceneName);
+}
 
 // =========================================================================
 // PHASE RENDERING
@@ -926,62 +1133,36 @@ function getGameRect() { return $('game').getBoundingClientRect(); }
 function pickAnimalsForPhase(phase) {
   const correctPool = ANIMALS.filter(a => a.tags.includes(phase.tag));
   const wrongPool   = ANIMALS.filter(a => !a.tags.includes(phase.tag));
-
-  // 3–5 correct + 3–4 wrong, total ~7
-  const numCorrect = Math.min(correctPool.length, 3 + Math.floor(Math.random() * 3)); // 3-5
-  const numWrong   = Math.min(wrongPool.length, 3 + Math.floor(Math.random() * 2));   // 3-4
-
-  const picked = [
+  const numCorrect = Math.min(correctPool.length, 3 + Math.floor(Math.random() * 3));
+  const numWrong   = Math.min(wrongPool.length, 3 + Math.floor(Math.random() * 2));
+  return shuffle([
     ...shuffle(correctPool).slice(0, numCorrect),
     ...shuffle(wrongPool).slice(0, numWrong),
-  ];
-  return shuffle(picked);
+  ]);
 }
 
 function generatePositions(count, gameW, gameH) {
-  // Play area: to the right of the box, full vertical range
   const minX = gameW * 0.46;
   const maxX = gameW * 0.94;
   const minY = gameH * 0.04;
   const maxY = gameH * 0.86;
   const minDist = Math.min(gameW, gameH) * 0.12;
-
-  // Build forbidden zones from real UI element rects (with padding for animal size).
-  // This way it adapts to any screen size and keeps animals from being hidden behind UI.
   const gameRect = $('game').getBoundingClientRect();
   const animalPad = Math.min(gameW, gameH) * 0.13;
-
-  const forbiddenZones = ['actionButtons', 'hud', 'soundToggle', 'progress']
-    .map(id => $(id))
-    .filter(el => el)
+  const forbiddenZones = ['actionButtons','hud','soundToggle','progress']
+    .map(id => $(id)).filter(el => el)
     .map(el => {
       const r = el.getBoundingClientRect();
-      return {
-        left: r.left - gameRect.left - animalPad,
-        right: r.right - gameRect.left,
-        top: r.top - gameRect.top - animalPad,
-        bottom: r.bottom - gameRect.top,
-      };
+      return { left: r.left - gameRect.left - animalPad, right: r.right - gameRect.left, top: r.top - gameRect.top - animalPad, bottom: r.bottom - gameRect.top };
     });
-
-  const inForbidden = p => forbiddenZones.some(f =>
-    p.x >= f.left && p.x <= f.right && p.y >= f.top && p.y <= f.bottom
-  );
-
+  const inForbidden = p => forbiddenZones.some(f => p.x >= f.left && p.x <= f.right && p.y >= f.top && p.y <= f.bottom);
   const positions = [];
   for (let i = 0; i < count; i++) {
     let pos, attempts = 0;
     do {
-      pos = {
-        x: minX + Math.random() * (maxX - minX),
-        y: minY + Math.random() * (maxY - minY),
-      };
+      pos = { x: minX + Math.random() * (maxX - minX), y: minY + Math.random() * (maxY - minY) };
       attempts++;
-    } while (
-      attempts < 150 &&
-      (inForbidden(pos) ||
-       positions.some(p => Math.hypot(p.x - pos.x, p.y - pos.y) < minDist))
-    );
+    } while (attempts < 150 && (inForbidden(pos) || positions.some(p => Math.hypot(p.x - pos.x, p.y - pos.y) < minDist)));
     positions.push(pos);
   }
   return positions;
@@ -989,6 +1170,7 @@ function generatePositions(count, gameW, gameH) {
 
 function renderPhase() {
   const phase = PHASES[state.phaseIndex];
+  setScene(phase.tag);
   $('categoryTitle').textContent = phase.title;
   $('progress').textContent = `${state.phaseIndex + 1}/${PHASES.length}`;
   $('boxContents').innerHTML = '';
@@ -1008,10 +1190,10 @@ function renderPhase() {
     el.className = 'animal';
     el.textContent = animal.emoji;
     el.style.left = positions[i].x + 'px';
-    el.style.top = positions[i].y + 'px';
+    el.style.top  = positions[i].y + 'px';
     el.style.animationDelay = (Math.random() * 2) + 's';
-    el.dataset.tags = animal.tags.join(',');
-    el.dataset.emoji = animal.emoji;
+    el.dataset.tags   = animal.tags.join(',');
+    el.dataset.emoji  = animal.emoji;
     el.dataset.startX = positions[i].x;
     el.dataset.startY = positions[i].y;
     el.title = animal.name;
@@ -1021,7 +1203,7 @@ function renderPhase() {
 }
 
 // =========================================================================
-// DRAG AND DROP (pointer events — works on mobile + desktop)
+// DRAG AND DROP
 // =========================================================================
 let dragging = null;
 let wasOverBox = false;
@@ -1029,24 +1211,13 @@ let wasOverBox = false;
 function startDrag(e, el) {
   if (el.classList.contains('placed') || dragging) return;
   e.preventDefault();
-
-  const gameRect = getGameRect();
   const elRect = el.getBoundingClientRect();
-
-  dragging = {
-    el,
-    offsetX: e.clientX - elRect.left,
-    offsetY: e.clientY - elRect.top,
-    pointerId: e.pointerId,
-  };
-
+  dragging = { el, offsetX: e.clientX - elRect.left, offsetY: e.clientY - elRect.top, pointerId: e.pointerId };
   el.classList.add('dragging');
   el.classList.remove('returning');
   try { el.setPointerCapture(e.pointerId); } catch {}
-
   sfx.pickup();
   wasOverBox = false;
-
   el.addEventListener('pointermove', onDragMove);
   el.addEventListener('pointerup', onDragEnd);
   el.addEventListener('pointercancel', onDragEnd);
@@ -1055,52 +1226,40 @@ function startDrag(e, el) {
 function onDragMove(e) {
   if (!dragging) return;
   e.preventDefault();
-
   const gameRect = getGameRect();
   const x = e.clientX - gameRect.left - dragging.offsetX;
-  const y = e.clientY - gameRect.top - dragging.offsetY;
+  const y = e.clientY - gameRect.top  - dragging.offsetY;
   dragging.el.style.left = x + 'px';
-  dragging.el.style.top = y + 'px';
-
-  // Audio-only feedback when entering the box — no color cue,
-  // so the child doesn't learn the answer before committing.
+  dragging.el.style.top  = y + 'px';
   const inBox = isOverBox(dragging.el);
-  if (inBox && !wasOverBox) {
-    sfx.hoverBox();
-    wasOverBox = true;
-  } else if (!inBox) {
-    wasOverBox = false;
-  }
+  if (inBox && !wasOverBox) { sfx.hoverBox(); wasOverBox = true; }
+  else if (!inBox) { wasOverBox = false; }
 }
 
 function isOverBox(el) {
   const boxRect = $('box').getBoundingClientRect();
-  const elRect = el.getBoundingClientRect();
-  const cx = elRect.left + elRect.width / 2;
-  const cy = elRect.top + elRect.height / 2;
+  const elRect  = el.getBoundingClientRect();
+  const cx = elRect.left + elRect.width  / 2;
+  const cy = elRect.top  + elRect.height / 2;
   return cx >= boxRect.left && cx <= boxRect.right && cy >= boxRect.top && cy <= boxRect.bottom;
 }
 
 function onDragEnd(e) {
   if (!dragging) return;
-
   const el = dragging.el;
   el.removeEventListener('pointermove', onDragMove);
   el.removeEventListener('pointerup', onDragEnd);
   el.removeEventListener('pointercancel', onDragEnd);
-
   const inBox = isOverBox(el);
   el.classList.remove('dragging');
-
   if (inBox) {
     const phase = PHASES[state.phaseIndex];
-    const tags = el.dataset.tags.split(',');
+    const tags  = el.dataset.tags.split(',');
     if (tags.includes(phase.tag)) handleCorrect(el);
     else handleWrong(el);
   } else {
     returnToStart(el);
   }
-
   dragging = null;
 }
 
@@ -1111,21 +1270,14 @@ function handleCorrect(el) {
   state.correctCount++;
   state.remainingCorrect--;
   $('correctCount').textContent = state.correctCount;
-
-  // Sparkle burst at drop position
   spawnSparkles(el);
-
-  // Add emoji to box
   const placed = document.createElement('div');
   placed.className = 'placed-animal';
   placed.textContent = el.dataset.emoji;
   $('boxContents').appendChild(placed);
-
   el.classList.add('placed');
   setTimeout(() => el.remove(), 100);
-
   sfx.correct();
-
   if (state.remainingCorrect <= 0) {
     $('nextBtn').disabled = false;
     $('nextBtn').classList.add('next-ready');
@@ -1137,18 +1289,14 @@ function handleWrong(el) {
   state.wrongCount++;
   $('wrongCount').textContent = state.wrongCount;
   sfx.wrong();
-
   el.classList.add('shake');
-  setTimeout(() => {
-    el.classList.remove('shake');
-    returnToStart(el);
-  }, 500);
+  setTimeout(() => { el.classList.remove('shake'); returnToStart(el); }, 500);
 }
 
 function returnToStart(el) {
   el.classList.add('returning');
   el.style.left = el.dataset.startX + 'px';
-  el.style.top = el.dataset.startY + 'px';
+  el.style.top  = el.dataset.startY + 'px';
   setTimeout(() => el.classList.remove('returning'), 400);
   sfx.drop();
 }
@@ -1157,22 +1305,21 @@ function spawnSparkles(el) {
   const game = $('game');
   const gameRect = getGameRect();
   const elRect = el.getBoundingClientRect();
-  const cx = elRect.left - gameRect.left + elRect.width / 2;
-  const cy = elRect.top - gameRect.top + elRect.height / 2;
-
-  const symbols = ['✨', '⭐', '💫', '🌟'];
-  for (let i = 0; i < 8; i++) {
+  const cx = elRect.left - gameRect.left + elRect.width  / 2;
+  const cy = elRect.top  - gameRect.top  + elRect.height / 2;
+  const symbols = SCENE_SPARKLES[state.currentScene] || ['✨','⭐','💫','🌟'];
+  for (let i = 0; i < 10; i++) {
     const s = document.createElement('div');
     s.className = 'sparkle';
     s.textContent = symbols[i % symbols.length];
     s.style.left = cx + 'px';
-    s.style.top = cy + 'px';
-    const angle = (i / 8) * Math.PI * 2;
-    const dist = 60 + Math.random() * 40;
+    s.style.top  = cy + 'px';
+    const angle = (i / 10) * Math.PI * 2;
+    const dist  = 55 + Math.random() * 55;
     s.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
     s.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
     game.appendChild(s);
-    setTimeout(() => s.remove(), 900);
+    setTimeout(() => s.remove(), 950);
   }
 }
 
@@ -1181,38 +1328,32 @@ function spawnSparkles(el) {
 // =========================================================================
 function nextPhase() {
   state.phaseIndex++;
-  if (state.phaseIndex >= PHASES.length) {
-    showFinal();
-    return;
-  }
+  if (state.phaseIndex >= PHASES.length) { showFinal(); return; }
   showPhaseTransition();
 }
 
 function showPhaseTransition() {
   const phase = PHASES[state.phaseIndex];
+  const sceneName = PHASE_SCENES[phase.tag] || 'floresta';
+  $('phaseCardIcon').textContent = SCENE_ICONS[sceneName] || '🌍';
   $('phaseCardTitle').textContent = phase.title;
   $('phaseCardSubtitle').textContent = `Fase ${state.phaseIndex + 1} de ${PHASES.length}`;
   const overlay = $('phaseTransition');
   overlay.classList.add('show');
   sfx.newPhase();
-  setTimeout(() => {
-    overlay.classList.remove('show');
-    renderPhase();
-  }, 1400);
+  setTimeout(() => { overlay.classList.remove('show'); renderPhase(); }, 1500);
 }
 
 function showFinal() {
   saveResult();
   $('finalCorrect').textContent = state.correctCount;
-  $('finalWrong').textContent = state.wrongCount;
-
+  $('finalWrong').textContent   = state.wrongCount;
   const total = state.correctCount + state.wrongCount;
   const ratio = total > 0 ? state.correctCount / total : 0;
   let stars = '⭐';
-  if (ratio > 0.6) stars = '⭐⭐';
+  if (ratio > 0.6)  stars = '⭐⭐';
   if (ratio > 0.85) stars = '⭐⭐⭐';
   $('finalStars').textContent = stars;
-
   $('finalScreen').classList.add('show');
   sfx.complete();
   setTimeout(sfx.complete, 500);
@@ -1223,7 +1364,7 @@ function restartGame() {
   state.correctCount = 0;
   state.wrongCount = 0;
   $('correctCount').textContent = 0;
-  $('wrongCount').textContent = 0;
+  $('wrongCount').textContent   = 0;
   $('finalScreen').classList.remove('show');
   showPhaseTransition();
 }
@@ -1247,7 +1388,7 @@ function saveResult() {
     ts: Date.now(),
     date: new Date().toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }),
     acertos: state.correctCount,
-    erros: state.wrongCount,
+    erros:   state.wrongCount,
     estrelas: stars,
     precisao: Math.round(ratio * 100),
   });
@@ -1267,22 +1408,18 @@ function deltaBadge(current, prev, lowerIsBetter) {
 function renderHistory() {
   const history = loadHistory();
   const content = $('historyContent');
-
   if (history.length === 0) {
     content.innerHTML = '<p class="hist-empty">Nenhuma partida registrada ainda.<br>Conclua uma partida completa<br>para ver seu histórico! 🐾</p>';
     return;
   }
-
   const starsText = n => '⭐'.repeat(n);
-  const reversed = [...history].reverse(); // mais recente primeiro
-
+  const reversed = [...history].reverse();
   let html = '';
   reversed.forEach((entry, i) => {
     const prev = reversed[i + 1] || null;
     const dAcertos = deltaBadge(entry.acertos,  prev?.acertos,  false);
     const dErros   = deltaBadge(entry.erros,    prev?.erros,    true);
     const dPrec    = deltaBadge(entry.precisao, prev?.precisao, false);
-
     html += `
       <div class="hist-entry">
         <div class="hist-stars">${starsText(entry.estrelas)}</div>
@@ -1306,55 +1443,35 @@ function renderHistory() {
         </div>
       </div>`;
   });
-
   content.innerHTML = html;
 }
 
-function showHistory() {
-  renderHistory();
-  $('historyScreen').classList.add('show');
-}
-
-function closeHistory() {
-  $('historyScreen').classList.remove('show');
-}
+function showHistory()  { renderHistory(); $('historyScreen').classList.add('show'); }
+function closeHistory() { $('historyScreen').classList.remove('show'); }
 
 // =========================================================================
 // EVENT WIRING
 // =========================================================================
 $('startBtn').addEventListener('click', () => {
-  getCtx(); // unlock audio on first user gesture
+  getCtx();
   $('startScreen').classList.remove('show');
   showPhaseTransition();
 });
-
-$('nextBtn').addEventListener('click', () => {
-  if ($('nextBtn').disabled) return;
-  nextPhase();
-});
-
+$('nextBtn').addEventListener('click', () => { if (!$('nextBtn').disabled) nextPhase(); });
 $('doneBtn').addEventListener('click', nextPhase);
-
 $('playAgainBtn').addEventListener('click', restartGame);
-
-$('btnHistory').addEventListener('click', () => {
-  getCtx();
-  showHistory();
-});
+$('btnHistory').addEventListener('click', () => { getCtx(); showHistory(); });
 $('btnCloseHist').addEventListener('click', closeHistory);
 $('btnClearHist').addEventListener('click', () => {
-  if (confirm('Apagar todo o histórico de partidas?'))
-    localStorage.removeItem(HIST_KEY);
+  if (confirm('Apagar todo o histórico de partidas?')) localStorage.removeItem(HIST_KEY);
   renderHistory();
 });
-
 $('soundToggle').addEventListener('click', () => {
   soundEnabled = !soundEnabled;
   $('soundToggle').classList.toggle('muted', !soundEnabled);
   if (soundEnabled) sfx.pickup();
 });
 
-// Reflow positions if window resizes (e.g., orientation change)
 let resizeTimer;
 window.addEventListener('resize', () => {
   clearTimeout(resizeTimer);
@@ -1365,20 +1482,21 @@ window.addEventListener('resize', () => {
     const positions = generatePositions(remaining.length, width, height);
     remaining.forEach((el, i) => {
       el.style.left = positions[i].x + 'px';
-      el.style.top = positions[i].y + 'px';
+      el.style.top  = positions[i].y + 'px';
       el.dataset.startX = positions[i].x;
       el.dataset.startY = positions[i].y;
     });
   }, 200);
 });
 
-// Prevent default touch behaviors that interfere with the game
 document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
 document.addEventListener('contextmenu', e => e.preventDefault());
 
 // =========================================================================
-// INIT
+// INIT — load floresta as starting background for the start screen
 // =========================================================================
+$('bgSvg').innerHTML = SCENES.floresta;
+$('game').setAttribute('data-scene', 'floresta');
 $('startScreen').classList.add('show');
 </script>
 </body>
